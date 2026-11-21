@@ -1,0 +1,1320 @@
+/* ============================================
+   RESET Y ESTILOS BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    background: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL - TAMAÑO CARTA
+   ============================================ */
+.registro-container {
+    width: 850px;
+    max-width: 100%;
+    background: #ffffff;
+    padding: 35px 60px 40px 60px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    border: 1px solid #d0d0d0;
+}
+
+/* ============================================
+   IMAGEN DE PORTADA
+   ============================================ */
+.portada-imagen {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+    min-height: 50px;
+}
+
+.portada-img {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: opacity 0.5s ease, transform 0.3s ease;
+}
+
+.portada-img.visible {
+    display: block !important;
+    animation: fadeInImagen 0.5s ease;
+}
+
+.portada-img.oculta {
+    display: none !important;
+}
+
+@keyframes fadeInImagen {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ============================================
+   LÍNEAS DECORATIVAS
+   ============================================ */
+.top-line {
+    width: 100%;
+    height: 3px;
+    background: #1a3a6b;
+    margin-bottom: 20px;
+    border-radius: 2px;
+}
+
+.bottom-line {
+    width: 100%;
+    height: 3px;
+    background: #1a3a6b;
+    margin-top: 25px;
+    border-radius: 2px;
+}
+
+/* ============================================
+   TÍTULOS
+   ============================================ */
+.main-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    color: #1a2a4a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    line-height: 1.1;
+}
+
+.main-title .highlight {
+    color: #1a5a8a;
+    transition: color 0.5s ease;
+}
+
+.sub-title {
+    text-align: center;
+    font-size: 16px;
+    color: #2c3e50;
+    letter-spacing: 8px;
+    font-weight: normal;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #1a3a6b;
+    padding-bottom: 10px;
+}
+
+/* ============================================
+   BADGE DE ASIGNACIÓN COMPLETA (NUEVO)
+   ============================================ */
+.badge-asignacion-completa {
+    background: #002D62;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 2px solid #C8102E;
+    display: none;
+    font-family: 'Times New Roman', Times, serif;
+    box-shadow: 0 4px 15px rgba(0, 45, 98, 0.2);
+}
+
+.badge-asignacion-completa.visible {
+    display: block;
+}
+
+.badge-asignacion-completa .grado-texto {
+    color: #FFD700;
+}
+
+.badge-asignacion-completa .seccion-texto {
+    color: #4FC3F7;
+}
+
+.badge-asignacion-completa .tanda-texto {
+    color: #81C784;
+}
+
+.badge-asignacion-completa .separador {
+    color: #fff;
+    opacity: 0.4;
+    margin: 0 6px;
+}
+
+.badge-asignacion-completa .btn-cambiar-grado {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 4px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-left: 12px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.badge-asignacion-completa .btn-cambiar-grado:hover {
+    background: #5a6268;
+    transform: scale(1.05);
+}
+
+/* Badge legacy (Grado seleccionado) */
+.badge-grado-seleccionado {
+    background: #002D62;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 2px solid #C8102E;
+    display: none;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.badge-grado-seleccionado.visible {
+    display: block;
+}
+
+.badge-grado-seleccionado span {
+    color: #FFD700;
+}
+
+.badge-grado-seleccionado .btn-cambiar-grado {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 4px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.badge-grado-seleccionado .btn-cambiar-grado:hover {
+    background: #5a6268;
+    transform: scale(1.05);
+}
+
+/* ============================================
+   FORMULARIO - CAMPOS
+   ============================================ */
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* Fila simple */
+.field-row {
+    display: flex;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid #d0d8e0;
+    flex-wrap: wrap;
+}
+
+.field-row:last-of-type {
+    border-bottom: none;
+}
+
+.field-label {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a2a4a;
+    min-width: 160px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   NUEVA FILA: SECCIÓN Y TANDA (BLOQUEADAS)
+   ============================================ */
+.field-row-seccion-tanda {
+    display: flex;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid #d0d8e0;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.field-row-seccion-tanda .field-label {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a2a4a;
+    min-width: 160px;
+    flex-shrink: 0;
+    letter-spacing: 0.5px;
+}
+
+.field-row-seccion-tanda .double-group {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.field-row-seccion-tanda .campo-bloqueado-permanente {
+    padding: 6px 12px;
+    border: none;
+    border-bottom: 2px solid #a0b0c0;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    background: #f0f0f0;
+    color: #333;
+    cursor: not-allowed;
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
+    outline: none;
+    text-transform: uppercase;
+    border-radius: 0;
+    width: 100%;
+    min-width: 80px;
+}
+
+.field-row-seccion-tanda .campo-bloqueado-permanente:focus {
+    border-bottom-color: #999;
+    border-bottom-width: 2px;
+    box-shadow: none;
+}
+
+.field-row-seccion-tanda .campo-bloqueado-permanente::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+.field-row-seccion-tanda .etiqueta-bloqueo {
+    font-size: 0.6rem;
+    color: #999;
+    font-style: italic;
+    align-self: flex-end;
+    padding-bottom: 6px;
+}
+
+.field-row-seccion-tanda .separador {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a2a4a;
+    padding: 0 4px;
+}
+
+.field-row-seccion-tanda .error-message {
+    margin-left: 0;
+    width: 100%;
+}
+
+/* ============================================
+   CAMPOS DE ENTRADA Y SELECTS
+   ============================================ */
+.field-input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid #a0b0c0;
+    min-height: 26px;
+    padding: 2px 4px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.3s ease;
+    text-transform: uppercase;
+}
+
+.field-input:focus {
+    border-bottom-color: #1a5a8a;
+    border-bottom-width: 3px;
+}
+
+.field-input.error {
+    border-bottom-color: #dc3545;
+    border-bottom-width: 3px;
+}
+
+.field-input.success {
+    border-bottom-color: #28a745;
+    border-bottom-width: 3px;
+}
+
+.field-input:disabled {
+    background: #f0f0f0;
+    color: #333;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.field-input[readonly] {
+    background: #f5f5f5;
+    color: #333;
+    cursor: not-allowed;
+}
+
+.field-select {
+    border: none;
+    border-bottom: 2px solid #a0b0c0;
+    min-height: 26px;
+    padding: 2px 4px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.3s ease;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.field-select:focus {
+    border-bottom-color: #1a5a8a;
+    border-bottom-width: 3px;
+}
+
+.field-select.error {
+    border-bottom-color: #dc3545;
+    border-bottom-width: 3px;
+}
+
+.field-select.success {
+    border-bottom-color: #28a745;
+    border-bottom-width: 3px;
+}
+
+.field-select:disabled {
+    background: #f0f0f0;
+    color: #333;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.field-select option {
+    text-transform: none;
+}
+
+/* ============================================
+   ESTILO PARA GRADO BLOQUEADO
+   ============================================ */
+.field-select.bloqueado {
+    background: #f0f0f0 !important;
+    color: #333 !important;
+    cursor: not-allowed !important;
+    opacity: 0.8;
+    border-bottom-color: #999 !important;
+}
+
+.field-select.bloqueado option {
+    color: #333;
+}
+
+.field-select.bloqueado:focus {
+    border-bottom-color: #999 !important;
+    border-bottom-width: 2px !important;
+    box-shadow: none !important;
+}
+
+/* ============================================
+   ESTILO PARA CAMPOS BLOQUEADOS POR ADMIN
+   ============================================ */
+.campo-bloqueado-admin {
+    display: none !important;
+}
+
+.field-row.bloqueado-admin,
+.field-row-double.bloqueado-admin {
+    display: none !important;
+}
+
+.field-row-double .triple-group .field-item:first-child {
+    display: flex !important;
+}
+
+.mensaje-bloqueo-admin {
+    background: #f8d9da;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 10px 0 15px 0;
+    text-align: center;
+    display: none;
+    color: #721c24;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.mensaje-bloqueo-admin.visible {
+    display: block;
+}
+
+.mensaje-bloqueo-admin .icono {
+    font-size: 24px;
+}
+
+/* ============================================
+   FILA CON DOS GRUPOS (Código / Año Escolar)
+   ============================================ */
+.field-row-double {
+    display: flex;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px solid #d0d8e0;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.field-row-double .field-label {
+    min-width: 160px;
+}
+
+.double-group {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.double-group .field-input {
+    flex: 1;
+    min-width: 70px;
+}
+
+.double-group .separator {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1a2a4a;
+    padding: 0 4px;
+}
+
+/* ============================================
+   FILA TRIPLE (Grado, Sección, Tanda - Legacy)
+   ============================================ */
+.triple-group {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex: 1;
+    flex-wrap: nowrap;
+}
+
+.triple-group .field-item {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.triple-group .field-item .field-select {
+    width: 100%;
+}
+
+.triple-group .field-label-inline {
+    font-weight: bold;
+    color: #1a2a4a;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* ============================================
+   MENSAJES DE ERROR
+   ============================================ */
+.error-message {
+    display: block;
+    width: 100%;
+    font-size: 12px;
+    color: #dc3545;
+    margin-top: 2px;
+    font-weight: bold;
+    min-height: 18px;
+}
+
+.error-message:empty {
+    display: none;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.button-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #d0d8e0;
+}
+
+.button-row button {
+    padding: 10px 30px;
+    border: 2px solid #1a3a6b;
+    border-radius: 6px;
+    background: #1a3a6b;
+    color: white;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.button-row button:hover {
+    background: #2a5a8b;
+    border-color: #2a5a8b;
+    transform: scale(1.02);
+}
+
+.button-row button:active {
+    transform: scale(0.98);
+}
+
+.button-row button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#btnLimpiar {
+    background: #6c757d;
+    border-color: #6c757d;
+}
+
+#btnLimpiar:hover:not(:disabled) {
+    background: #5a6268;
+    border-color: #5a6268;
+}
+
+#btnIngresar {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+#btnIngresar:hover:not(:disabled) {
+    background: #218838;
+    border-color: #218838;
+}
+
+/* ============================================
+   MENSAJE FLOTANTE
+   ============================================ */
+.mensaje-flotante {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Times New Roman', serif;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    text-align: center;
+}
+
+.mensaje-flotante.mostrar {
+    transform: translateX(-50%) translateY(0px);
+    opacity: 1;
+}
+
+.mensaje-flotante.exito {
+    background: #d4edda;
+    border: 3px solid #28a745;
+    color: #155724;
+}
+
+.mensaje-flotante.error {
+    background: #f8d7da;
+    border: 3px solid #dc3545;
+    color: #721c24;
+}
+
+.mensaje-flotante.warning {
+    background: #fff3cd;
+    border: 3px solid #ffc107;
+    color: #856404;
+}
+
+.mensaje-flotante.info {
+    background: #d1ecf1;
+    border: 3px solid #17a2b8;
+    color: #0c5460;
+}
+
+/* ============================================
+   MARCA DE AGUA
+   ============================================ */
+.watermark {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 11px;
+    color: #8a9aaa;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* ============================================
+   AUTOCOMPLETADO PERSONALIZADO
+   ============================================ */
+.autocomplete-container {
+    position: relative;
+    flex: 1;
+}
+
+.autocomplete-container .field-input {
+    width: 100%;
+}
+
+.autocomplete-items {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 2px solid #1a3a6b;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.autocomplete-items.show {
+    display: block;
+}
+
+.autocomplete-items .item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+    text-transform: uppercase;
+}
+
+.autocomplete-items .item:hover {
+    background: #e8f0fe;
+}
+
+.autocomplete-items .item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-items .item.highlight {
+    background: #d0d8e0;
+}
+
+/* ============================================
+   MODAL PARA AGREGAR CENTRO
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modal-overlay.activo {
+    display: flex;
+}
+
+.modal-contenido {
+    background: white;
+    padding: 35px 40px 30px 40px;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-contenido h2 {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 22px;
+    color: #1a3a6b;
+    text-align: center;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.modal-contenido .modal-sub {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.modal-contenido .modal-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+
+.modal-contenido .modal-campo label {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    font-weight: bold;
+    color: #1a2a4a;
+}
+
+.modal-contenido .modal-campo input,
+.modal-contenido .modal-campo select {
+    padding: 8px 12px;
+    border: 2px solid #d0d8e0;
+    border-radius: 6px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.modal-contenido .modal-campo input:focus,
+.modal-contenido .modal-campo select:focus {
+    border-color: #1a5a8a;
+}
+
+.modal-contenido .modal-campo input {
+    text-transform: uppercase;
+}
+
+.modal-contenido .modal-mensaje {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 5px;
+    min-height: 20px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.modal-contenido .modal-mensaje.error {
+    color: #dc3545;
+}
+
+.modal-contenido .modal-mensaje.exito {
+    color: #28a745;
+}
+
+.modal-contenido .modal-mensaje.warning {
+    color: #856404;
+}
+
+.modal-botones {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.modal-botones button {
+    flex: 1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-botones .modal-btn-guardar {
+    background: #28a745;
+    color: white;
+}
+
+.modal-botones .modal-btn-guardar:hover {
+    background: #218838;
+}
+
+.modal-botones .modal-btn-cancelar {
+    background: #6c757d;
+    color: white;
+}
+
+.modal-botones .modal-btn-cancelar:hover {
+    background: #5a6268;
+}
+
+.modal-botones .modal-btn-guardar:disabled,
+.modal-botones .modal-btn-cancelar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 700px) {
+    .registro-container {
+        padding: 20px 15px 25px 15px;
+    }
+
+    .main-title {
+        font-size: 24px;
+    }
+
+    .sub-title {
+        font-size: 13px;
+        letter-spacing: 4px;
+        margin-bottom: 18px;
+    }
+
+    .field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 3px;
+    }
+
+    .field-row-double {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+    }
+
+    .field-row-seccion-tanda {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+    }
+
+    .field-row-seccion-tanda .double-group {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .field-row-seccion-tanda .campo-bloqueado-permanente {
+        min-width: 100%;
+    }
+
+    .field-row-seccion-tanda .etiqueta-bloqueo {
+        text-align: center;
+    }
+
+    .field-label {
+        min-width: auto;
+        font-size: 13px;
+    }
+
+    .double-group {
+        flex-wrap: wrap;
+    }
+
+    .triple-group {
+        flex-wrap: wrap;
+    }
+
+    .triple-group .field-item {
+        min-width: 100px;
+        flex: 1;
+    }
+
+    .field-input {
+        min-height: 22px;
+        font-size: 13px;
+    }
+
+    .field-select {
+        min-height: 22px;
+        font-size: 13px;
+    }
+
+    .error-message {
+        margin-left: 0;
+    }
+
+    .portada-img {
+        max-width: 100%;
+    }
+
+    .button-row {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button-row button {
+        width: 100%;
+        max-width: 250px;
+    }
+
+    .autocomplete-items .item {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+
+    .modal-contenido {
+        padding: 25px 20px 20px 20px;
+    }
+
+    .modal-botones {
+        flex-direction: column;
+    }
+
+    .badge-asignacion-completa {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .badge-asignacion-completa .btn-cambiar-grado {
+        font-size: 10px;
+        padding: 3px 10px;
+        margin-left: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .registro-container {
+        padding: 12px 10px 18px 10px;
+    }
+
+    .main-title {
+        font-size: 18px;
+    }
+
+    .sub-title {
+        font-size: 11px;
+        letter-spacing: 2px;
+        padding-bottom: 6px;
+    }
+
+    .field-label {
+        font-size: 12px;
+    }
+
+    .field-row-seccion-tanda .campo-bloqueado-permanente {
+        font-size: 12px;
+        padding: 4px 8px;
+        min-width: 100%;
+    }
+
+    .autocomplete-items .item {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    .modal-contenido h2 {
+        font-size: 18px;
+    }
+
+    .modal-contenido .modal-sub {
+        font-size: 12px;
+    }
+
+    .badge-asignacion-completa {
+        font-size: 11px;
+        padding: 6px 10px;
+    }
+
+    .badge-asignacion-completa .grado-texto,
+    .badge-asignacion-completa .seccion-texto,
+    .badge-asignacion-completa .tanda-texto {
+        display: inline-block;
+    }
+
+    .badge-asignacion-completa .separador {
+        margin: 0 3px;
+    }
+}
+
+/* ============================================
+   ESTILO PARA IMPRESIÓN
+   ============================================ */
+@media print {
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: white;
+        padding: 0;
+        margin: 0;
+        display: block;
+        min-height: auto;
+    }
+
+    .registro-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0.4in 0.5in 0.4in 0.5in;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        background: white;
+        margin: 0 auto;
+        min-height: 100vh;
+    }
+
+    .portada-imagen {
+        margin-bottom: 12px;
+    }
+
+    .portada-img {
+        max-width: 550px;
+        border: none;
+        box-shadow: none;
+    }
+
+    .portada-img.oculta {
+        display: none !important;
+    }
+
+    .portada-img.visible {
+        display: block !important;
+    }
+
+    .top-line {
+        height: 2px;
+        margin-bottom: 15px;
+    }
+
+    .bottom-line {
+        height: 2px;
+        margin-top: 18px;
+    }
+
+    .main-title {
+        font-size: 28px;
+        margin-bottom: 3px;
+    }
+
+    .sub-title {
+        font-size: 14px;
+        margin-bottom: 18px;
+        padding-bottom: 8px;
+        border-bottom-width: 1.5px;
+    }
+
+    .form-fields {
+        gap: 6px;
+        margin-top: 3px;
+    }
+
+    .field-row {
+        padding: 2px 0;
+        border-bottom-width: 0.5px;
+    }
+
+    .field-row-double {
+        padding: 2px 0;
+        border-bottom-width: 0.5px;
+        gap: 8px;
+    }
+
+    .field-row-seccion-tanda {
+        padding: 2px 0;
+        border-bottom-width: 0.5px;
+        gap: 8px;
+    }
+
+    .field-row-seccion-tanda .campo-bloqueado-permanente {
+        border-bottom-width: 1.5px;
+        background: transparent !important;
+        color: #333 !important;
+        opacity: 1 !important;
+        pointer-events: none !important;
+    }
+
+    .field-label {
+        font-size: 13px;
+        min-width: 140px;
+    }
+
+    .field-input {
+        border-bottom-width: 1.5px;
+        min-height: 22px;
+        font-size: 13px;
+        background: transparent !important;
+    }
+
+    .field-select {
+        border-bottom-width: 1.5px;
+        min-height: 22px;
+        font-size: 13px;
+        background: transparent !important;
+    }
+
+    .field-input:focus {
+        border-bottom-color: #666;
+        border-bottom-width: 1.5px;
+    }
+
+    .field-select:focus {
+        border-bottom-color: #666;
+        border-bottom-width: 1.5px;
+    }
+
+    .double-group .separator {
+        font-size: 14px;
+        padding: 0 3px;
+    }
+
+    .triple-group .field-item .field-label-inline {
+        font-size: 12px;
+    }
+
+    .watermark {
+        margin-top: 12px;
+        font-size: 10px;
+    }
+
+    .button-row {
+        display: none !important;
+    }
+
+    .error-message {
+        display: none !important;
+    }
+
+    .autocomplete-items {
+        display: none !important;
+    }
+
+    .modal-overlay {
+        display: none !important;
+    }
+
+    .badge-asignacion-completa {
+        display: block !important;
+        background: #002D62 !important;
+        color: white !important;
+        border: 2px solid #C8102E !important;
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .badge-asignacion-completa .btn-cambiar-grado {
+        display: none !important;
+    }
+
+    .badge-grado-seleccionado {
+        display: none !important;
+    }
+
+    .mensaje-bloqueo-admin {
+        display: none !important;
+    }
+
+    @page {
+        size: letter;
+        margin: 0.4in 0.5in 0.4in 0.5in;
+    }
+
+    .registro-container {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+}
+
+/* ============================================
+   ESTILOS PARA BLOQUEO DE CAMPOS
+   ============================================ */
+.form-fields.bloqueado {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+}
+
+.form-fields.bloqueado .field-input,
+.form-fields.bloqueado .field-select {
+    background: #f0f0f0;
+    color: #999;
+}
+
+.mensaje-bloqueo {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 3px dashed #dc3545;
+    border-radius: 12px;
+    margin: 20px 0;
+    animation: fadeInBloqueo 0.5s ease;
+}
+
+@keyframes fadeInBloqueo {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.mensaje-bloqueo .icono-bloqueo {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.mensaje-bloqueo h3 {
+    color: #dc3545;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.mensaje-bloqueo p {
+    color: #6c757d;
+    font-size: 16px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.mensaje-bloqueo .sub-texto {
+    color: #718096;
+    font-size: 13px;
+    margin-top: 15px;
+}

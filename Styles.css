@@ -1,0 +1,465 @@
+/* ============================================
+   VARIABLES Y RESET MODERNO
+   ============================================ */
+:root {
+    --primary: #002D62; /* Azul Bandera Dominicana */
+    --primary-light: #0033A0;
+    --accent: #C8102E; /* Rojo Bandera Dominicana */
+    --danger: #dc3545;
+    --bg: #f4f7fa;
+    --text: #2d3748;
+    --text-light: #718096;
+    --white: #ffffff;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
+}
+
+/* ============================================
+   ENCABEZADO FIJO (STICKY) CON FONDO ANIMADO
+   ============================================ */
+.header {
+    /* Gradiente con 4 colores de la bandera dominicana repetidos */
+    background: linear-gradient(
+        90deg,
+        #002D62 0%,
+        #0033A0 25%,
+        #C8102E 50%,
+        #0033A0 75%,
+        #002D62 100%
+    );
+    /* Hacemos el fondo 2 veces más ancho que el header para poder moverlo */
+    background-size: 200% 100%;
+    /* Animación del fondo */
+    animation: moverGradiente 6s ease-in-out infinite;
+    
+    color: var(--white);
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 45, 98, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Animación que mueve el fondo de izquierda a derecha */
+@keyframes moverGradiente {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.header .logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header .logo .icono { font-size: 36px; }
+.header .logo h1 { font-size: 20px; font-weight: 700; letter-spacing: 1px; line-height: 1.2; }
+.header .logo small { font-size: 12px; opacity: 0.9; display: block; font-weight: 400; }
+
+/* Botón estratégico en el header (siempre visible) */
+.btn-header-acceso {
+    background: var(--white);
+    color: #002D62;
+    padding: 10px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+.btn-header-acceso:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+    background: #f8fafc;
+    border-color: rgba(255,255,255,0.6);
+}
+
+/* ============================================
+   NAVEGACIÓN POR PESTAÑAS (TABS)
+   ============================================ */
+.tabs-container {
+    background: var(--white);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0 40px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    position: sticky;
+    top: 76px;
+    z-index: 999;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 16px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    border-radius: 8px 8px 0 0;
+}
+
+.tab-btn:hover { color: var(--primary); background: #f7fafc; }
+
+.tab-btn.active {
+    color: #002D62;
+    background: #edf2f7;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #002D62, #C8102E);
+    border-radius: 3px 3px 0 0;
+}
+
+/* ============================================
+   CONTENIDO PRINCIPAL
+   ============================================ */
+.main-content {
+    flex: 1;
+    padding: 30px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero / Banner Principal */
+.hero {
+    background: linear-gradient(135deg, #e8edf4 0%, #d5dde8 100%);
+    padding: 50px 40px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid #cbd5e0;
+    margin-bottom: 30px;
+}
+
+.hero .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #002D62, #C8102E);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.hero h2 { font-size: 36px; color: #002D62; margin-bottom: 12px; font-weight: 800; }
+.hero h2 span { color: #C8102E; }
+.hero p { font-size: 18px; color: var(--text); max-width: 650px; margin: 0 auto 24px auto; }
+
+/* Botón principal destacado en el Hero */
+.btn-hero-acceso {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, #002D62 0%, #0033A0 50%, #C8102E 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 45, 98, 0.4);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-hero-acceso:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(200, 16, 46, 0.5);
+}
+
+.btn-hero-acceso .flecha { transition: transform 0.3s ease; }
+.btn-hero-acceso:hover .flecha { transform: translateX(5px); }
+
+/* Secciones y Tarjetas */
+.section-title {
+    font-size: 22px;
+    color: #002D62;
+    border-bottom: 3px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+}
+
+.grid-anuncios {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.tarjeta-anuncio {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border-left: 5px solid #002D62;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarjeta-anuncio:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.tarjeta-anuncio .icono { font-size: 28px; margin-bottom: 12px; }
+.tarjeta-anuncio h3 { font-size: 18px; color: #002D62; margin-bottom: 8px; font-weight: 700; }
+.tarjeta-anuncio p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+.tarjeta-anuncio .fecha-anuncio {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-anuncio.destacado { border-left-color: #C8102E; background: #fffaf7; }
+.tarjeta-anuncio.urgente { border-left-color: #dc3545; background: #fff5f5; }
+
+/* ============================================
+   PIE DE PÁGINA
+   ============================================ */
+.footer {
+    background: linear-gradient(135deg, #002D62 0%, #001a3d 100%);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 30px 40px;
+    text-align: center;
+    margin-top: auto;
+}
+
+.footer .logo-footer { font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; }
+.footer .logo-footer span { color: white; }
+.footer p { font-size: 13px; opacity: 0.8; margin-bottom: 16px; }
+
+.footer .links { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+.footer .links a { color: rgba(255, 255, 255, 0.8); text-decoration: none; font-size: 13px; transition: color 0.3s; }
+.footer .links a:hover { color: white; text-decoration: underline; }
+
+/* ============================================
+   RESPONSIVE - MÓVIL (≤ 768px)
+   ============================================ */
+@media (max-width: 768px) {
+    .header { 
+        padding: 12px 20px; 
+        flex-direction: column; 
+        gap: 12px; 
+        text-align: center; 
+    }
+    
+    .header .logo { 
+        justify-content: center; 
+    }
+    
+    .header .logo .icono { font-size: 30px; }
+    .header .logo h1 { font-size: 17px; }
+    .header .logo small { font-size: 11px; }
+    
+    .btn-header-acceso { 
+        width: 100%; 
+        justify-content: center; 
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .tabs-container { 
+        padding: 0 16px; 
+        top: 100px;
+    }
+    
+    .tab-btn { 
+        padding: 12px 16px; 
+        font-size: 13px; 
+    }
+    
+    .main-content { 
+        padding: 20px 16px; 
+    }
+    
+    .hero { 
+        padding: 30px 20px; 
+    }
+    
+    .hero h2 { 
+        font-size: 26px; 
+    }
+    
+    .hero p { 
+        font-size: 15px; 
+    }
+    
+    .btn-hero-acceso { 
+        width: 100%; 
+        justify-content: center; 
+        padding: 14px 24px;
+        font-size: 15px;
+    }
+    
+    .section-title { 
+        font-size: 18px; 
+    }
+    
+    .grid-anuncios { 
+        grid-template-columns: 1fr; 
+        gap: 16px; 
+    }
+    
+    .tarjeta-anuncio { 
+        padding: 18px; 
+    }
+    
+    .tarjeta-anuncio h3 { 
+        font-size: 16px; 
+    }
+    
+    .tarjeta-anuncio p { 
+        font-size: 13px; 
+    }
+    
+    .footer { 
+        padding: 24px 20px; 
+    }
+    
+    .footer .links { 
+        gap: 16px; 
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL MUY PEQUEÑO (≤ 480px)
+   ============================================ */
+@media (max-width: 480px) {
+    .header { 
+        padding: 10px 12px; 
+        gap: 10px; 
+    }
+    
+    .header .logo .icono { font-size: 26px; }
+    .header .logo h1 { font-size: 15px; }
+    .header .logo small { font-size: 10px; }
+    
+    .btn-header-acceso { 
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .tabs-container { 
+        padding: 0 8px; 
+        top: 90px;
+        gap: 4px;
+    }
+    
+    .tab-btn { 
+        padding: 10px 12px; 
+        font-size: 12px; 
+    }
+    
+    .main-content { 
+        padding: 16px 12px; 
+    }
+    
+    .hero { 
+        padding: 24px 16px; 
+    }
+    
+    .hero h2 { 
+        font-size: 22px; 
+    }
+    
+    .hero p { 
+        font-size: 14px; 
+    }
+    
+    .btn-hero-acceso { 
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .section-title { 
+        font-size: 16px; 
+    }
+    
+    .tarjeta-anuncio { 
+        padding: 14px; 
+    }
+    
+    .tarjeta-anuncio h3 { 
+        font-size: 15px; 
+    }
+    
+    .tarjeta-anuncio p { 
+        font-size: 12px; 
+    }
+    
+    .footer { 
+        padding: 20px 12px; 
+    }
+    
+    .footer .logo-footer { 
+        font-size: 12px; 
+    }
+    
+    .footer p { 
+        font-size: 11px; 
+    }
+    
+    .footer .links a { 
+        font-size: 11px; 
+    }
+}

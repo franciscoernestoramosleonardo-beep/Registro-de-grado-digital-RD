@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Ícono de la aplicación y color del tema -->
+    <link rel="icon" href="registro.png" type="image/png">
+    <link rel="apple-touch-icon" href="registro.png">
+    <meta name="theme-color" content="#1e4a7a">
+    
+    <title>Registro de Grado - Portada</title>
+    <link rel="stylesheet" href="PORTADA.css" />
+    <style>
+        /* ESTILOS CRÍTICOS PARA EL FUNCIONAMIENTO INICIAL */
+        #portadaImg {
+            display: none;
+        }
+        #portadaImg.visible {
+            display: block;
+        }
+        .grado-contenido {
+            display: none;
+        }
+        .grado-contenido.activo {
+            display: inline;
+        }
+
+        /* Autocomplete */
+        .autocomplete-container {
+            position: relative;
+            flex: 1;
+        }
+        .autocomplete-items {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #1a3a6b;
+            border-top: none;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .autocomplete-items.show {
+            display: block;
+        }
+        .autocomplete-items .item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .autocomplete-items .item:hover,
+        .autocomplete-items .item.highlight {
+            background: #e8f0fe;
+            color: #1a3a6b;
+        }
+        .autocomplete-items .item:last-child {
+            border-bottom: none;
+        }
+
+        /* Mensaje flotante */
+        .mensaje-flotante {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.5s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .mensaje-flotante.mostrar {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .mensaje-flotante.exito {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .mensaje-flotante.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+        }
+        .mensaje-flotante.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .mensaje-flotante.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #17a2b8;
+        }
+
+        /* Errores en campos */
+        .field-input.error, .field-select.error {
+            border-color: #dc3545 !important;
+            background-color: #fff0f0 !important;
+        }
+        .field-input.success, .field-select.success {
+            border-color: #28a745 !important;
+            background-color: #f0fff0 !important;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            display: block;
+            min-height: 18px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-contenido {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-contenido h2 {
+            color: #1a3a6b;
+            margin-top: 0;
+            font-size: 24px;
+        }
+        .modal-sub {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .modal-campo {
+            margin-bottom: 15px;
+        }
+        .modal-campo label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 14px;
+        }
+        .modal-campo input, .modal-campo select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .modal-campo input:focus, .modal-campo select:focus {
+            border-color: #1a3a6b;
+            outline: none;
+        }
+        .modal-mensaje {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
+        }
+        .modal-mensaje.error {
+            display: block;
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .modal-mensaje.exito {
+            display: block;
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Badge de asignación */
+        .badge-asignacion-completa {
+            background: #002D62;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #C8102E;
+            display: none;
+            font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 4px 15px rgba(0, 45, 98, 0.2);
+        }
+        .badge-asignacion-completa.visible {
+            display: block;
+        }
+        .badge-asignacion-completa .grado-texto {
+            color: #FFD700;
+        }
+        .badge-asignacion-completa .seccion-texto {
+            color: #4FC3F7;
+        }
+        .badge-asignacion-completa .tanda-texto {
+            color: #81C784;
+        }
+        .badge-asignacion-completa .separador {
+            color: #fff;
+            opacity: 0.4;
+            margin: 0 6px;
+        }
+
+        .btn-cambiar-grado {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .btn-cambiar-grado:hover {
+            background: #5a6268;
+            transform: scale(1.05);
+        }
+
+        /* Grado bloqueado */
+        .field-select.bloqueado {
+            background: #f0f0f0 !important;
+            color: #333 !important;
+            cursor: not-allowed !important;
+            opacity: 0.8;
+            border-bottom-color: #999 !important;
+        }
+        .field-select.bloqueado option {
+            color: #333;
+        }
+
+        /* Sección y Tanda bloqueadas */
+        .campo-bloqueado-permanente {
+            background: #f0f0f0 !important;
+            color: #333 !important;
+            cursor: not-allowed !important;
+            opacity: 0.85;
+            border-bottom-color: #999 !important;
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+        .campo-bloqueado-permanente option {
+            color: #333;
+        }
+        .campo-bloqueado-permanente:focus {
+            border-bottom-color: #999 !important;
+            border-bottom-width: 2px !important;
+            box-shadow: none !important;
+        }
+
+        .field-row-seccion-tanda {
+            display: flex;
+            align-items: baseline;
+            padding: 4px 0;
+            border-bottom: 1px solid #d0d8e0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .field-row-seccion-tanda .field-label {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1a2a4a;
+            min-width: 160px;
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+        }
+        .field-row-seccion-tanda .double-group {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex: 1;
+            flex-wrap: wrap;
+        }
+        .field-row-seccion-tanda .campo-bloqueado-permanente {
+            padding: 6px 12px;
+            border: none;
+            border-bottom: 2px solid #a0b0c0;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            background: #f0f0f0;
+            color: #333;
+            cursor: not-allowed;
+            opacity: 0.85;
+            pointer-events: none;
+            user-select: none;
+            outline: none;
+            text-transform: uppercase;
+            border-radius: 0;
+            width: 100%;
+            min-width: 80px;
+        }
+        .field-row-seccion-tanda .etiqueta-bloqueo {
+            font-size: 0.6rem;
+            color: #999;
+            font-style: italic;
+            align-self: flex-end;
+            padding-bottom: 6px;
+        }
+
+        #btnValidar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Mensaje de bloqueo admin */
+        .mensaje-bloqueo-admin {
+            background: #f8d9da;
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 10px 0 15px 0;
+            text-align: center;
+            display: none;
+            color: #721c24;
+        }
+        .mensaje-bloqueo-admin.visible {
+            display: block;
+        }
+        .mensaje-bloqueo-admin .icono {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         VERIFICACIÓN DE AUTENTICACIÓN
+         ============================================ -->
+    <script src="auth.js"></script>
+    <script>
+        (function() {
+            if (typeof AuthSystem === 'undefined') {
+                alert('⚠️ Sistema de autenticación no disponible');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (!AuthSystem.estaAutenticado()) {
+                alert('⚠️ Debe validar sus credenciales para acceder a esta página');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const resultado = AuthSystem.validarSesionActiva();
+            if (!resultado.valido) {
+                alert('⚠️ ' + resultado.motivo);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            console.log('✅ Autenticación verificada');
+        })();
+    </script>
+
+    <div class="registro-container">
+
+        <!-- ✅ BADGE DE ASIGNACIÓN (Grado + Sección + Tanda) -->
+        <div class="badge-asignacion-completa" id="badgeAsignacionCompleta">
+            📚 Asignación: <span class="grado-texto" id="badgeGradoTexto">-</span>
+            <span class="separador">|</span>
+            <span class="seccion-texto" id="badgeSeccionTexto">-</span>
+            <span class="separador">|</span>
+            <span class="tanda-texto" id="badgeTandaTexto">-</span>
+            <button class="btn-cambiar-grado" id="btnCambiarGrado" onclick="cambiarGrado()">🔄 Cambiar</button>
+        </div>
+
+        <!-- IMAGEN DE PORTADA -->
+        <div class="portada-imagen">
+            <img 
+                src="" 
+                alt="Seleccione un grado" 
+                class="portada-img"
+                id="portadaImg"
+            />
+        </div>
+
+        <!-- LÍNEA DECORATIVA SUPERIOR -->
+        <div class="top-line"></div>
+
+        <!-- TÍTULO PRINCIPAL -->
+        <h1 class="main-title" id="mainTitle">
+            <span style="color: #1a3a6b;">REGISTRO</span>
+            <span class="grado-contenido" id="gradoContenido"></span>
+        </h1>
+
+        <!-- SUBTÍTULO DECORATIVO -->
+        <div class="sub-title">— • —</div>
+
+        <!-- FORMULARIO DE CAMPOS -->
+        <div class="form-fields" id="formulario">
+
+            <!-- MENSAJE DE BLOQUEO ADMIN -->
+            <div class="mensaje-bloqueo-admin" id="mensajeBloqueoAdmin">
+                <span class="icono">🔒</span>
+                <strong>Campos bloqueados por el administrador</strong>
+                <br>
+                <span style="font-size: 13px;">Los campos del formulario están temporalmente bloqueados.</span>
+            </div>
+
+            <!-- Centro Educativo con autocompletado -->
+            <div class="field-row" id="filaCentro">
+                <span class="field-label">Centro Educativo:</span>
+                <div class="autocomplete-container">
+                    <input type="text" class="field-input" id="centroEducativo" maxlength="100" placeholder="Escriba el nombre del centro" autocomplete="off" />
+                    <div class="autocomplete-items" id="autocompleteItems"></div>
+                </div>
+                <span class="error-message" id="errorCentroEducativo"></span>
+            </div>
+
+            <!-- Código y Año Escolar -->
+            <div class="field-row-double" id="filaCodigo">
+                <span class="field-label">Código:</span>
+                <div class="double-group">
+                    <input type="text" class="field-input" id="codigo" maxlength="7" placeholder="Escriba el código y presione Enter" />
+                    <span class="separator">Año Escolar:</span>
+                    <input type="text" class="field-input" id="anioInicio" maxlength="4" style="max-width: 100px;" value="2025" readonly />
+                    <span class="separator">—</span>
+                    <input type="text" class="field-input" id="anioFin" maxlength="4" style="max-width: 100px;" value="2026" readonly />
+                </div>
+                <span class="error-message" id="errorCodigo"></span>
+            </div>
+
+            <!-- Grado (bloqueado) -->
+            <div class="field-row-double" id="filaGrado">
+                <span class="field-label">Grado:</span>
+                <div class="triple-group">
+                    <div class="field-item" style="flex: 0.8; min-width: 120px;">
+                        <select class="field-select" id="grado" style="min-width: 100px;">
+                            <option value="">Seleccione</option>
+                            <option value="Primer Grado">Primer Grado</option>
+                            <option value="Segundo Grado">Segundo Grado</option>
+                            <option value="Tercer Grado">Tercer Grado</option>
+                            <option value="Cuarto Grado">Cuarto Grado</option>
+                            <option value="Quinto Grado">Quinto Grado</option>
+                            <option value="Sexto Grado">Sexto Grado</option>
+                        </select>
+                    </div>
+                    <span class="field-label-inline" style="color: #999; font-style: italic;">(bloqueado)</span>
+                </div>
+                <span class="error-message" id="errorGrado"></span>
+            </div>
+
+            <!-- Sección y Tanda (BLOQUEADAS PERMANENTEMENTE) -->
+            <div class="field-row-seccion-tanda" id="filaSeccionTanda">
+                <span class="field-label">Asignación:</span>
+                <div class="double-group" style="flex: 1; gap: 10px; flex-wrap: wrap;">
+                    <div style="flex: 0.4; min-width: 70px;">
+                        <label style="font-size: 0.6rem; font-weight: 600; color: #6a8a9e; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 2px;">Sección</label>
+                        <input type="text" class="campo-bloqueado-permanente" id="seccionAsignada" value="-" placeholder="Cargando..." readonly disabled />
+                    </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <label style="font-size: 0.6rem; font-weight: 600; color: #6a8a9e; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 2px;">Tanda</label>
+                        <input type="text" class="campo-bloqueado-permanente" id="tandaAsignada" value="-" placeholder="Cargando..." readonly disabled />
+                    </div>
+                    <span class="etiqueta-bloqueo">🔒 Asignado por el administrador</span>
+                </div>
+                <span class="error-message" id="errorSeccionTanda"></span>
+            </div>
+
+            <!-- Regional y Distrito -->
+            <div class="field-row-double" id="filaRegional">
+                <span class="field-label">Regional de Educación:</span>
+                <div class="double-group" style="flex: 1; gap: 15px;">
+                    <div style="flex: 0.6; min-width: 80px;">
+                        <select class="field-select" id="regional" style="width: 100%; min-width: 60px;">
+                            <option value="">--</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                        </select>
+                        <span class="error-message" id="errorRegional" style="margin-left: 0;"></span>
+                    </div>
+                    <span class="separator" style="font-weight: normal; font-size: 16px;">Distrito Educativo:</span>
+                    <div style="flex: 0.5; min-width: 70px;">
+                        <select class="field-select" id="distrito" style="width: 100%; min-width: 60px;">
+                            <option value="">--</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                        </select>
+                        <span class="error-message" id="errorDistrito" style="margin-left: 0;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="button-row" id="buttonRow">
+                <button type="button" id="btnValidar">✅ Validar Campos</button>
+                <button type="button" id="btnLimpiar">🗑️ Limpiar Todo</button>
+            </div>
+
+            <div class="button-row" id="buttonRowIngresar" style="display: none;">
+                <button type="button" id="btnIngresar">🚪 Entrar al Sistema</button>
+            </div>
+
+        </div>
+
+        <div class="bottom-line"></div>
+        <div class="watermark">Ministerio de Educación • República Dominicana</div>
+
+    </div>
+
+    <!-- MODAL PARA AGREGAR CENTRO -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-contenido">
+            <h2>➕ Agregar Centro</h2>
+            <p class="modal-sub">El centro no está registrado. Complete los datos.</p>
+            
+            <div class="modal-campo">
+                <label for="modalCentro">Nombre del Centro</label>
+                <input type="text" id="modalCentro" maxlength="100" placeholder="Escriba el nombre del centro" />
+            </div>
+            
+            <div class="modal-campo">
+                <label for="modalRegional">Regional de Educación</label>
+                <select id="modalRegional">
+                    <option value="">-- Seleccione --</option>
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                </select>
+            </div>
+            
+            <div class="modal-campo">
+                <label for="modalDistrito">Distrito Educativo</label>
+                <select id="modalDistrito">
+                    <option value="">-- Seleccione --</option>
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                </select>
+            </div>
+            
+            <div class="modal-mensaje" id="modalMensaje"></div>
+            
+            <div class="modal-botones">
+                <button class="modal-btn-cancelar" id="modalBtnCancelar">Cancelar</button>
+                <button class="modal-btn-guardar" id="modalBtnGuardar">✅ Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="datos-del centro-educativo.js"></script>
+    <script src="PORTADA.js"></script>
+   
+</body>
+</html>

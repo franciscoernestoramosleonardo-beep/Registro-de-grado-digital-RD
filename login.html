@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- Ícono de la aplicación y color del tema -->
+    <link rel="icon" href="registro.png" type="image/png">
+    <link rel="apple-touch-icon" href="registro.png">
+    <meta name="theme-color" content="#1e4a7a">
+    
+    <title>Validación de Acceso - MINERD</title>
+    <link rel="stylesheet" href="auth.css">
+    <style>
+        #selectorGrados .bienvenida-contenido {
+            max-width: 700px !important;
+        }
+        #selectorGrados #listaGrados {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        #selectorGrados #listaGrados::-webkit-scrollbar {
+            width: 6px;
+        }
+        #selectorGrados #listaGrados::-webkit-scrollbar-track {
+            background: #f0f4f8;
+            border-radius: 3px;
+        }
+        #selectorGrados #listaGrados::-webkit-scrollbar-thumb {
+            background: #002D62;
+            border-radius: 3px;
+        }
+
+        .btn-asignacion-completa {
+            padding: 14px 20px;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: space-between;
+            width: 100%;
+            border: 3px solid;
+            text-align: left;
+        }
+        .btn-asignacion-completa:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .btn-asignacion-completa .icono-grado {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        .btn-asignacion-completa .info-grado {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .btn-asignacion-completa .grado-nombre {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .btn-asignacion-completa .grado-detalles {
+            font-size: 13px;
+            font-weight: 400;
+            opacity: 0.8;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .btn-asignacion-completa .grado-detalles .seccion-badge {
+            background: rgba(0,0,0,0.08);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .btn-asignacion-completa .grado-detalles .tanda-badge {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .btn-asignacion-completa .flecha {
+            font-size: 20px;
+            opacity: 0.5;
+            flex-shrink: 0;
+        }
+        .btn-asignacion-completa.bloqueado {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.8);
+        }
+        .btn-asignacion-completa.bloqueado:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .btn-asignacion-completa .bloqueado-badge {
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-asignacion-completa.primero { border-color: #E7733E; color: #E7733E; }
+        .btn-asignacion-completa.primero .grado-nombre { color: #E7733E; }
+        .btn-asignacion-completa.segundo { border-color: #001FA1; color: #001FA1; }
+        .btn-asignacion-completa.segundo .grado-nombre { color: #001FA1; }
+        .btn-asignacion-completa.tercero { border-color: #115E3D; color: #115E3D; }
+        .btn-asignacion-completa.tercero .grado-nombre { color: #115E3D; }
+        .btn-asignacion-completa.cuarto { border-color: #F113FF; color: #F113FF; }
+        .btn-asignacion-completa.cuarto .grado-nombre { color: #F113FF; }
+        .btn-asignacion-completa.quinto { border-color: #555900; color: #555900; }
+        .btn-asignacion-completa.quinto .grado-nombre { color: #555900; }
+        .btn-asignacion-completa.sexto { border-color: #451703; color: #451703; }
+        .btn-asignacion-completa.sexto .grado-nombre { color: #451703; }
+
+        .btn-asignacion-completa .seccion-badge {
+            background: rgba(0,0,0,0.08);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .btn-asignacion-completa .tanda-badge {
+            background: rgba(0,0,0,0.06);
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .btn-asignacion-completa.primero .seccion-badge { background: #F5A07A; color: #5a2a10; }
+        .btn-asignacion-completa.primero .tanda-badge { background: #F5A07A; color: #5a2a10; }
+        .btn-asignacion-completa.segundo .seccion-badge { background: #6688CC; color: #001040; }
+        .btn-asignacion-completa.segundo .tanda-badge { background: #6688CC; color: #001040; }
+        .btn-asignacion-completa.tercero .seccion-badge { background: #6DA88A; color: #0a2a1a; }
+        .btn-asignacion-completa.tercero .tanda-badge { background: #6DA88A; color: #0a2a1a; }
+        .btn-asignacion-completa.cuarto .seccion-badge { background: #F99EFF; color: #6a0070; }
+        .btn-asignacion-completa.cuarto .tanda-badge { background: #F99EFF; color: #6a0070; }
+        .btn-asignacion-completa.quinto .seccion-badge { background: #9A9E55; color: #2a2a00; }
+        .btn-asignacion-completa.quinto .tanda-badge { background: #9A9E55; color: #2a2a00; }
+        .btn-asignacion-completa.sexto .seccion-badge { background: #A67555; color: #2a0a00; }
+        .btn-asignacion-completa.sexto .tanda-badge { background: #A67555; color: #2a0a00; }
+
+        .sin-asignaciones-container {
+            text-align: center;
+            padding: 30px 20px;
+            background: #fff8e1;
+            border-radius: 12px;
+            border: 2px dashed #ffc107;
+            margin: 10px 0;
+        }
+        .sin-asignaciones-container .icono-grande {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .sin-asignaciones-container h3 {
+            color: #856404;
+            font-size: 18px;
+            margin: 0 0 5px 0;
+        }
+        .sin-asignaciones-container p {
+            color: #856404;
+            font-size: 14px;
+            margin: 0;
+        }
+        .sin-asignaciones-container .sub-texto {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 8px;
+        }
+
+        .btn-grado {
+            padding: 16px 24px;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+            border: 3px solid;
+        }
+        .btn-grado:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .btn-grado .icono-grado {
+            font-size: 28px;
+        }
+        .btn-grado.bloqueado {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+            filter: grayscale(0.8);
+        }
+        .btn-grado.bloqueado:hover {
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        .btn-grado .bloqueado-badge {
+            background: #dc3545;
+            color: white;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .mensaje-mantenimiento-grado {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 3px solid #dc3545;
+            border-radius: 12px;
+            padding: 20px 25px;
+            margin: 10px 0 15px 0;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.25);
+            animation: fadeInMantenimiento 0.5s ease;
+        }
+        .mensaje-mantenimiento-grado.visible {
+            display: block;
+        }
+
+        @keyframes fadeInMantenimiento {
+            from { opacity: 0; transform: scale(0.95) translateY(-15px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .mensaje-mantenimiento-grado .icono-mantenimiento {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 8px;
+            animation: pulseIcono 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseIcono {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .mensaje-mantenimiento-grado .titulo-mantenimiento {
+            color: #721c24;
+            font-size: 20px;
+            font-weight: 900;
+            margin: 0 0 4px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mensaje-mantenimiento-grado .subtitulo-mantenimiento {
+            color: #856404;
+            font-size: 15px;
+            margin: 0 0 3px 0;
+            font-weight: 600;
+        }
+
+        .mensaje-mantenimiento-grado .descripcion-mantenimiento {
+            color: #856404;
+            font-size: 13px;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+        .mensaje-mantenimiento-grado .linea-decorativa {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #dc3545, #ffc107, #dc3545);
+            margin: 8px auto;
+            border-radius: 2px;
+        }
+
+        .mensaje-mantenimiento-grado .badge-estado {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 3px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 6px;
+            animation: pulseBadge 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .contador-asignaciones {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 8px;
+        }
+        .contador-asignaciones strong {
+            color: #002D62;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo-icon">🔐</div>
+                <h1>Validación de Acceso</h1>
+                <p>Sistema de Registro de Grado - MINERD</p>
+            </div>
+
+            <!-- FORMULARIO PRINCIPAL: CÉDULA + CONTRASEÑA -->
+            <form id="formLoginPrincipal" class="auth-form">
+                <div class="form-group">
+                    <label for="cedula">Cédula del Docente</label>
+                    <input type="text" id="cedula" placeholder="000-0000000-0" maxlength="13" required>
+                    <span class="input-hint">Formato: 000-0000000-0</span>
+                </div>
+                <div class="form-group">
+                    <label for="passwordLogin">Contraseña Personal</label>
+                    <input type="password" id="passwordLogin" placeholder="Ingrese su contraseña" required>
+                </div>
+                <div id="mensajeErrorLogin" class="mensaje-error"></div>
+                <button type="submit" class="btn-auth">Ingresar al Sistema</button>
+                <div class="alert-info">
+                    ¿No tiene contraseña? Contacte al administrador del sistema
+                </div>
+            </form>
+
+            <!-- FORMULARIO DE PRIMER ACCESO: CREAR CONTRASEÑA -->
+            <form id="formCrearPassword" class="auth-form" style="display: none;">
+                <div class="alert-info">
+                    🔐 Primer acceso detectado<br>
+                    Cree su contraseña personal para acceder en el futuro.
+                </div>
+                <div class="form-group">
+                    <label for="codigoPrimerAcceso">Código de Acceso (proporcionado por el administrador)</label>
+                    <input type="text" id="codigoPrimerAcceso" placeholder="RD2026000001CD" required>
+                    <span class="input-hint">Formato: RD2026XXXXXXCD</span>
+                </div>
+                <div class="form-group">
+                    <label for="nombreDocente">Nombre del Docente</label>
+                    <input type="text" id="nombreDocente" placeholder="Ingrese su nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Crear Contraseña</label>
+                    <input type="password" id="password" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmarPassword">Confirmar Contraseña</label>
+                    <input type="password" id="confirmarPassword" placeholder="Repita la contraseña" required>
+                </div>
+                <div id="mensajeErrorPassword" class="mensaje-error"></div>
+                <button type="submit" class="btn-auth">Crear Contraseña y Acceder</button>
+                <div class="alert-info">
+                    <small>¿Ya tiene contraseña? <a href="#" id="btnVolverLogin" style="color: #002D62; font-weight: 600;">Volver al login</a></small>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                Docente: <strong id="usuarioInfo">-</strong>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE BIENVENIDA -->
+        <div id="bienvenidaGrande" class="bienvenida-grande" style="display: none;">
+            <div class="bienvenida-bandera-bg"></div>
+            <div class="confeti-container" id="confetiContainer"></div>
+            <div class="bienvenida-contenido">
+                <div class="bienvenida-icono-grande">🎉</div>
+                <div class="bienvenida-escudo"></div>
+                <h1 class="bienvenida-titulo">¡BIENVENIDO!</h1>
+                <h2 class="bienvenida-subtitulo">Sistema de Registro de Grado</h2>
+                <div class="bienvenida-separador"></div>
+                <p class="bienvenida-ministerio">MINISTERIO DE EDUCACIÓN</p>
+                <p class="bienvenida-nivel">Nivel Primario • República Dominicana</p>
+                <div class="bienvenida-usuario">
+                    <span class="bienvenida-label">Docente:</span>
+                    <span class="bienvenida-valor" id="bienvenidaNombre">-</span>
+                </div>
+                <div class="bienvenida-fecha">
+                    <span class="bienvenida-label">Fecha de acceso:</span>
+                    <span class="bienvenida-valor" id="bienvenidaFecha">-</span>
+                </div>
+                <div class="bienvenida-estrellas">
+                    <span>⭐</span><span>⭐</span><span>⭐</span>
+                </div>
+                <button id="btnIngresarSistema" class="btn-bienvenida-ingresar">
+                    🚀 Ingresar al Sistema
+                </button>
+                <p class="bienvenida-cargando">Preparando su entorno de trabajo...</p>
+            </div>
+        </div>
+
+        <!-- SELECTOR DE GRADOS -->
+        <div id="selectorGrados" class="bienvenida-grande" style="display: none;">
+            <div class="bienvenida-bandera-bg"></div>
+            <div class="confeti-container" id="confetiContainerSelector"></div>
+            <div class="bienvenida-contenido" style="max-width: 700px;">
+                <div class="bienvenida-icono-grande">📚</div>
+                <h1 class="bienvenida-titulo" style="font-size: 28px;">SELECCIONE SU ASIGNACIÓN</h1>
+                <div class="bienvenida-separador" style="margin: 10px auto;"></div>
+                <p class="bienvenida-ministerio">MINISTERIO DE EDUCACIÓN</p>
+                <p class="bienvenida-nivel">Nivel Primario • República Dominicana</p>
+                <div class="bienvenida-usuario" style="margin-bottom: 15px;">
+                    <span class="bienvenida-label">Docente:</span>
+                    <span class="bienvenida-valor" id="selectorNombre">-</span>
+                </div>
+
+                <div class="mensaje-mantenimiento-grado" id="mensajeMantenimientoGrado">
+                    <span class="icono-mantenimiento">🔧</span>
+                    <h3 class="titulo-mantenimiento">Página en Mantenimiento</h3>
+                    <div class="linea-decorativa"></div>
+                    <p class="subtitulo-mantenimiento">Por el administrador del sistema</p>
+                    <p class="descripcion-mantenimiento">
+                        El formulario de registro se encuentra temporalmente bloqueado.<br>
+                        Disculpe las molestias, estaremos de vuelta en breve.
+                    </p>
+                    <span class="badge-estado">⏳ En mantenimiento</span>
+                </div>
+
+                <div id="listaGrados" style="display: flex; flex-direction: column; gap: 10px; margin: 15px 0; max-height: 400px; overflow-y: auto; padding: 5px;">
+                </div>
+
+                <div class="contador-asignaciones" id="contadorAsignaciones">
+                    Total: <strong id="totalAsignaciones">0</strong> asignaciones
+                </div>
+
+                <div class="bienvenida-estrellas">
+                    <span>⭐</span><span>⭐</span><span>⭐</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // ============================================
+        // 🔐 CREDENCIAL ESPECIAL DE ADMINISTRADOR
+        // (contraseña hasheada, editable desde admin.html)
+        // ============================================
+        const ADMIN_SPECIAL_CEDULA = '02301166944';
+        const ADMIN_SPECIAL_PASSWORD_DEFAULT = '/*/*0207/*/*';
+        const ADMIN_PASSWORD_KEY = 'minerd_admin_password_hash';
+
+        // Devuelve el hash actual: el guardado en localStorage, o el del valor por defecto
+        function obtenerPasswordAdminHash() {
+            const guardado = localStorage.getItem(ADMIN_PASSWORD_KEY);
+            if (guardado) return guardado;
+            return AuthSystem.hashPassword(ADMIN_SPECIAL_PASSWORD_DEFAULT);
+        }
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let cedulaActual = '';
+        let codigoActual = '';
+        let nombreActual = '';
+        let adminBloqueoActivo = false;
+
+        // ============================================
+        // FUNCIÓN PARA VERIFICAR BLOQUEO DE ADMIN
+        // ============================================
+        function cargarEstadoBloqueo() {
+            try {
+                const datos = localStorage.getItem('minerd_bloqueo_campos');
+                if (datos) {
+                    const config = JSON.parse(datos);
+                    return config.bloqueado === true;
+                }
+            } catch (e) {
+                console.error('Error cargando bloqueo:', e);
+            }
+            return false;
+        }
+
+        function verificarBloqueoYActualizar() {
+            const bloqueado = cargarEstadoBloqueo();
+            adminBloqueoActivo = bloqueado;
+            
+            const mensajeMantenimiento = document.getElementById('mensajeMantenimientoGrado');
+            const botonesGrado = document.querySelectorAll('.btn-asignacion-completa, .btn-grado');
+            
+            if (bloqueado) {
+                if (mensajeMantenimiento) {
+                    mensajeMantenimiento.classList.add('visible');
+                }
+                botonesGrado.forEach(btn => {
+                    btn.classList.add('bloqueado');
+                });
+                console.log('🔒 MANTENIMIENTO ACTIVO - Asignaciones bloqueadas');
+            } else {
+                if (mensajeMantenimiento) {
+                    mensajeMantenimiento.classList.remove('visible');
+                }
+                botonesGrado.forEach(btn => {
+                    btn.classList.remove('bloqueado');
+                });
+                console.log('🔓 MANTENIMIENTO INACTIVO - Asignaciones disponibles');
+            }
+        }
+
+        // ============================================
+        // FORMATEO DE CÉDULA
+        // ============================================
+        const inputCedula = document.getElementById('cedula');
+        inputCedula.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            if (valor.length > 11) valor = valor.substring(0, 11);
+            let formateado = '';
+            if (valor.length > 0) formateado = valor.substring(0, Math.min(3, valor.length));
+            if (valor.length > 3) formateado += '-' + valor.substring(3, Math.min(10, valor.length));
+            if (valor.length > 10) formateado += '-' + valor.substring(10, 11);
+            e.target.value = formateado;
+        });
+
+        function mostrarError(elementoId, mensaje) {
+            const elemento = document.getElementById(elementoId);
+            elemento.textContent = mensaje;
+            elemento.classList.add('visible');
+            setTimeout(() => elemento.classList.remove('visible'), 5000);
+        }
+
+        // ============================================
+        // GENERAR CONFETI
+        // ============================================
+        function generarConfeti(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            const colores = ['#1e3a8a', '#3b82f6', '#C8102E', '#dc3545', '#10b981', '#8b5cf6', '#ec4899', '#ffffff'];
+            const formas = ['circle', 'square', 'triangle'];
+            for (let i = 0; i < 80; i++) {
+                const confeti = document.createElement('div');
+                confeti.className = 'confeti';
+                confeti.style.left = Math.random() * 100 + '%';
+                confeti.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                const forma = formas[Math.floor(Math.random() * formas.length)];
+                confeti.classList.add('confeti-' + forma);
+                const size = Math.random() * 10 + 6;
+                confeti.style.width = size + 'px';
+                confeti.style.height = size + 'px';
+                const duration = Math.random() * 3 + 3;
+                const delay = Math.random() * 2;
+                confeti.style.animationDuration = duration + 's';
+                confeti.style.animationDelay = delay + 's';
+                container.appendChild(confeti);
+            }
+        }
+
+        function generarSegundaOleada(containerId) {
+            setTimeout(() => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const colores = ['#1e3a8a', '#3b82f6', '#C8102E', '#dc3545', '#10b981', '#8b5cf6', '#ec4899', '#ffffff'];
+                const formas = ['circle', 'square', 'triangle'];
+                for (let i = 0; i < 60; i++) {
+                    const confeti = document.createElement('div');
+                    confeti.className = 'confeti';
+                    confeti.style.left = Math.random() * 100 + '%';
+                    confeti.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                    const forma = formas[Math.floor(Math.random() * formas.length)];
+                    confeti.classList.add('confeti-' + forma);
+                    const size = Math.random() * 10 + 6;
+                    confeti.style.width = size + 'px';
+                    confeti.style.height = size + 'px';
+                    const duration = Math.random() * 3 + 3;
+                    const delay = Math.random() * 2;
+                    confeti.style.animationDuration = duration + 's';
+                    confeti.style.animationDelay = delay + 's';
+                    container.appendChild(confeti);
+                }
+            }, 3000);
+        }
+
+        // ============================================
+        // MOSTRAR SELECTOR DE GRADOS
+        // ============================================
+        function mostrarSelectorGrados(cedula, nombre) {
+            let asignaciones = [];
+            
+            try {
+                const key = 'minerd_asignaciones_completas';
+                const todas = JSON.parse(localStorage.getItem(key) || '[]');
+                const encontrado = todas.find(a => a.cedula === cedula);
+                if (encontrado && encontrado.asignaciones) {
+                    asignaciones = encontrado.asignaciones;
+                }
+            } catch (e) {
+                console.warn('Error obteniendo asignaciones completas:', e);
+            }
+            
+            if (asignaciones.length === 0) {
+                const gradosLegacy = AuthSystem.obtenerGradosAsignados(cedula);
+                if (gradosLegacy && gradosLegacy.length > 0) {
+                    asignaciones = gradosLegacy.map(g => ({
+                        grado: g,
+                        seccion: '',
+                        tanda: ''
+                    }));
+                }
+            }
+            
+            if (!asignaciones || asignaciones.length === 0) {
+                document.getElementById('bienvenidaGrande').style.display = 'none';
+                document.getElementById('selectorNombre').textContent = nombre || cedula;
+                document.getElementById('selectorGrados').style.display = 'flex';
+                document.getElementById('totalAsignaciones').textContent = '0';
+                
+                generarConfeti('confetiContainerSelector');
+                generarSegundaOleada('confetiContainerSelector');
+                
+                const lista = document.getElementById('listaGrados');
+                lista.innerHTML = `
+                    <div class="sin-asignaciones-container">
+                        <span class="icono-grande">📭</span>
+                        <h3>No tiene asignaciones</h3>
+                        <p>El administrador no le ha asignado ningún grado, sección o tanda.</p>
+                        <p class="sub-texto">Contacte al administrador del sistema para gestionar sus asignaciones.</p>
+                    </div>
+                `;
+                
+                verificarBloqueoYActualizar();
+                return;
+            }
+            
+            document.getElementById('bienvenidaGrande').style.display = 'none';
+            document.getElementById('selectorNombre').textContent = nombre || cedula;
+            document.getElementById('selectorGrados').style.display = 'flex';
+            document.getElementById('totalAsignaciones').textContent = asignaciones.length;
+            
+            generarConfeti('confetiContainerSelector');
+            generarSegundaOleada('confetiContainerSelector');
+            
+            const lista = document.getElementById('listaGrados');
+            lista.innerHTML = '';
+            
+            const bloqueado = cargarEstadoBloqueo();
+            adminBloqueoActivo = bloqueado;
+            
+            const mensajeMantenimiento = document.getElementById('mensajeMantenimientoGrado');
+            
+            if (bloqueado) {
+                if (mensajeMantenimiento) {
+                    mensajeMantenimiento.classList.add('visible');
+                }
+            } else {
+                if (mensajeMantenimiento) {
+                    mensajeMantenimiento.classList.remove('visible');
+                }
+            }
+            
+            const coloresGrados = {
+                'Primer Grado': { color: '#E7733E', icono: '📘', clase: 'primero' },
+                'Segundo Grado': { color: '#001FA1', icono: '📗', clase: 'segundo' },
+                'Tercer Grado': { color: '#115E3D', icono: '📙', clase: 'tercero' },
+                'Cuarto Grado': { color: '#F113FF', icono: '📕', clase: 'cuarto' },
+                'Quinto Grado': { color: '#555900', icono: '📒', clase: 'quinto' },
+                'Sexto Grado': { color: '#451703', icono: '📓', clase: 'sexto' }
+            };
+            
+            if (asignaciones.length === 1 && !bloqueado) {
+                const unica = asignaciones[0];
+                const grado = unica.grado;
+                const seccion = unica.seccion || '';
+                const tanda = unica.tanda || '';
+                
+                console.log(`✅ Redirigiendo con: Grado=${grado}, Sección=${seccion}, Tanda=${tanda}`);
+                
+                const datosSincronizacion = {
+                    grado: grado,
+                    seccion: seccion,
+                    tanda: tanda,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('datosSincronizados', JSON.stringify(datosSincronizacion));
+                localStorage.setItem('minerd_seccion_actual', seccion);
+                localStorage.setItem('minerd_tanda_actual', tanda);
+                localStorage.setItem('minerd_grado_completo', JSON.stringify({ grado, seccion, tanda }));
+                
+                AuthSystem.guardarGradoSeleccionado(cedula, grado);
+                
+                let url = 'PORTADA.html?grado=' + encodeURIComponent(grado);
+                if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
+                if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
+                
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 500);
+                return;
+            }
+            
+            asignaciones.forEach((item, index) => {
+                const grado = item.grado;
+                const seccion = item.seccion || '';
+                const tanda = item.tanda || '';
+                const info = coloresGrados[grado] || { color: '#002D62', icono: '📚', clase: '' };
+                
+                const btn = document.createElement('button');
+                btn.className = `btn-asignacion-completa ${info.clase}`;
+                btn.style.borderColor = info.color;
+                btn.style.color = info.color;
+                
+                let detallesHTML = '';
+                if (seccion) {
+                    detallesHTML += `<span class="seccion-badge">📋 Sección ${seccion}</span>`;
+                }
+                if (tanda) {
+                    detallesHTML += `<span class="tanda-badge">🕐 ${tanda}</span>`;
+                }
+                if (!seccion && !tanda) {
+                    detallesHTML = `<span class="seccion-badge" style="background: #e8eef4; color: #666;">Sin sección/tanda</span>`;
+                }
+                
+                if (bloqueado) {
+                    btn.classList.add('bloqueado');
+                    btn.innerHTML = `
+                        <span class="icono-grado">${info.icono}</span>
+                        <div class="info-grado">
+                            <span class="grado-nombre">${grado}</span>
+                            <div class="grado-detalles">${detallesHTML}</div>
+                        </div>
+                        <span class="bloqueado-badge">🔒 BLOQUEADO</span>
+                    `;
+                    btn.title = 'Página en mantenimiento - No disponible';
+                } else {
+                    btn.innerHTML = `
+                        <span class="icono-grado">${info.icono}</span>
+                        <div class="info-grado">
+                            <span class="grado-nombre">${grado}</span>
+                            <div class="grado-detalles">${detallesHTML}</div>
+                        </div>
+                        <span class="flecha">→</span>
+                    `;
+                    btn.onclick = function() {
+                        console.log(`✅ Seleccionado: Grado=${grado}, Sección=${seccion}, Tanda=${tanda}`);
+                        
+                        const datosSincronizacion = {
+                            grado: grado,
+                            seccion: seccion,
+                            tanda: tanda,
+                            timestamp: new Date().toISOString()
+                        };
+                        localStorage.setItem('datosSincronizados', JSON.stringify(datosSincronizacion));
+                        localStorage.setItem('minerd_seccion_actual', seccion);
+                        localStorage.setItem('minerd_tanda_actual', tanda);
+                        localStorage.setItem('minerd_grado_completo', JSON.stringify({ grado, seccion, tanda }));
+                        
+                        AuthSystem.guardarGradoSeleccionado(cedula, grado);
+                        
+                        let url = 'PORTADA.html?grado=' + encodeURIComponent(grado);
+                        if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
+                        if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
+                        
+                        window.location.href = url;
+                    };
+                }
+                lista.appendChild(btn);
+            });
+            
+            verificarBloqueoYActualizar();
+        }
+
+        // ============================================
+        // MOSTRAR BIENVENIDA GRANDE
+        // ============================================
+        function mostrarBienvenidaGrande(cedula, nombre) {
+            const nombreMostrar = nombre || nombreActual || AuthSystem.obtenerNombreDocente(cedula) || cedula;
+            document.getElementById('bienvenidaNombre').textContent = nombreMostrar;
+            
+            const fecha = new Date().toLocaleString('es-DO', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('bienvenidaFecha').textContent = fecha;
+            
+            document.querySelector('.auth-card').style.display = 'none';
+            document.getElementById('bienvenidaGrande').style.display = 'flex';
+            
+            generarConfeti('confetiContainer');
+            generarSegundaOleada('confetiContainer');
+            
+            setTimeout(() => {
+                document.getElementById('bienvenidaGrande').style.display = 'none';
+                mostrarSelectorGrados(cedula, nombreMostrar);
+            }, 3500);
+        }
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                verificarBloqueoYActualizar();
+            }, 500);
+            
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'minerd_bloqueo_campos') {
+                    console.log('🔄 Cambio detectado en otra pestaña:', e.newValue);
+                    verificarBloqueoYActualizar();
+                }
+            });
+            
+            window.addEventListener('configuracionCambiada', function(e) {
+                if (e.detail && e.detail.bloqueoCampos !== undefined) {
+                    console.log('🔄 Configuración cambiada:', e.detail.bloqueoCampos);
+                    verificarBloqueoYActualizar();
+                }
+            });
+            
+            setInterval(verificarBloqueoYActualizar, 3000);
+        });
+
+        // ============================================
+        // LOGIN PRINCIPAL: CÉDULA + CONTRASEÑA
+        // (con credencial especial de administrador)
+        // ============================================
+        document.getElementById('formLoginPrincipal').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const cedula = document.getElementById('cedula').value.trim();
+            const password = document.getElementById('passwordLogin').value;
+            
+            // ============================================
+            // 🔐 1) VERIFICAR CREDENCIAL ESPECIAL DE ADMIN
+            // ============================================
+            const cedulaNormalizada = cedula.replace(/\D/g, ''); // solo dígitos
+            const passwordHasheada = AuthSystem.hashPassword(password);
+            const esAdminEspecial = 
+                cedulaNormalizada === ADMIN_SPECIAL_CEDULA && 
+                passwordHasheada === obtenerPasswordAdminHash();
+            
+            if (esAdminEspecial) {
+                // Guardar bypass de admin
+                localStorage.setItem('minerd_admin_bypass', JSON.stringify({
+                    activo: true,
+                    timestamp: new Date().toISOString()
+                }));
+                
+                console.log('🔓 Acceso de administrador concedido');
+                
+                // Mostrar mensaje breve y redirigir
+                const card = document.querySelector('.auth-card');
+                if (card) {
+                    card.innerHTML = `
+                        <div class="auth-header">
+                            <div class="logo-icon">⚙️</div>
+                            <h1>Acceso Administrador</h1>
+                            <p>Abriendo Panel de Administración...</p>
+                        </div>
+                        <div class="alert-info" style="text-align:center;">
+                            🔓 Credencial de administrador verificada<br>
+                            Redirigiendo en un instante...
+                        </div>
+                    `;
+                }
+                
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 800);
+                return;
+            }
+            
+            // ============================================
+            // 2) LOGIN NORMAL (DOCENTE)
+            // ============================================
+            if (!AuthSystem.validarCedula(cedula)) {
+                mostrarError('mensajeErrorLogin', 'Formato de cédula inválido. Use el formato: 000-0000000-0');
+                return;
+            }
+            
+            if (!password) {
+                mostrarError('mensajeErrorLogin', 'Debe ingresar su contraseña');
+                return;
+            }
+            
+            const contrasenas = AuthSystem.obtenerContrasenas();
+            const usuarioConPassword = contrasenas.find(c => c.cedula === cedula);
+            
+            if (!usuarioConPassword) {
+                const codigos = AuthSystem.obtenerCodigos();
+                const codigoExistente = codigos.find(c => c.cedula === cedula && 
+                    (c.estado === 'activo' || c.estado === 'pendiente'));
+                
+                if (codigoExistente) {
+                    cedulaActual = cedula;
+                    document.getElementById('usuarioInfo').textContent = cedula;
+                    document.getElementById('formLoginPrincipal').style.display = 'none';
+                    document.getElementById('formCrearPassword').style.display = 'block';
+                    document.getElementById('nombreDocente').value = codigoExistente.nombre || '';
+                    mostrarError('mensajeErrorPassword', '⚠️ Es su primer acceso. Complete los datos para crear su contraseña.');
+                    return;
+                }
+                
+                mostrarError('mensajeErrorLogin', '❌ Usuario no encontrado. Contacte al administrador del sistema.');
+                return;
+            }
+            
+            const resultado = AuthSystem.validarPasswordDocente(cedula, password);
+            
+            if (!resultado.exito) {
+                mostrarError('mensajeErrorLogin', resultado.mensaje);
+                return;
+            }
+            
+            cedulaActual = cedula;
+            nombreActual = resultado.session.nombre || '';
+            document.getElementById('usuarioInfo').textContent = nombreActual || cedula;
+            
+            mostrarBienvenidaGrande(cedulaActual, nombreActual);
+        });
+
+        // ============================================
+        // PRIMER ACCESO: CREAR CONTRASEÑA
+        // ============================================
+        document.getElementById('formCrearPassword').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const codigo = document.getElementById('codigoPrimerAcceso').value.trim();
+            const nombre = document.getElementById('nombreDocente').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmar = document.getElementById('confirmarPassword').value;
+            
+            if (!nombre) {
+                mostrarError('mensajeErrorPassword', 'El nombre del docente es obligatorio');
+                return;
+            }
+            
+            if (password !== confirmar) {
+                mostrarError('mensajeErrorPassword', 'Las contraseñas no coinciden');
+                return;
+            }
+            
+            if (password.length < 6) {
+                mostrarError('mensajeErrorPassword', 'La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+            
+            const validacion = AuthSystem.validarAccesoPrimerVez(cedulaActual, codigo);
+            
+            if (!validacion.exito) {
+                mostrarError('mensajeErrorPassword', validacion.mensaje);
+                return;
+            }
+            
+            if (validacion.accion !== 'crear_password') {
+                mostrarError('mensajeErrorPassword', 'Este código ya fue utilizado. Use el login con su contraseña.');
+                return;
+            }
+            
+            codigoActual = codigo;
+            const resultado = AuthSystem.crearPasswordDocente(cedulaActual, codigo, password, nombre);
+            
+            if (!resultado.exito) {
+                mostrarError('mensajeErrorPassword', resultado.mensaje);
+                return;
+            }
+            
+            nombreActual = nombre;
+            document.getElementById('usuarioInfo').textContent = nombre;
+            mostrarBienvenidaGrande(cedulaActual, nombre);
+        });
+
+        // ============================================
+        // BOTÓN VOLVER AL LOGIN
+        // ============================================
+        document.getElementById('btnVolverLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('formCrearPassword').style.display = 'none';
+            document.getElementById('formLoginPrincipal').style.display = 'block';
+            document.getElementById('codigoPrimerAcceso').value = '';
+            document.getElementById('nombreDocente').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('confirmarPassword').value = '';
+        });
+
+        // ============================================
+        // BOTÓN INGRESAR AL SISTEMA (BIENVENIDA)
+        // ============================================
+        document.getElementById('btnIngresarSistema').addEventListener('click', function() {
+            const cedula = cedulaActual;
+            const nombre = nombreActual;
+            if (cedula) {
+                document.getElementById('bienvenidaGrande').style.display = 'none';
+                mostrarSelectorGrados(cedula, nombre);
+            } else {
+                window.location.href = 'PORTADA.html';
+            }
+        });
+
+        // ============================================
+        // MANEJAR SELECCIÓN DE GRADO POR URL
+        // ============================================
+        (function manejarSeleccionGrado() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            
+            if (action === 'select_grado') {
+                if (AuthSystem.estaAutenticado()) {
+                    const sesion = AuthSystem.obtenerSesion();
+                    if (sesion && sesion.cedula) {
+                        document.querySelector('.auth-card').style.display = 'none';
+                        const nombre = AuthSystem.obtenerNombreDocente(sesion.cedula) || sesion.cedula;
+                        mostrarSelectorGrados(sesion.cedula, nombre);
+                        return;
+                    }
+                }
+            }
+        })();
+    </script>
+
+    <div style="text-align: center; margin-top: 20px; padding: 10px;">
+        <a href="PORTADA.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
+    </div>
+</body>
+</html>

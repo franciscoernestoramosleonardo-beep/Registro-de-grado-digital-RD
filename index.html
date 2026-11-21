@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Ícono de la aplicación y color del tema -->
+    <link rel="icon" href="registro.png" type="image/png">
+    <link rel="apple-touch-icon" href="registro.png">
+    <meta name="theme-color" content="#1e4a7a">
+    
+    <title>Sistema de Registro de Grado | MINERD</title>
+    
+    <!-- Enlace a la hoja de estilos principal -->
+    <link rel="stylesheet" href="Styles.css" />
+    
+    <!-- Enlace al script de funcionalidad (pestañas y otros) -->
+    <script src="Script.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">
+            <span class="icono">📚</span>
+            <div>
+                <h1>REGISTRO DE GRADO DIGITAL RD</h1>
+                <small>Nivel Primario • Ministerio de Educación (MINERD)</small>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <!-- BOTÓN ADMIN: Oculto por defecto, se muestra solo si la huella del equipo coincide -->
+            <a href="admin.html" id="btnAdmin" class="btn-header-acceso" style="background: #C8102E; color: white; display: none;">
+                ⚙️ Panel Admin
+            </a>
+            <!-- BOTÓN DE ACCESO NORMAL: Siempre visible -->
+            <a href="login.html" class="btn-header-acceso">
+                🔐 Acceder al Sistema
+            </a>
+        </div>
+    </header>
+
+    <nav class="tabs-container">
+        <button class="tab-btn active" data-tab="inicio">🏠 Inicio</button>
+        <button class="tab-btn" data-tab="anuncios">📢 Anuncios</button>
+        <button class="tab-btn" data-tab="registro">Información de Registro</button>
+        <button class="tab-btn" data-tab="ayuda">❓ Ayuda y Contacto</button>
+    </nav>
+
+    <main class="main-content">
+        
+        <!-- PESTAÑA: INICIO -->
+        <div id="inicio" class="tab-content active">
+            <div class="hero">
+                <span class="badge">🇩🇴 República Dominicana</span>
+                <h2>Sistema de <span>Registro</span> de Grado</h2>
+                <p>
+                    Plataforma oficial para el registro y gestión de grados del Nivel Primario 
+                    en los centros educativos del país. Gestione la información de manera 
+                    eficiente, segura y en tiempo real.
+                </p>
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <a href="login.html" class="btn-hero-acceso">
+                        🚪 Ingresar al Sistema de Registro
+                        <span class="flecha">→</span>
+                    </a>
+                    <!-- BOTÓN ADMIN EN EL HERO: Oculto por defecto -->
+                    <a href="admin.html" id="btnAdminHero" class="btn-hero-acceso" style="background: linear-gradient(135deg, #C8102E 0%, #8B0000 100%); box-shadow: 0 8px 20px rgba(200, 16, 46, 0.4); display: none;">
+                        ⚙️ Panel de Administración
+                        <span class="flecha">→</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="section-title">
+                <span>⚡</span> Características del Sistema
+            </div>
+            <div class="grid-anuncios">
+                <div class="tarjeta-anuncio">
+                    <div class="icono">📊</div>
+                    <h3>Estadísticas en Tiempo Real</h3>
+                    <p>Visualice el avance del registro de su centro educativo con reportes actualizados al instante.</p>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">🛡️</div>
+                    <h3>Seguridad de Datos</h3>
+                    <p>Información protegida con los más altos estándares de seguridad informática del MINERD.</p>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">📱</div>
+                    <h3>Acceso Multiplataforma</h3>
+                    <p>Utilice el sistema desde cualquier dispositivo: computadora, tableta o teléfono móvil.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA: ANUNCIOS -->
+        <div id="anuncios" class="tab-content">
+            <div class="section-title">
+                <span>📢</span> Anuncios y Novedades
+            </div>
+            <div class="grid-anuncios">
+                <div class="tarjeta-anuncio destacado">
+                    <div class="icono">📋</div>
+                    <h3>Inicio de Registro 2026-2027</h3>
+                    <p>Ya está disponible el registro de grado para el nuevo año escolar 2026-2027. Complete todos los campos requeridos antes de la fecha límite.</p>
+                    <span class="fecha-anuncio">📅 15 de julio de 2026</span>
+                </div>
+                <div class="tarjeta-anuncio urgente">
+                    <div class="icono">⚡</div>
+                    <h3>Actualización del Sistema v4.0</h3>
+                    <p>Se ha implementado una nueva versión con mejoras en la interfaz, velocidad y sincronización de datos en la nube.</p>
+                    <span class="fecha-anuncio">📅 10 de julio de 2026</span>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">📌</div>
+                    <h3>Nuevos Centros Educativos</h3>
+                    <p>Se han agregado 15 nuevos centros educativos a la base de datos nacional. Consulte el listado completo en descargas.</p>
+                    <span class="fecha-anuncio">📅 5 de julio de 2026</span>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">🖥️</div>
+                    <h3>Manual de Usuario Actualizado</h3>
+                    <p>Descargue el manual de usuario v4.0 para conocer todas las nuevas funcionalidades y atajos del sistema.</p>
+                    <span class="fecha-anuncio">📅 1 de julio de 2026</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PESTAÑA: INFORMACIÓN DE REGISTRO -->
+        <div id="registro" class="tab-content">
+            <div class="section-title">
+                <span>📝</span> Proceso de Registro de Grado
+            </div>
+            <div class="tarjeta-anuncio" style="border-left-color: var(--primary, #002D62); margin-bottom: 20px;">
+                <h3>Requisitos Previos</h3>
+                <p style="margin-top: 10px;">
+                    1. Tener las credenciales de acceso proporcionadas por la Dirección Regional o Distrito.<br>
+                    2. Contar con el listado oficial de estudiantes matriculados y aprobados.<br>
+                    3. Verificar la información demográfica de cada estudiante antes de guardar el registro.<br>
+                    4. El registro debe ser completado y validado antes del 30 de septiembre del año escolar en curso.
+                </p>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="login.html" class="btn-hero-acceso">
+                     Iniciar Registro Ahora
+                </a>
+            </div>
+        </div>
+
+        <!-- PESTAÑA: AYUDA Y CONTACTO -->
+        <div id="ayuda" class="tab-content">
+            <div class="section-title">
+                <span>❓</span> Centro de Ayuda y Contacto
+            </div>
+            <div class="grid-anuncios">
+                <div class="tarjeta-anuncio">
+                    <div class="icono">📞</div>
+                    <h3>Soporte Técnico</h3>
+                    <p>Línea de atención: <strong>(809) 555-0123</strong><br>
+                    Horario: Lunes a Viernes, 8:00 AM - 4:00 PM.</p>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">✉️</div>
+                    <h3>Correo Electrónico</h3>
+                    <p>Envíe sus consultas técnicas a:<br>
+                    <strong>soporte.registro@minerd.gob.do</strong></p>
+                </div>
+                <div class="tarjeta-anuncio">
+                    <div class="icono">📍</div>
+                    <h3>Oficinas Centrales</h3>
+                    <p>Ministerio de Educación<br>
+                    Av. México esq. Dr. Delgado, Santo Domingo, R.D.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <div class="logo-footer">
+            <span>MINERD</span> • Registro de Grado • Nivel Primario
+        </div>
+        <p>
+            Ministerio de Educación de la República Dominicana<br>
+            Todos los derechos reservados &copy; 2026
+        </p>
+        <div class="links">
+            <a href="index.html">Inicio</a>
+            <a href="#">Términos de Uso</a>
+            <a href="#">Política de Privacidad</a>
+            <a href="#">Mapa del Sitio</a>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         SCRIPT: VERIFICACIÓN DE HUELLA DEL EQUIPO
+         ============================================ -->
+    <script>
+        // ⚠️ HUELLA AUTORIZADA PARA MOSTRAR EL BOTÓN DE ADMIN
+        const HUELLA_AUTORIZADA = 'RD-4E345649-81536864';
+
+        function generarHuellaEquipo() {
+            const datos = [
+                navigator.userAgent,
+                navigator.language,
+                navigator.platform,
+                navigator.hardwareConcurrency || 0,
+                screen.width + 'x' + screen.height,
+                screen.colorDepth,
+                new Date().getTimezoneOffset(),
+                navigator.deviceMemory || 0,
+                navigator.maxTouchPoints || 0
+            ].join('|');
+
+            let hash = 0;
+            for (let i = 0; i < datos.length; i++) {
+                const char = datos.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            const hashHex = Math.abs(hash).toString(16).padStart(8, '0').toUpperCase();
+            return 'RD-' + hashHex + '-' + (navigator.hardwareConcurrency || 'X') + screen.width + screen.height;
+        }
+
+        function verificarAccesoAdmin() {
+            const huellaActual = generarHuellaEquipo();
+            console.log('🔐 Huella actual del equipo:', huellaActual);
+            console.log('🔑 Huella autorizada en sistema:', HUELLA_AUTORIZADA);
+
+            // Si la huella generada coincide con la autorizada, mostramos los botones
+            if (HUELLA_AUTORIZADA !== 'PEGA_AQUI_TU_HUELLA' && huellaActual === HUELLA_AUTORIZADA) {
+                const btnAdmin = document.getElementById('btnAdmin');
+                const btnAdminHero = document.getElementById('btnAdminHero');
+                
+                if (btnAdmin) btnAdmin.style.display = 'inline-flex';
+                if (btnAdminHero) btnAdminHero.style.display = 'inline-flex';
+                
+                console.log('✅ Acceso Admin HABILITADO en este equipo.');
+            } else {
+                console.log('❌ Acceso Admin DENEGADO (Equipo no autorizado).');
+            }
+        }
+
+        // Ejecutar la verificación cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', verificarAccesoAdmin);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,3418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Ícono de la aplicación y color del tema -->
+    <link rel="icon" href="registro.png" type="image/png">
+    <link rel="apple-touch-icon" href="registro.png">
+    <meta name="theme-color" content="#1e4a7a">
+    
+    <title>Registro de Grado - Nivel Primario</title>
+    
+    <!-- ============================================
+         PROTECCIÓN DE AUTENTICACIÓN
+         ============================================ -->
+    <script src="auth.js"></script>
+    <script>
+        (function() {
+            if (typeof AuthSystem === 'undefined') {
+                alert('⚠️ Sistema de autenticación no disponible. Redirigiendo al login...');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const resultado = AuthSystem.validarSesionActiva();
+            if (!resultado.valido) {
+                alert('⚠️ ACCESO DENEGADO\n\n' + resultado.motivo);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const sesion = AuthSystem.obtenerSesion();
+            if (!sesion || !sesion.cedula) {
+                alert('⚠️ Sesión no válida. Redirigiendo al login...');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // ============================================
+            // LEER GRADO, SECCIÓN Y TANDA (URL → localStorage → sesión)
+            // ============================================
+            const urlParams = new URLSearchParams(window.location.search);
+
+            let grado = '';
+            let seccion = '';
+            let tanda = '';
+
+            // 1. Intentar desde URL
+            const gradoUrl = urlParams.get('grado');
+            const seccionUrl = urlParams.get('seccion');
+            const tandaUrl = urlParams.get('tanda');
+
+            if (gradoUrl) grado = decodeURIComponent(gradoUrl);
+            if (seccionUrl) seccion = decodeURIComponent(seccionUrl);
+            if (tandaUrl) tanda = decodeURIComponent(tandaUrl);
+
+            // 2. Fallback: minerd_grado_completo
+            if (!grado || !seccion || !tanda) {
+                try {
+                    const completo = JSON.parse(localStorage.getItem('minerd_grado_completo') || 'null');
+                    if (completo) {
+                        if (!grado && completo.grado) grado = completo.grado;
+                        if (!seccion && completo.seccion) seccion = completo.seccion;
+                        if (!tanda && completo.tanda) tanda = completo.tanda;
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Fallback: datosSincronizados
+            if (!grado || !seccion || !tanda) {
+                try {
+                    const sincro = JSON.parse(localStorage.getItem('datosSincronizados') || 'null');
+                    if (sincro) {
+                        if (!grado && sincro.grado) grado = sincro.grado;
+                        if (!seccion && sincro.seccion) seccion = sincro.seccion;
+                        if (!tanda && sincro.tanda) tanda = sincro.tanda;
+                    }
+                } catch (e) {}
+            }
+
+            // 4. Fallback: claves individuales
+            if (!grado) grado = localStorage.getItem('minerd_grado_actual') || '';
+            if (!seccion) seccion = localStorage.getItem('minerd_seccion_actual') || '';
+            if (!tanda) tanda = localStorage.getItem('minerd_tanda_actual') || '';
+
+            // 5. Fallback: sesión de AuthSystem
+            if (!grado && sesion.grado) grado = sesion.grado;
+            if (!grado && sesion.cedula) {
+                const g = AuthSystem.obtenerGradoSeleccionado(sesion.cedula);
+                if (g) grado = g;
+            }
+
+            // Guardar todo en localStorage para uso futuro
+            if (grado) {
+                AuthSystem.guardarGradoSeleccionado(sesion.cedula, grado);
+                localStorage.setItem('minerd_grado_actual', grado);
+            }
+            if (seccion) localStorage.setItem('minerd_seccion_actual', seccion);
+            if (tanda) localStorage.setItem('minerd_tanda_actual', tanda);
+
+            // Exponer globalmente para la barra superior
+            window.__gradoActual = grado;
+            window.__seccionActual = seccion;
+            window.__tandaActual = tanda;
+
+            if (!grado) {
+                alert('⚠️ No hay grado seleccionado. Redirigiendo al login...');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            console.log('✅ Sesión válida');
+            console.log('   🎓 Grado:', grado);
+            console.log('   📋 Sección:', seccion || '(sin asignar)');
+            console.log('   🕐 Tanda:', tanda || '(sin asignar)');
+        })();
+    </script>
+    
+   <style>
+    /* ============================================
+       ESTILOS BASE COMPLETOS
+       ============================================ */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background: #e8ecf1;
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        overflow-x: hidden;
+        word-wrap: break-word;
+    }
+
+    .main-container {
+        width: 1366px;
+        max-width: 1366px;
+        min-width: 1366px;
+        height: 100vh;
+        max-height: 100vh;
+        min-height: 100vh;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ============================================
+       TOP BAR - ENCABEZADO PRINCIPAL
+       ============================================ */
+    .top-bar {
+        background: #1a2a4a;
+        padding: 10px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #1a3a6b;
+        flex-shrink: 0;
+        min-height: 50px;
+        transition: all 0.3s ease;
+    }
+    .top-bar-left { 
+        display: flex; 
+        align-items: center; 
+        gap: 15px; 
+        flex-wrap: wrap; 
+    }
+    .top-bar-title { 
+        color: #ffffff; 
+        font-size: 16px; 
+        font-weight: bold; 
+        letter-spacing: 1px; 
+        font-family: 'Times New Roman', Times, serif; 
+        transition: all 0.3s ease; 
+    }
+    .top-bar-logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: contain;
+        background: rgba(255,255,255,0.1);
+        padding: 2px;
+        display: none;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .top-bar-logo.visible {
+        display: block;
+    }
+    .top-bar-grado {
+        color: #FFD700;
+        font-size: 14px;
+        font-weight: bold;
+        background: rgba(255,255,255,0.1);
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid #FFD700;
+        white-space: nowrap;
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .top-bar-right { 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+    }
+
+    .menu-engranaje { 
+        position: relative; 
+        display: inline-block; 
+    }
+    .btn-engranaje { 
+        background: transparent; 
+        border: none; 
+        color: #ffffff; 
+        font-size: 22px; 
+        cursor: pointer; 
+        padding: 4px 10px; 
+        border-radius: 6px; 
+        transition: all 0.3s ease; 
+        line-height: 1; 
+    }
+    .btn-engranaje:hover { 
+        background: rgba(255, 255, 255, 0.15); 
+        transform: rotate(45deg); 
+    }
+    .menu-dropdown { 
+        position: absolute; 
+        top: 110%; 
+        right: 0; 
+        background: #ffffff; 
+        min-width: 200px; 
+        border-radius: 8px; 
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); 
+        border: 1px solid #d0d8e0; 
+        display: none; 
+        z-index: 1001; 
+        overflow: hidden; 
+        padding: 6px 0; 
+    }
+    .menu-dropdown.active { 
+        display: block; 
+        animation: fadeInMenu 0.25s ease; 
+    }
+    @keyframes fadeInMenu { 
+        from { opacity: 0; transform: translateY(-10px) scale(0.97); } 
+        to { opacity: 1; transform: translateY(0) scale(1); } 
+    }
+    .menu-item { 
+        padding: 10px 18px; 
+        font-size: 13px; 
+        color: #1a2a4a; 
+        font-family: 'Times New Roman', Times, serif; 
+        cursor: pointer; 
+        transition: all 0.2s ease; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px; 
+    }
+    .menu-item:hover { 
+        background: #e8f0fe; 
+        color: #1a3a6b; 
+    }
+    .menu-item:active { 
+        background: #d0d8e0; 
+    }
+    .menu-divider { 
+        height: 1px; 
+        background: #e8ecf1; 
+        margin: 4px 12px; 
+    }
+
+    /* ============================================
+       TABS CONTAINER - PESTAÑAS
+       ============================================ */
+    .tabs-container {
+        background: #1a2a4a;
+        padding: 0 20px;
+        border-bottom: 3px solid #1a3a6b;
+        display: flex;
+        gap: 2px;
+        flex-wrap: wrap;
+        align-items: center;
+        flex-shrink: 0;
+        min-height: 44px;
+        position: relative;
+    }
+    .tab-btn {
+        padding: 10px 18px;
+        border: none;
+        background: transparent;
+        color: #a0b0c0;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -3px;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+    .tab-btn:hover { 
+        color: #ffffff; 
+        background: rgba(255, 255, 255, 0.05); 
+    }
+    .tab-btn.active { 
+        color: #ffffff; 
+        border-bottom-color: #4a8ab5; 
+        background: rgba(255, 255, 255, 0.08); 
+    }
+    .tab-btn .tab-icon { 
+        margin-right: 6px; 
+        font-size: 14px; 
+    }
+    .tab-btn .tab-badge { 
+        background: #dc3545; 
+        color: white; 
+        font-size: 9px; 
+        padding: 1px 6px; 
+        border-radius: 10px; 
+        margin-left: 5px; 
+        vertical-align: top; 
+    }
+
+    /* BOTÓN RETORNAR */
+    .btn-retornar {
+        padding: 8px 18px;
+        border: 2px solid #FFD700;
+        background: transparent;
+        color: #FFD700;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+        letter-spacing: 0.5px;
+        display: none;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+    .btn-retornar:hover {
+        background: #FFD700;
+        color: #1a2a4a;
+        transform: scale(1.05);
+    }
+    .btn-retornar.visible {
+        display: block;
+        animation: fadeInMenu 0.3s ease;
+    }
+
+    .tab-content-container {
+        padding: 16px 24px;
+        background: #f5f6f8;
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        min-height: 0;
+        scrollbar-width: thin;
+    }
+    .tab-content-container::-webkit-scrollbar { width: 8px; height: 8px; }
+    .tab-content-container::-webkit-scrollbar-track { background: #e8ecf1; border-radius: 4px; }
+    .tab-content-container::-webkit-scrollbar-thumb { background: #1a3a6b; border-radius: 4px; }
+    .tab-content-container::-webkit-scrollbar-thumb:hover { background: #2a5a8b; }
+
+    .tab-panel { display: none; animation: fadeInContenido 0.3s ease; }
+    .tab-panel.activo { display: block; }
+    @keyframes fadeInContenido { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .contenido-pagina {
+        display: none;
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+    }
+    .contenido-pagina.activo {
+        display: block;
+        animation: fadeInContenido 0.3s ease;
+        height: auto;
+        min-height: 100%;
+    }
+    .contenido-pagina iframe {
+        width: 100%;
+        height: auto;
+        min-height: 100vh;
+        border: 1px solid #d0d8e0;
+        border-radius: 8px;
+        background: white;
+        display: block;
+    }
+
+    .lista-funciones { max-width: 100%; }
+    .lista-titulo { font-size: 16px; font-weight: bold; color: #1a2a4a; padding-bottom: 8px; border-bottom: 2px solid #1a3a6b; margin-bottom: 10px; }
+    .lista-items { display: flex; flex-direction: column; gap: 2px; }
+    .lista-item {
+        padding: 4px 10px;
+        font-size: 13px;
+        color: #1a2a4a;
+        background: #ffffff;
+        border-radius: 3px;
+        border-left: 3px solid #d0d8e0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: 'Times New Roman', Times, serif;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .lista-item:hover { background: #e8f0fe; border-left-color: #1a5a8a; transform: translateX(3px); }
+    .lista-item:active { transform: scale(0.98); }
+    .lista-item.item-indice { border-left-color: #1a3a6b; background: #e8f0fe; font-weight: bold; }
+    .lista-item.item-indice:hover { background: #d0d8e0; border-left-color: #0d3b6b; }
+    .lista-item.item-formulario { border-left-color: #1a73e8; background: #e8f0fe; font-weight: bold; }
+    .lista-item.item-busqueda-rapida {
+        border-left-color: #FF6B00;
+        background: #FFF3E8;
+        font-weight: bold;
+        color: #0f0e0e;
+    }
+    .lista-item.item-busqueda-rapida:hover {
+        background: #FFE0CC;
+        border-left-color: #CC5500;
+        transform: translateX(3px);
+    }
+    .lista-item.item-colores {
+        border-left-color: #9B59B6;
+        background: #F4ECF7;
+        font-weight: bold;
+        color: #6C3483;
+    }
+    .lista-item.item-colores:hover {
+        background: #E8DAEF;
+        border-left-color: #7D3C98;
+        transform: translateX(3px);
+    }
+    .lista-item.item-colores .icono-colores {
+        margin-right: 8px;
+    }
+    .lista-item.item-cumpleanos {
+        border-left-color: #FF6B6B;
+        background: #FFF0F0;
+        font-weight: bold;
+        color: #C0392B;
+    }
+    .lista-item.item-cumpleanos:hover {
+        background: #FFE0E0;
+        border-left-color: #E74C3C;
+        transform: translateX(3px);
+    }
+    .lista-item.item-estadisticas {
+        border-left-color: #2E86C1;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-estadisticas:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-estadisticas .icono-estadisticas {
+        margin-right: 8px;
+    }
+    .lista-item.item-dashboard {
+        border-left-color: #8E44AD;
+        background: #F4ECF7;
+        font-weight: bold;
+        color: #6C3483;
+    }
+    .lista-item.item-dashboard:hover {
+        background: #E8DAEF;
+        border-left-color: #7D3C98;
+        transform: translateX(3px);
+    }
+    .lista-item.item-dashboard .icono-dashboard {
+        margin-right: 8px;
+    }
+    .lista-item.item-top-estudiantes {
+        border-left-color: #F1C40F;
+        background: #FEF9E7;
+        font-weight: bold;
+        color: #7D6608;
+    }
+    .lista-item.item-top-estudiantes:hover {
+        background: #FDEBD0;
+        border-left-color: #D4AC0D;
+        transform: translateX(3px);
+    }
+    .lista-item.item-top-estudiantes .icono-top {
+        margin-right: 8px;
+    }
+    .lista-item.item-riesgo {
+        border-left-color: #C0392B;
+        background: #FDEDEC;
+        font-weight: bold;
+        color: #922B21;
+    }
+    .lista-item.item-riesgo:hover {
+        background: #FADBD8;
+        border-left-color: #A93226;
+        transform: translateX(3px);
+    }
+    .lista-item.item-riesgo .icono-riesgo {
+        margin-right: 8px;
+    }
+    .lista-item.item-foto-estudiante {
+        border-left-color: #E67E22;
+        background: #FEF5E7;
+        font-weight: bold;
+        color: #A04000;
+    }
+    .lista-item.item-foto-estudiante:hover {
+        background: #FDEBD0;
+        border-left-color: #D35400;
+        transform: translateX(3px);
+    }
+    .lista-item.item-foto-estudiante .icono-foto {
+        margin-right: 8px;
+    }
+    .lista-item.item-datos-generales {
+        border-left-color: #2E86C1;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-datos-generales:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-datos-generales .icono-datos {
+        margin-right: 8px;
+    }
+    .lista-item.item-condicion-inicial {
+        border-left-color: #6A1B9A;
+        background: #F3E5F5;
+        font-weight: bold;
+        color: #4A148C;
+    }
+    .lista-item.item-condicion-inicial:hover {
+        background: #E1BEE7;
+        border-left-color: #4A148C;
+        transform: translateX(3px);
+    }
+    .lista-item.item-condicion-inicial .icono-condicion {
+        margin-right: 8px;
+    }
+    .lista-item.item-preprimario {
+        border-left-color: #E67E22;
+        background: #FEF5E7;
+        font-weight: bold;
+        color: #A04000;
+    }
+    .lista-item.item-preprimario:hover {
+        background: #FDEBD0;
+        border-left-color: #D35400;
+        transform: translateX(3px);
+    }
+    .lista-item.item-preprimario .icono-preprimario {
+        margin-right: 8px;
+    }
+    .lista-item.item-control-movimiento {
+        border-left-color: #8E44AD;
+        background: #F4ECF7;
+        font-weight: bold;
+        color: #6C3483;
+    }
+    .lista-item.item-control-movimiento:hover {
+        background: #E8DAEF;
+        border-left-color: #7D3C98;
+        transform: translateX(3px);
+    }
+    .lista-item.item-control-movimiento .icono-control {
+        margin-right: 8px;
+    }
+    .lista-item.item-datos-padres {
+        border-left-color: #E74C3C;
+        background: #FDEDEC;
+        font-weight: bold;
+        color: #922B21;
+    }
+    .lista-item.item-datos-padres:hover {
+        background: #FADBD8;
+        border-left-color: #A93226;
+        transform: translateX(3px);
+    }
+    .lista-item.item-datos-padres .icono-padres {
+        margin-right: 8px;
+    }
+    .lista-item.item-historial-medico {
+        border-left-color: #1A8A6B;
+        background: #E8F8F5;
+        font-weight: bold;
+        color: #0E6B4F;
+    }
+    .lista-item.item-historial-medico:hover {
+        background: #D0F0EA;
+        border-left-color: #0E6B4F;
+        transform: translateX(3px);
+    }
+    .lista-item.item-historial-medico .icono-medico {
+        margin-right: 8px;
+    }
+    .lista-item.item-directorio-padres {
+        border-left-color: #3498DB;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-directorio-padres:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-directorio-padres .icono-directorio {
+        margin-right: 8px;
+    }
+    .lista-item.item-mapa-procedencia {
+        border-left-color: #8B4513;
+        background: #FAF0E6;
+        font-weight: bold;
+        color: #5D3A1A;
+    }
+    .lista-item.item-mapa-procedencia:hover {
+        background: #F5E6D3;
+        border-left-color: #5D3A1A;
+        transform: translateX(3px);
+    }
+    .lista-item.item-mapa-procedencia .icono-mapa {
+        margin-right: 8px;
+    }
+    .lista-item.item-neae {
+        border-left-color: #6A1B9A;
+        background: #F3E5F5;
+        font-weight: bold;
+        color: #4A148C;
+    }
+    .lista-item.item-neae:hover {
+        background: #E1BEE7;
+        border-left-color: #4A148C;
+        transform: translateX(3px);
+    }
+    .lista-item.item-neae .icono-neae {
+        margin-right: 8px;
+    }
+    .lista-item.item-ajustes-curriculares {
+        border-left-color: #2980B9;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-ajustes-curriculares:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-ajustes-curriculares .icono-ajustes {
+        margin-right: 8px;
+    }
+    .lista-item.item-estadisticas-sobreedad {
+        border-left-color: #E74C3C;
+        background: #FDEDEC;
+        font-weight: bold;
+        color: #922B21;
+    }
+    .lista-item.item-estadisticas-sobreedad:hover {
+        background: #FADBD8;
+        border-left-color: #A93226;
+        transform: translateX(3px);
+    }
+    .lista-item.item-estadisticas-sobreedad .icono-sobreedad {
+        margin-right: 8px;
+    }
+    .lista-item.item-reporte-automatico {
+        border-left-color: #8E44AD;
+        background: #F4ECF7;
+        font-weight: bold;
+        color: #6C3483;
+    }
+    .lista-item.item-reporte-automatico:hover {
+        background: #E8DAEF;
+        border-left-color: #7D3C98;
+        transform: translateX(3px);
+    }
+    .lista-item.item-reporte-automatico .icono-reporte {
+        margin-right: 8px;
+    }
+    .lista-item.item-vista-responsiva {
+        border-left-color: #3498DB;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-vista-responsiva:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-vista-responsiva .icono-vista {
+        margin-right: 8px;
+    }
+    .lista-item.item-modo-offline {
+        border-left-color: #6C757D;
+        background: #F8F9FA;
+        font-weight: bold;
+        color: #343A40;
+    }
+    .lista-item.item-modo-offline:hover {
+        background: #E9ECEF;
+        border-left-color: #495057;
+        transform: translateX(3px);
+    }
+    .lista-item.item-modo-offline .icono-offline {
+        margin-right: 8px;
+    }
+    .lista-item.item-logo-personalizado {
+        border-left-color: #E67E22;
+        background: #FEF5E7;
+        font-weight: bold;
+        color: #A04000;
+    }
+    .lista-item.item-logo-personalizado:hover {
+        background: #FDEBD0;
+        border-left-color: #D35400;
+        transform: translateX(3px);
+    }
+    .lista-item.item-logo-personalizado .icono-logo {
+        margin-right: 8px;
+    }
+    .lista-item.item-selector-mes {
+        border-left-color: #1ABC9C;
+        background: #E8F8F5;
+        font-weight: bold;
+        color: #0E6B4F;
+    }
+    .lista-item.item-selector-mes:hover {
+        background: #D0F0EA;
+        border-left-color: #0E6B4F;
+        transform: translateX(3px);
+    }
+    .lista-item.item-selector-mes .icono-selector {
+        margin-right: 8px;
+    }
+    .lista-item.item-leyenda {
+        border-left-color: #6C757D;
+        background: #F8F9FA;
+        font-weight: bold;
+        color: #343A40;
+    }
+    .lista-item.item-leyenda:hover {
+        background: #E9ECEF;
+        border-left-color: #495057;
+        transform: translateX(3px);
+    }
+    .lista-item.item-leyenda .icono-leyenda {
+        margin-right: 8px;
+    }
+    .lista-item.item-tabla-mensual {
+        border-left-color: #2980B9;
+        background: #EBF5FB;
+        font-weight: bold;
+        color: #1A5276;
+    }
+    .lista-item.item-tabla-mensual:hover {
+        background: #D4E6F1;
+        border-left-color: #1A5276;
+        transform: translateX(3px);
+    }
+    .lista-item.item-tabla-mensual .icono-tabla {
+        margin-right: 8px;
+    }
+    .lista-item.item-escanear-asistencia {
+        border-left-color: #6F42C1;
+        background: #F3E8FF;
+        font-weight: bold;
+        color: #5A2D8A;
+    }
+    .lista-item.item-escanear-asistencia:hover {
+        background: #E8D5FF;
+        border-left-color: #6F42C1;
+        transform: translateX(3px);
+    }
+    .lista-item.item-escanear-asistencia .icono-escanear {
+        margin-right: 8px;
+    }
+    .lista-item.item-resumen-mes {
+        border-left-color: #28A745;
+        background: #E8F5E9;
+        font-weight: bold;
+        color: #1E7E34;
+    }
+    .lista-item.item-resumen-mes:hover {
+        background: #D4EDDA;
+        border-left-color: #28A745;
+        transform: translateX(3px);
+    }
+    .lista-item.item-resumen-mes .icono-resumen-mes {
+        margin-right: 8px;
+    }
+    .lista-item.item-alertas-automaticas {
+        border-left-color: #E74C3C;
+        background: #FDEDEC;
+        font-weight: bold;
+        color: #922B21;
+    }
+    .lista-item.item-alertas-automaticas:hover {
+        background: #FADBD8;
+        border-left-color: #A93226;
+        transform: translateX(3px);
+    }
+    .lista-item.item-alertas-automaticas .icono-alertas {
+        margin-right: 8px;
+    }
+    .lista-item.item-calculo-automatico {
+        border-left-color: #6F42C1;
+        background: #F3E8FF;
+        font-weight: bold;
+        color: #5A2D8A;
+    }
+    .lista-item.item-calculo-automatico:hover {
+        background: #E8D5FF;
+        border-left-color: #6F42C1;
+        transform: translateX(3px);
+    }
+    .lista-item.item-calculo-automatico .icono-calculo {
+        margin-right: 8px;
+    }
+    .lista-item.item-trazo-azul {
+        border-left-color: #1A73E8;
+        background: #E8F0FE;
+        font-weight: bold;
+        color: #1557B0;
+    }
+    .lista-item.item-trazo-azul:hover {
+        background: #D2E3FC;
+        border-left-color: #1557B0;
+        transform: translateX(3px);
+    }
+    .lista-item.item-trazo-azul .icono-trazo {
+        margin-right: 8px;
+    }
+    .lista-item.item-notificaciones-push {
+        border-left-color: #DC3545;
+        background: #FDE8E8;
+        font-weight: bold;
+        color: #A71D2A;
+    }
+    .lista-item.item-notificaciones-push:hover {
+        background: #FCD5D5;
+        border-left-color: #A71D2A;
+        transform: translateX(3px);
+    }
+    .lista-item.item-notificaciones-push .icono-push {
+        margin-right: 8px;
+    }
+    .lista-item.item-fechas-recuperaciones {
+        border-left-color: #FF6B00;
+        background: #FFF3E8;
+        font-weight: bold;
+        color: #A04000;
+    }
+    .lista-item.item-fechas-recuperaciones:hover {
+        background: #FFE0CC;
+        border-left-color: #CC5500;
+        transform: translateX(3px);
+    }
+    .lista-item.item-fechas-recuperaciones .icono-recuperacion {
+        margin-right: 8px;
+    }
+    .lista-item.item-alertas-cierre {
+        border-left-color: #DC3545;
+        background: #FDE8E8;
+        font-weight: bold;
+        color: #A71D2A;
+    }
+    .lista-item.item-alertas-cierre:hover {
+        background: #FCD5D5;
+        border-left-color: #A71D2A;
+        transform: translateX(3px);
+    }
+    .lista-item.item-alertas-cierre .icono-cierre {
+        margin-right: 8px;
+    }
+    .lista-item.item-sigerd {
+        border-left-color: #0F6B4F;
+        background: #E8F8F5;
+        font-weight: bold;
+        color: #0E6B4F;
+    }
+    .lista-item.item-sigerd:hover {
+        background: #D0F0EA;
+        border-left-color: #0E6B4F;
+        transform: translateX(3px);
+    }
+    .lista-item.item-sigerd .icono-sigerd {
+        margin-right: 8px;
+    }
+
+    .carta-page-indice {
+        width: 100%;
+        height: auto;
+        max-width: 8.5in;
+        margin: 0 auto;
+        background: #ffffff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border-radius: 4px;
+        border: 1px solid #d0d0d0;
+        overflow: visible;
+        padding: 0.6in 0.7in 0.5in 0.7in;
+    }
+    .page-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #1a2a4a;
+        text-transform: uppercase;
+        text-align: center;
+        letter-spacing: 2px;
+        margin-bottom: 20px;
+        border-bottom: 3px solid #1a3a6b;
+        padding-bottom: 10px;
+    }
+    .sub-title-indice {
+        font-size: 14px;
+        font-weight: bold;
+        color: #1a2a4a;
+        text-transform: uppercase;
+        text-align: center;
+        letter-spacing: 6px;
+        margin-bottom: 25px;
+    }
+    .indice-lista { display: flex; flex-direction: column; gap: 4px; }
+    .indice-item {
+        display: flex;
+        align-items: baseline;
+        padding: 2px 0;
+        font-size: 13px;
+        color: #1a2a4a;
+        border-bottom: 1px dotted #d0d8e0;
+    }
+    .indice-texto { flex-shrink: 0; font-weight: normal; }
+    .indice-puntos { flex: 1; color: #a0b0c0; font-size: 12px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; }
+    .indice-pagina { flex-shrink: 0; font-weight: bold; color: #1a3a6b; margin-left: 6px; min-width: 30px; text-align: right; }
+    .indice-item.clickable { cursor: pointer; transition: all 0.3s ease; border-radius: 4px; padding: 2px 8px; margin: 0 -8px; }
+    .indice-item.clickable:hover { background: #e8fef4; border-bottom-color: #1a3a6b; }
+    .indice-item.clickable:active { background: #d0d8e0; transform: scale(0.98); }
+    .indice-item.clickable .indice-pagina { color: #1a5a8a; text-decoration: underline; }
+    .indice-item.clickable:hover .indice-pagina { color: #0d3b6b; }
+    .indice-item.proximamente { opacity: 0.7; cursor: default; }
+    .indice-item.proximamente .indice-pagina { color: #8a9aaa; }
+    .indice-estado {
+        flex-shrink: 0;
+        font-size: 10px;
+        color: #856404;
+        background: #fff3cd;
+        padding: 1px 8px;
+        border-radius: 10px;
+        margin-left: 8px;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+    .bottom-line-indice { width: 100%; height: 2px; background: #1a3a6b; margin-top: 25px; border-radius: 2px; }
+    .watermark-indice { text-align: center; margin-top: 12px; font-size: 10px; color: #8a9aaa; letter-spacing: 3px; text-transform: uppercase; }
+
+    .indice-grid-3x3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin: 6px 0 12px 0;
+    }
+    .indice-grid-3x3 .grid-item {
+        background: #f9fafc;
+        border-radius: 20px;
+        padding: 22px 16px 20px 16px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+        min-height: 140px;
+        justify-content: center;
+    }
+    .indice-grid-3x3 .grid-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(26, 42, 74, 0.10);
+        border-color: #1a3a6b;
+        background: #ffffff;
+    }
+    .indice-grid-3x3 .grid-item:active { transform: scale(0.97); }
+    .indice-grid-3x3 .grid-item .icono { 
+        font-size: 38px; 
+        line-height: 1.2; 
+        margin-bottom: 8px; 
+        display: block; 
+    }
+    .indice-grid-3x3 .grid-item .titulo { 
+        font-weight: 700; 
+        font-size: 18px; 
+        color: #1a2a4a; 
+        line-height: 1.3; 
+        margin-bottom: 4px; 
+    }
+    .indice-grid-3x3 .grid-item .pagina { display: none; }
+    .indice-grid-3x3 .grid-item .estado {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 14px;
+        border-radius: 40px;
+        margin-top: 8px;
+        background: #e6f0e6;
+        color: #1a6a3a;
+    }
+    .indice-grid-3x3 .grid-item .estado.activo { background: #dff0d8; color: #2d6a4f; }
+    .indice-grid-3x3 .grid-item .estado.destacado { background: #d4e3fd; color: #1a4a8a; }
+    .indice-grid-3x3 .grid-item.tipo-centro { border-left: 4px solid #1a3a6b; }
+    .indice-grid-3x3 .grid-item.tipo-maestro { border-left: 4px solid #2a6a8a; }
+    .indice-grid-3x3 .grid-item.tipo-resumen { border-left: 4px solid #4a7a5a; }
+    .indice-grid-3x3 .grid-item.tipo-estudiante { border-left: 4px solid #6a4a8a; }
+    .indice-grid-3x3 .grid-item.tipo-pmt { border-left: 4px solid #8a6a4a; }
+    .indice-grid-3x3 .grid-item.tipo-asistencia { border-left: 4px solid #c07a3a; }
+    .indice-grid-3x3 .grid-item.tipo-evaluacion { border-left: 4px solid #b04a6a; }
+    .indice-grid-3x3 .grid-item.tipo-acta { border-left: 4px solid #3a7a8a; }
+    .indice-grid-3x3 .grid-item.tipo-lista { border-left: 4px solid #5a7a9a; }
+    .indice-grid-3x3 .grid-item.tipo-cumpleanos { border-left: 4px solid #E74C3C; }
+    .indice-grid-3x3 .grid-item.tipo-estadisticas { border-left: 4px solid #2E86C1; }
+    .indice-grid-3x3 .grid-item.tipo-top-estudiantes { border-left: 4px solid #F1C40F; }
+    .indice-grid-3x3 .grid-item.tipo-riesgo { border-left: 4px solid #C0392B; }
+
+    .indice-extra-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 16px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 18px;
+    }
+    .indice-extra-row .grid-item {
+        background: #f9fafc;
+        border-radius: 20px;
+        padding: 22px 16px 20px 16px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.01);
+        min-height: 140px;
+        justify-content: center;
+    }
+    .indice-extra-row .grid-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(26, 42, 74, 0.10);
+        border-color: #1a3a6b;
+        background: #ffffff;
+    }
+    .indice-extra-row .grid-item:active { transform: scale(0.97); }
+    .indice-extra-row .grid-item .icono { 
+        font-size: 38px; 
+        line-height: 1.2; 
+        margin-bottom: 8px; 
+        display: block; 
+    }
+    .indice-extra-row .grid-item .titulo { 
+        font-weight: 700; 
+        font-size: 18px; 
+        color: #1a2a4a; 
+        line-height: 1.3; 
+        margin-bottom: 4px; 
+    }
+    .indice-extra-row .grid-item .pagina { display: none; }
+    .indice-extra-row .grid-item .estado {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 14px;
+        border-radius: 40px;
+        margin-top: 8px;
+        background: #e6f0e6;
+        color: #1a6a3a;
+    }
+    .indice-extra-row .grid-item .estado.activo { background: #dff0d8; color: #2d6a4f; }
+    .indice-extra-row .grid-item .estado.destacado { background: #d4e3fd; color: #1a4a8a; }
+    .indice-extra-row .grid-item.tipo-acta { border-left: 4px solid #3a7a8a; }
+    .indice-extra-row .grid-item.tipo-lista { border-left: 4px solid #5a7a9a; }
+    .indice-extra-row .grid-item.tipo-cumpleanos { border-left: 4px solid #E74C3C; }
+    .indice-extra-row .grid-item.tipo-estadisticas { border-left: 4px solid #2E86C1; }
+    .indice-extra-row .grid-item.tipo-top-estudiantes { border-left: 4px solid #F1C40F; }
+    .indice-extra-row .grid-item.tipo-riesgo { border-left: 4px solid #C0392B; }
+
+    .indice-footer {
+        margin-top: 18px;
+        text-align: center;
+        border-top: 2px solid #1a2a4a;
+        padding-top: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .indice-footer span { font-size: 13px; color: #4a5a7a; letter-spacing: 2px; }
+    .indice-footer .repdom { font-weight: 600; color: #1a2a4a; letter-spacing: 3px; }
+
+    .modal-colores {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        padding: 20px;
+        backdrop-filter: blur(5px);
+    }
+    .modal-colores.activo {
+        display: flex;
+        animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-colores .modal-contenido {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 30px 35px 25px 35px;
+        max-width: 750px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        position: relative;
+    }
+    .modal-colores .modal-contenido::-webkit-scrollbar { width: 6px; }
+    .modal-colores .modal-contenido::-webkit-scrollbar-track { background: #f0f4f8; border-radius: 3px; }
+    .modal-colores .modal-contenido::-webkit-scrollbar-thumb { background: #1a3a6b; border-radius: 3px; }
+
+    .modal-colores .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #718096;
+        transition: color 0.3s;
+        line-height: 1;
+    }
+    .modal-colores .modal-close:hover { color: #dc3545; }
+
+    .modal-colores h2 {
+        color: #1a2a4a;
+        font-size: 22px;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .modal-colores .modal-sub {
+        color: #718096;
+        font-size: 14px;
+        margin-bottom: 20px;
+    }
+
+    .modal-colores .seccion-colores {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e8ecf1;
+    }
+    .modal-colores .seccion-colores:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    .modal-colores .seccion-titulo {
+        font-size: 14px;
+        font-weight: bold;
+        color: #1a2a4a;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .modal-colores .seccion-titulo .badge {
+        font-size: 10px;
+        background: #e8ecf1;
+        padding: 1px 10px;
+        border-radius: 12px;
+        color: #718096;
+        font-weight: normal;
+    }
+
+    .modal-colores .grid-colores {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 10px;
+    }
+    .modal-colores .grid-colores-2 {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+
+    .modal-colores .color-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+    .modal-colores .color-item:hover {
+        border-color: #1a3a6b;
+        background: #f0f4f8;
+    }
+    .modal-colores .color-item label {
+        font-size: 12px;
+        color: #1a2a4a;
+        font-weight: 600;
+        flex: 1;
+        cursor: pointer;
+    }
+    .modal-colores .color-item input[type="color"] {
+        width: 40px;
+        height: 36px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        padding: 2px;
+        background: white;
+        flex-shrink: 0;
+    }
+    .modal-colores .color-item input[type="color"]:hover {
+        border-color: #1a3a6b;
+    }
+
+    .modal-colores .color-picker-grupo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    .modal-colores .color-picker-grupo .color-opcion {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    .modal-colores .color-picker-grupo .color-opcion:hover {
+        transform: scale(1.15);
+        border-color: #1a2a4a;
+    }
+    .modal-colores .color-picker-grupo .color-opcion.seleccionada {
+        border-color: #1a2a4a;
+        box-shadow: 0 0 0 2px white, 0 0 0 4px #1a2a4a;
+    }
+
+    .modal-colores .btn-guardar-colores {
+        width: 100%;
+        padding: 12px;
+        background: #1a2a4a;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 15px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    .modal-colores .btn-guardar-colores:hover {
+        background: #2a3a5a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 42, 74, 0.3);
+    }
+
+    .modal-colores .btn-restablecer {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Times New Roman', Times, serif;
+        margin-top: 8px;
+    }
+    .modal-colores .btn-restablecer:hover {
+        background: #5a6268;
+    }
+
+    .modal-colores .preview-colores {
+        display: flex;
+        gap: 15px;
+        padding: 12px 15px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 2px dashed #d0d8e0;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .modal-colores .preview-colores .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #1a2a4a;
+    }
+    .modal-colores .preview-colores .preview-cuadrado {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        border: 1px solid #d0d8e0;
+    }
+
+    .mensaje-no-disponible {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff3cd;
+        border: 3px solid #ffc107;
+        border-radius: 10px;
+        padding: 25px 35px;
+        text-align: center;
+        z-index: 2000;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+        animation: popIn 0.3s ease;
+        max-width: 90%;
+    }
+    .mensaje-no-disponible .icono-grande { font-size: 40px; display: block; margin-bottom: 8px; }
+    .mensaje-no-disponible h3 { font-size: 20px; color: #856404; font-family: 'Times New Roman', Times, serif; margin-bottom: 4px; }
+    .mensaje-no-disponible p { font-size: 14px; color: #856404; font-family: 'Times New Roman', Times, serif; opacity: 0.8; }
+    .mensaje-no-disponible .cerrar-btn { margin-top: 12px; padding: 6px 24px; background: #ffc107; border: none; border-radius: 5px; font-size: 13px; font-weight: bold; color: #856404; cursor: pointer; font-family: 'Times New Roman', Times, serif; transition: all 0.2s ease; }
+    .mensaje-no-disponible .cerrar-btn:hover { background: #e6a800; transform: scale(1.03); }
+    @keyframes popIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.85); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+
+    .toast-mensaje {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a2a4a;
+        color: white;
+        padding: 12px 28px;
+        border-radius: 60px;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 15px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(255,255,255,0.1);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+        opacity: 0;
+        transform: translateX(-50%) translateY(16px);
+        pointer-events: none;
+        z-index: 999;
+        white-space: nowrap;
+    }
+    .toast-mensaje.visible { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+    /* ============================================
+       RESPONSIVE - TABLET (≤ 1400px)
+       ============================================ */
+    @media (max-width: 1400px) {
+        body { 
+            padding: 10px; 
+        }
+        .main-container { 
+            width: 100%; 
+            max-width: 1366px; 
+            min-width: auto; 
+            height: 100vh; 
+            max-height: 100vh; 
+            min-height: 100vh; 
+            margin: 0 auto; 
+            border-radius: 8px; 
+        }
+    }
+
+    /* ============================================
+       RESPONSIVE - MÓVIL (≤ 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body { 
+            padding: 8px; 
+            overflow-x: hidden;
+        }
+        .main-container { 
+            width: 100%; 
+            max-width: 100%; 
+            min-width: auto; 
+            height: 100vh; 
+            max-height: 100vh; 
+            min-height: 100vh; 
+            margin: 0 auto; 
+            border-radius: 6px; 
+        }
+        
+        /* TOP BAR COMPACTO */
+        .top-bar { 
+            padding: 6px 10px; 
+            min-height: 38px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .top-bar-left { 
+            gap: 8px; 
+        }
+        .top-bar-title { 
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+        .top-bar-grado { 
+            font-size: 10px; 
+            padding: 2px 8px;
+        }
+        .btn-engranaje { 
+            font-size: 16px;
+            padding: 3px 6px;
+        }
+        
+        /* TABS COMPACTOS */
+        .tabs-container { 
+            min-height: 32px;
+            padding: 0 6px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 1px;
+        }
+        .tabs-container::-webkit-scrollbar { 
+            display: none; 
+        }
+        .tab-btn { 
+            padding: 5px 8px; 
+            font-size: 9px;
+            flex-shrink: 0;
+            letter-spacing: 0.3px;
+        }
+        .tab-btn .tab-icon { 
+            font-size: 10px;
+            margin-right: 3px;
+        }
+        .tab-btn .tab-badge {
+            font-size: 7px;
+            padding: 1px 4px;
+        }
+        
+        .tab-content-container { 
+            padding: 10px; 
+        }
+        .carta-page-indice { 
+            padding: 0.4in 0.4in 0.3in 0.4in; 
+        }
+        .page-title { 
+            font-size: 13px; 
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+        .sub-title-indice { 
+            font-size: 11px; 
+            letter-spacing: 3px;
+        }
+        .indice-grid-3x3 { 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+        }
+        .indice-grid-3x3 .grid-item { 
+            min-height: 110px; 
+            padding: 16px 10px 14px 10px; 
+        }
+        .indice-grid-3x3 .grid-item .icono { 
+            font-size: 30px; 
+        }
+        .indice-grid-3x3 .grid-item .titulo { 
+            font-size: 15px; 
+        }
+        .indice-extra-row { 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+        }
+        .indice-extra-row .grid-item { 
+            min-height: 110px; 
+            padding: 16px 10px 14px 10px; 
+        }
+        .indice-extra-row .grid-item .icono { 
+            font-size: 30px; 
+        }
+        .indice-extra-row .grid-item .titulo { 
+            font-size: 15px; 
+        }
+        .btn-retornar { 
+            font-size: 10px; 
+            padding: 5px 10px; 
+        }
+        .modal-colores .modal-contenido { 
+            padding: 18px 15px; 
+            max-width: 95%; 
+        }
+        .modal-colores .grid-colores { 
+            grid-template-columns: 1fr; 
+        }
+        .modal-colores .grid-colores-2 { 
+            grid-template-columns: 1fr; 
+        }
+        .lista-item { 
+            font-size: 11px; 
+            padding: 3px 7px; 
+        }
+    }
+
+    /* ============================================
+       RESPONSIVE - MÓVIL PEQUEÑO (≤ 480px)
+       ============================================ */
+    @media (max-width: 480px) {
+        body { 
+            padding: 5px; 
+        }
+        .main-container { 
+            border-radius: 4px; 
+        }
+        
+        /* TOP BAR MUY COMPACTO */
+        .top-bar { 
+            padding: 5px 8px; 
+            min-height: 32px;
+            gap: 5px;
+        }
+        .top-bar-title { 
+            font-size: 10px;
+            letter-spacing: 0.3px;
+        }
+        .top-bar-grado { 
+            font-size: 9px; 
+            padding: 2px 6px;
+        }
+        .btn-engranaje { 
+            font-size: 14px;
+            padding: 2px 5px;
+        }
+        
+        /* TABS ULTRA COMPACTOS */
+        .tabs-container { 
+            min-height: 28px;
+            padding: 0 4px;
+            gap: 0;
+        }
+        .tab-btn { 
+            padding: 4px 6px; 
+            font-size: 8px;
+            letter-spacing: 0.2px;
+        }
+        .tab-btn .tab-icon { 
+            font-size: 9px;
+            margin-right: 2px;
+        }
+        .tab-btn .tab-badge {
+            font-size: 6px;
+            padding: 0 3px;
+        }
+        
+        .tab-content-container { 
+            padding: 8px; 
+        }
+        .carta-page-indice { 
+            padding: 0.3in 0.3in 0.2in 0.3in; 
+        }
+        .page-title { 
+            font-size: 11px; 
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        .sub-title-indice { 
+            font-size: 10px; 
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+        .indice-grid-3x3 { 
+            grid-template-columns: 1fr; 
+            gap: 8px; 
+        }
+        .indice-grid-3x3 .grid-item { 
+            min-height: 95px; 
+            padding: 12px 8px 10px 8px; 
+        }
+        .indice-grid-3x3 .grid-item .icono { 
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        .indice-grid-3x3 .grid-item .titulo { 
+            font-size: 13px; 
+        }
+        .indice-grid-3x3 .grid-item .estado { 
+            font-size: 9px; 
+            padding: 2px 8px; 
+        }
+        .indice-extra-row { 
+            grid-template-columns: 1fr; 
+            gap: 8px; 
+        }
+        .indice-extra-row .grid-item { 
+            min-height: 95px; 
+            padding: 12px 8px 10px 8px; 
+        }
+        .indice-extra-row .grid-item .icono { 
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+        .indice-extra-row .grid-item .titulo { 
+            font-size: 13px; 
+        }
+        .indice-extra-row .grid-item .estado { 
+            font-size: 9px; 
+            padding: 2px 8px; 
+        }
+        .btn-retornar { 
+            font-size: 9px; 
+            padding: 3px 8px; 
+        }
+        .lista-item { 
+            font-size: 10px; 
+            padding: 2px 6px; 
+        }
+        .mensaje-no-disponible { 
+            padding: 18px 20px; 
+        }
+        .mensaje-no-disponible .icono-grande { 
+            font-size: 32px; 
+        }
+        .mensaje-no-disponible h3 { 
+            font-size: 16px; 
+        }
+        .mensaje-no-disponible p { 
+            font-size: 12px; 
+        }
+    }
+
+    /* ============================================
+       RESPONSIVE - MÓVIL MUY PEQUEÑO (≤ 360px)
+       ============================================ */
+    @media (max-width: 360px) {
+        body { 
+            padding: 3px; 
+        }
+        .main-container { 
+            border-radius: 3px; 
+        }
+        
+        /* TOP BAR MÍNIMO */
+        .top-bar { 
+            padding: 4px 6px; 
+            min-height: 28px;
+            gap: 4px;
+        }
+        .top-bar-title { 
+            font-size: 9px;
+            letter-spacing: 0.2px;
+        }
+        .top-bar-grado { 
+            font-size: 8px; 
+            padding: 1px 5px;
+        }
+        .btn-engranaje { 
+            font-size: 12px;
+            padding: 2px 4px;
+        }
+        
+        /* TABS MÍNIMOS */
+        .tabs-container { 
+            min-height: 24px;
+            padding: 0 3px;
+        }
+        .tab-btn { 
+            padding: 3px 5px; 
+            font-size: 7px;
+            letter-spacing: 0.1px;
+        }
+        .tab-btn .tab-icon { 
+            font-size: 8px;
+            margin-right: 1px;
+        }
+        .tab-btn .tab-badge {
+            display: none;
+        }
+        
+        .tab-content-container { 
+            padding: 6px; 
+        }
+        .carta-page-indice { 
+            padding: 0.25in 0.25in 0.15in 0.25in; 
+        }
+        .page-title { 
+            font-size: 10px; 
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+        .sub-title-indice { 
+            font-size: 9px; 
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .indice-grid-3x3 .grid-item { 
+            min-height: 85px; 
+            padding: 10px 6px 8px 6px; 
+        }
+        .indice-grid-3x3 .grid-item .icono { 
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .indice-grid-3x3 .grid-item .titulo { 
+            font-size: 12px; 
+        }
+        .indice-extra-row .grid-item { 
+            min-height: 85px; 
+            padding: 10px 6px 8px 6px; 
+        }
+        .indice-extra-row .grid-item .icono { 
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .indice-extra-row .grid-item .titulo { 
+            font-size: 12px; 
+        }
+        .btn-retornar { 
+            font-size: 8px; 
+            padding: 2px 6px; 
+        }
+        .lista-item { 
+            font-size: 9px; 
+            padding: 2px 5px; 
+        }
+    }
+
+    @media print {
+        html, body { margin: 0 !important; padding: 0 !important; background: white !important; overflow: visible !important; height: auto !important; min-height: auto !important; }
+        body { padding: 0 !important; margin: 0 !important; background: white !important; }
+        .main-container { width: 100% !important; max-width: 100% !important; min-width: auto !important; height: auto !important; max-height: auto !important; min-height: auto !important; box-shadow: none !important; border-radius: 0 !important; background: white !important; overflow: visible !important; display: block !important; }
+        .top-bar, .tabs-container, .tab-content-container { display: none !important; }
+        .contenido-pagina { display: block !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; }
+        .contenido-pagina iframe { border: none !important; border-radius: 0 !important; height: auto !important; min-height: auto !important; }
+        .carta-page-indice { height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; box-shadow: none !important; border: none !important; border-radius: 0 !important; background: white !important; }
+        .modal-colores { display: none !important; }
+        .mensaje-no-disponible { display: none !important; }
+        .btn-retornar { display: none !important; }
+        @page { size: letter; margin: 0.2in; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="main-container">
+
+        <!-- ========== BARRA SUPERIOR ========== -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <span class="top-bar-title">📚 Registro de Grado</span>
+                <img id="logoPersonalizado" class="top-bar-logo" src="" alt="Logo" />
+                <span class="top-bar-grado" id="gradoActualDisplay">🎓 Cargando...</span>
+            </div>
+            <div class="top-bar-right">
+                <div class="menu-engranaje">
+                    <button class="btn-engranaje" id="btnEngranaje">⚙️</button>
+                    <div class="menu-dropdown" id="menuDropdown">
+                        <div class="menu-item" data-action="inicio">🏠 Ir al Inicio</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" data-action="ayuda">❓ Ayuda</div>
+                        <div class="menu-item" data-action="acerca">ℹ️ Acerca de</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" data-action="configuracion">⚙️ Configuración</div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" data-action="cerrar-sesion" style="color: #dc3545;">🚪 Cerrar Sesión</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== PESTAÑAS HORIZONTALES ========== -->
+        <div class="tabs-container" id="tabsContainer">
+            <button class="tab-btn active" data-tab="tab-inicio">
+                <span class="tab-icon">🏠</span> Inicio
+            </button>
+            <button class="tab-btn" data-tab="tab-estudiantes">
+                <span class="tab-icon">👥</span> Estudiantes
+            </button>
+            <button class="tab-btn" data-tab="tab-asistencia">
+                <span class="tab-icon">📅</span> Asistencia
+            </button>
+            <button class="tab-btn" data-tab="tab-evaluacion">
+                <span class="tab-icon">📚</span> Evaluación
+            </button>
+            <button class="tab-btn" data-tab="tab-reportes">
+                <span class="tab-icon">📄</span> Reportes
+            </button>
+            <button class="tab-btn" data-tab="tab-comunicacion">
+                <span class="tab-icon">💬</span> Comunicación
+            </button>
+            <button class="tab-btn" data-tab="tab-configuracion">
+                <span class="tab-icon">⚙️</span> Configuración
+                <span class="tab-badge">!</span>
+            </button>
+            <!-- NUEVA PESTAÑA SIGERD -->
+            <button class="tab-btn" data-tab="tab-sigerd">
+                <span class="tab-icon">📋</span> SIGERD
+            </button>
+            <!-- BOTÓN RETORNAR -->
+            <button class="btn-retornar" id="btnRetornar">↩️ Retornar al Indice</button>
+        </div>
+
+        <!-- ========== CONTENIDO DE PESTAÑAS ========== -->
+        <div class="tab-content-container" id="tabContentContainer">
+
+            <!-- TAB 1: INICIO -->
+            <div class="tab-panel activo" id="tab-inicio">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">🏠 Inicio</div>
+                    <div class="lista-items">
+                        <div class="lista-item item-formulario" data-funcion="Formulario">📋 Formulario del Estudiante</div>
+                        <div class="lista-item item-indice" id="itemIndice3x3" data-funcion="indice">📑 Índice</div>
+                        <div class="lista-item item-estadisticas" data-funcion="Estadísticas rápidas">
+                            <span class="icono-estadisticas">📊</span> Estadísticas rápidas
+                        </div>
+                        <div class="lista-item item-dashboard" data-funcion="Dashboard del docente">
+                            <span class="icono-dashboard">📈</span> Dashboard del docente
+                        </div>
+                        <div class="lista-item item-busqueda-rapida" data-funcion="Búsqueda rápida">🔍 Búsqueda rápida</div>
+                        <div class="lista-item" data-funcion="Notificaciones activas">🔔 Notificaciones activas</div>
+                        <div class="lista-item" data-funcion="Calendario escolar">📆 Calendario escolar</div>
+                        <div class="lista-item" data-funcion="Cronómetro de períodos">⏰ Cronómetro de períodos</div>
+                        <div class="lista-item item-top-estudiantes" data-funcion="Top de estudiantes">
+                            <span class="icono-top">🏆</span> Top de estudiantes
+                        </div>
+                        <div class="lista-item item-riesgo" data-funcion="Estudiantes en riesgo">
+                            <span class="icono-riesgo">⚠️</span> Estudiantes en riesgo
+                        </div>
+                        <div class="lista-item item-cumpleanos" data-funcion="Alertas de cumpleaños">🎂 Alertas de cumpleaños</div>
+                        <div class="lista-item item-vista-responsiva" data-funcion="Vista responsiva">
+                            <span class="icono-vista">📱</span> Vista responsiva
+                        </div>
+                        <div class="lista-item item-modo-offline" data-funcion="Modo offline">
+                            <span class="icono-offline">📶</span> Modo offline
+                        </div>
+                        <div class="lista-item item-logo-personalizado" data-funcion="Logo personalizado">
+                            <span class="icono-logo">🖼️</span> Logo personalizado
+                        </div>
+                        <div class="lista-item item-colores" id="btnColoresInstitucionales">
+                            <span class="icono-colores">🎨</span> Colores institucionales
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DEL ÍNDICE 3×3 -->
+                <div id="contenedorIndice3x3" style="display: none; margin-top: 6px;">
+                    <div class="indice-grid-3x3">
+                        <div class="grid-item tipo-centro" data-target="contenido-datos-centro" data-funcion="Datos del Centro Educativo">
+                            <span class="icono">🏫</span>
+                            <span class="titulo">Datos del Centro</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-maestro" data-target="contenido-datos-maestro" data-funcion="Datos del Maestro o Maestra">
+                            <span class="icono">👨‍🏫</span>
+                            <span class="titulo">Maestro / Maestra</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-resumen" data-target="contenido-rmi-15oct" data-funcion="Resumen de matrícula inicial al 15 de octubre">
+                            <span class="icono">📋</span>
+                            <span class="titulo">Matrícula 15 oct</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-estudiante" data-target="contenido-estudiante" data-funcion="Datos del Estudiante">
+                            <span class="icono">👤</span>
+                            <span class="titulo">Datos del Estudiante</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-pmt" data-target="contenido-datos-pmt" data-funcion="Datos relativos al padre, madre, tutor o tutora">
+                            <span class="icono">👨‍👩‍👧</span>
+                            <span class="titulo">Padre / Madre / Tutor</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-asistencia" data-target="contenido-asistencia" data-funcion="Control de asistencia y puntualidad">
+                            <span class="icono">📅</span>
+                            <span class="titulo">Asistencia · puntualidad</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-asistencia" data-target="contenido-resumen-anual" data-funcion="Resumen anual de asistencia">
+                            <span class="icono">📊</span>
+                            <span class="titulo">Resumen anual asistencia</span>
+                            <span class="estado destacado">📌 activo</span>
+                        </div>
+                        <div class="grid-item tipo-resumen" data-target="contenido-resumen-inscritos" data-funcion="Resumen de inscritos e inscritas de la sección">
+                            <span class="icono">📌</span>
+                            <span class="titulo">Inscritos por sección</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-evaluacion" data-target="contenido-evaluacion" data-funcion="Registro de evaluación">
+                            <span class="icono">📚</span>
+                            <span class="titulo">Registro de evaluación</span>
+                            <span class="estado destacado">⭐ activo</span>
+                        </div>
+                    </div>
+
+                    <div class="indice-extra-row">
+                        <div class="grid-item tipo-acta" data-target="contenido-acta" data-funcion="Acta de rendimiento del/de la estudiante de fin del año escolar">
+                            <span class="icono">📄</span>
+                            <span class="titulo">Acta de rendimiento</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-lista" data-target="contenido-lista-estudiantes" data-funcion="Listado de Estudiantes">
+                            <span class="icono">👥</span>
+                            <span class="titulo">Listado de Estudiantes</span>
+                            <span class="estado activo">✅ activo</span>
+                        </div>
+                        <div class="grid-item tipo-estadisticas" data-target="contenido-estadisticas" data-funcion="Estadísticas rápidas">
+                            <span class="icono">📊</span>
+                            <span class="titulo">Estadísticas rápidas</span>
+                            <span class="estado destacado">📈 activo</span>
+                        </div>
+                        <div class="grid-item tipo-top-estudiantes" data-target="contenido-top-estudiantes" data-funcion="Top de estudiantes">
+                            <span class="icono">🏆</span>
+                            <span class="titulo">Top de estudiantes</span>
+                            <span class="estado destacado">🏅 activo</span>
+                        </div>
+                        <div class="grid-item tipo-riesgo" data-target="contenido-riesgo" data-funcion="Estudiantes en riesgo">
+                            <span class="icono">⚠️</span>
+                            <span class="titulo">Estudiantes en riesgo</span>
+                            <span class="estado destacado">🔴 activo</span>
+                        </div>
+                        <div class="grid-item tipo-cumpleanos" data-target="contenido-cumpleanos" data-funcion="Alertas de cumpleaños">
+                            <span class="icono">🎂</span>
+                            <span class="titulo">Alertas de cumpleaños</span>
+                            <span class="estado destacado">🎈 activo</span>
+                        </div>
+                    </div>
+
+                    <div class="indice-footer">
+                        <span>Ministerio de Educación <span class="repdom">· República Dominicana</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: ESTUDIANTES -->
+            <div class="tab-panel" id="tab-estudiantes">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">👥 Estudiantes</div>
+                    <div class="lista-items">
+                        <div class="lista-item" data-funcion="Lista de estudiantes">📋 Lista de estudiantes</div>
+                        <div class="lista-item item-foto-estudiante" data-funcion="Foto del estudiante">
+                            <span class="icono-foto">📸</span> Foto del estudiante
+                        </div>
+                        <div class="lista-item item-datos-generales" data-funcion="Datos generales">
+                            <span class="icono-datos">👤</span> Datos generales
+                        </div>
+                        <div class="lista-item item-condicion-inicial" data-funcion="Condición inicial">
+                            <span class="icono-condicion">📝</span> Condición inicial
+                        </div>
+                        <div class="lista-item item-preprimario" data-funcion="Preprimario">
+                            <span class="icono-preprimario">🧒</span> Preprimario
+                        </div>
+                        <div class="lista-item item-control-movimiento" data-funcion="Control de movimiento">
+                            <span class="icono-control">🔄</span> Control de movimiento
+                        </div>
+                        <div class="lista-item item-datos-padres" data-funcion="Datos de padres/tutores">
+                            <span class="icono-padres">👨‍👩‍👧</span> Datos de padres/tutores
+                        </div>
+                        <div class="lista-item item-historial-medico" data-funcion="Historial médico">
+                            <span class="icono-medico">🏥</span> Historial médico
+                        </div>
+                        <div class="lista-item item-directorio-padres" data-funcion="Directorio de padres">
+                            <span class="icono-directorio">📞</span> Directorio de padres
+                        </div>
+                        <div class="lista-item item-mapa-procedencia" data-funcion="Mapa de procedencia">
+                            <span class="icono-mapa">📍</span> Mapa de procedencia
+                        </div>
+                        <div class="lista-item item-neae" data-funcion="NEAE">
+                            <span class="icono-neae">🧩</span> NEAE
+                        </div>
+                        <div class="lista-item item-ajustes-curriculares" data-funcion="Ajustes curriculares">
+                            <span class="icono-ajustes">🎯</span> Ajustes curriculares
+                        </div>
+                        <div class="lista-item item-estadisticas-sobreedad" data-funcion="Estadísticas de sobreedad">
+                            <span class="icono-sobreedad">📊</span> Estadísticas de sobreedad
+                        </div>
+                        <div class="lista-item item-reporte-automatico" data-funcion="Reporte automático">
+                            <span class="icono-reporte">📄</span> Reporte automático
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ASISTENCIA -->
+            <div class="tab-panel" id="tab-asistencia">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">📅 Asistencia</div>
+                    <div class="lista-items">
+                        <div class="lista-item item-selector-mes" data-funcion="Selector de mes">
+                            <span class="icono-selector">📅</span> Selector de mes
+                        </div>
+                        <div class="lista-item item-leyenda" data-funcion="Leyenda">
+                            <span class="icono-leyenda">📝</span> Leyenda
+                        </div>
+                        <div class="lista-item item-tabla-mensual" data-funcion="Tabla mensual">
+                            <span class="icono-tabla">📊</span> Tabla mensual
+                        </div>
+                        <div class="lista-item item-escanear-asistencia" data-funcion="Escanear asistencia">
+                            <span class="icono-escanear">📷</span> Escanear asistencia
+                        </div>
+                        <div class="lista-item item-resumen-mes" data-funcion="Resumen del mes">
+                            <span class="icono-resumen-mes">📊</span> Resumen del mes
+                        </div>
+                        <div class="lista-item item-alertas-automaticas" data-funcion="Alertas automáticas">
+                            <span class="icono-alertas">🔔</span> Alertas automáticas
+                        </div>
+                        <div class="lista-item" data-funcion="Resumen anual">📈 Resumen anual</div>
+                        <div class="lista-item item-calculo-automatico" data-funcion="Cálculo automático">
+                            <span class="icono-calculo">🧮</span> Cálculo automático
+                        </div>
+                        <div class="lista-item item-trazo-azul" data-funcion="Trazo azul">
+                            <span class="icono-trazo">🔵</span> Trazo azul
+                        </div>
+                        <div class="lista-item item-notificaciones-push" data-funcion="Notificaciones push">
+                            <span class="icono-push">🔔</span> Notificaciones push
+                        </div>
+                        <div class="lista-item item-fechas-recuperaciones" data-funcion="Fechas de recuperaciones">
+                            <span class="icono-recuperacion">📝</span> Fechas de recuperaciones
+                        </div>
+                        <div class="lista-item item-alertas-cierre" data-funcion="Alertas de cierre">
+                            <span class="icono-cierre">🔔</span> Alertas de cierre
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: EVALUACIÓN -->
+            <div class="tab-panel" id="tab-evaluacion">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">📚 Evaluación</div>
+                    <div class="lista-items">
+                        <div class="lista-item" data-funcion="7 Áreas curriculares">📚 7 Áreas curriculares</div>
+                        <div class="lista-item" data-funcion="3 Competencias por área">🎯 3 Competencias</div>
+                        <div class="lista-item" data-funcion="4 Períodos">📅 4 Períodos</div>
+                        <div class="lista-item" data-funcion="Plantillas de competencias">📋 Plantillas</div>
+                        <div class="lista-item" data-funcion="Especificación de aspectos">🎯 Especificación</div>
+                        <div class="lista-item" data-funcion="Calculadora de recuperaciones">🧮 Calculadora</div>
+                        <div class="lista-item" data-funcion="Promedio ponderado">📊 Promedio ponderado</div>
+                        <div class="lista-item" data-funcion="Proyección de notas">📈 Proyección</div>
+                        <div class="lista-item" data-funcion="Metas por estudiante">🎯 Metas</div>
+                        <div class="lista-item" data-funcion="Comparación entre períodos">📉 Comparación</div>
+                        <div class="lista-item" data-funcion="Análisis de tendencias">🔍 Tendencias</div>
+                        <div class="lista-item" data-funcion="Fórmulas automáticas">🧮 Fórmulas</div>
+                        <div class="lista-item" data-funcion="Escala de valoración">📊 Escala</div>
+                        <div class="lista-item" data-funcion="Recuperación pedagógica">🔄 Recuperación</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: REPORTES -->
+            <div class="tab-panel" id="tab-reportes">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">📄 Reportes</div>
+                    <div class="lista-items">
+                        <div class="lista-item" data-funcion="Generación de Informes">🎓 Generación de Informes</div>
+                        <div class="lista-item" data-funcion="Informe individual">📄 Informe individual</div>
+                        <div class="lista-item" data-funcion="Certificados automáticos">🎓 Certificados</div>
+                        <div class="lista-item" data-funcion="Acta de rendimiento">📋 Acta de rendimiento</div>
+                        <div class="lista-item" data-funcion="Informe de alfabetización">📑 Informe de alfabetización</div>
+                        <div class="lista-item" data-funcion="Código QR en informes">📱 Código QR</div>
+                        <div class="lista-item" data-funcion="Resumen de matrícula">📊 Resumen de matrícula</div>
+                        <div class="lista-item" data-funcion="Registro de experiencias">📝 Registro de experiencias</div>
+                        <div class="lista-item" data-funcion="Registro de acompañantes">👨‍🏫 Registro de acompañantes</div>
+                        <div class="lista-item" data-funcion="Envío por correo">📧 Envío por correo</div>
+                        <div class="lista-item" data-funcion="Exportar a PDF">📤 Exportar a PDF</div>
+                        <div class="lista-item" data-funcion="Exportar a Excel">📊 Exportar a Excel</div>
+                        <div class="lista-item" data-funcion="Formato A4">📄 Formato A4</div>
+                        <div class="lista-item" data-funcion="Secciones a imprimir">🎨 Secciones a imprimir</div>
+                        <div class="lista-item" data-funcion="Ocultar controles">🚫 Ocultar controles</div>
+                        <div class="lista-item" data-funcion="Estilo profesional">✨ Estilo profesional</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: COMUNICACIÓN -->
+            <div class="tab-panel" id="tab-comunicacion">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">💬 Comunicación</div>
+                    <div class="lista-items">
+                        <div class="lista-item" data-funcion="Sincronización entre secciones">🔄 Sincronización</div>
+                        <div class="lista-item" data-funcion="Portal de padres">💬 Portal de padres</div>
+                        <div class="lista-item" data-funcion="Envío por correo">📧 Envío por correo</div>
+                        <div class="lista-item" data-funcion="Envío masivo de emails">📧 Envío masivo</div>
+                        <div class="lista-item" data-funcion="WhatsApp integrado">📱 WhatsApp integrado</div>
+                        <div class="lista-item" data-funcion="Agenda de citas">📅 Agenda de citas</div>
+                        <div class="lista-item" data-funcion="Notificaciones">🔔 Notificaciones</div>
+                        <div class="lista-item" data-funcion="Plantillas de comentarios">📝 Plantillas</div>
+                        <div class="lista-item" data-funcion="Multiidioma">🌐 Multiidioma</div>
+                        <div class="lista-item" data-funcion="Diseño de informes">📐 Diseño de informes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 7: CONFIGURACIÓN -->
+            <div class="tab-panel" id="tab-configuracion">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">⚙️ Configuración</div>
+                    <div class="lista-items">
+                        <div class="lista-item" data-funcion="Datos institucionales">🏫 Datos institucionales</div>
+                        <div class="lista-item" data-funcion="Datos del docente">👨‍🏫 Datos del docente</div>
+                        <div class="lista-item" data-funcion="Multiusuario">👤 Multiusuario</div>
+                        <div class="lista-item" data-funcion="Contraseña">🔑 Contraseña</div>
+                        <div class="lista-item" data-funcion="Historial de cambios">📜 Historial</div>
+                        <div class="lista-item" data-funcion="Bloqueo automático">🔒 Bloqueo automático</div>
+                        <div class="lista-item" data-funcion="Guardar automáticamente">💾 Guardar automático</div>
+                        <div class="lista-item" data-funcion="Backup en la nube">💾 Backup en la nube</div>
+                        <div class="lista-item" data-funcion="Exportar respaldo">📤 Exportar respaldo</div>
+                        <div class="lista-item" data-funcion="Importar respaldo">📥 Importar respaldo</div>
+                        <div class="lista-item" data-funcion="Borrar datos por sección">🗑️ Borrar datos</div>
+                        <div class="lista-item" data-funcion="Eliminar registros">❌ Eliminar registros</div>
+                        <div class="lista-item" data-funcion="Persistencia">🔒 Persistencia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 8: SIGERD (NUEVA) -->
+            <div class="tab-panel" id="tab-sigerd">
+                <div class="lista-funciones">
+                    <div class="lista-titulo">📋 SIGERD</div>
+                    <div class="lista-items">
+                        <div class="lista-item item-sigerd" data-funcion="Formulario SIGERD" id="btnFormularioSigerd">
+                            <span class="icono-sigerd">📋</span> Formulario SIGERD
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== CONTENEDORES DE PÁGINAS (IFRAMES) ========== -->
+            <div id="contenido-formulario" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="FORMULARIO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-busqueda-rapida" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="BUSQUEDA RAPIDA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-boletin" class="contenido-pagina" style="padding: 0; display: none;">
+                <iframe src="BOLETIN.htm" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white; display:block;"></iframe>
+            </div>
+
+            <div id="contenido-calendario" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="CALENDARIO-ESCOLAR.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-agenda-citas" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="AGENDA-DE-CITA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-lista-estudiantes" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="LISTADO DE LOS ESTUDIANTE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-cambio-password" class="contenido-pagina" style="padding: 20px; display: none;">
+                <div style="text-align: center; padding: 40px; background: white; border-radius: 8px; border: 1px solid #d0d8e0;">
+                    <h2 style="color: #1a2a4a;">🔑 Cambio de Contraseña</h2>
+                    <p style="color: #718096; margin-top: 10px;">Función disponible próximamente</p>
+                </div>
+            </div>
+
+            <!-- ÍNDICE (versión clásica) -->
+            <div id="contenido-indice" class="contenido-pagina" style="padding: 20px; display: none;">
+                <div class="carta-page-indice">
+                    <div class="page-title">Registro de Grado - Nivel Primario</div>
+                    <div class="sub-title-indice">ÍNDICE</div>
+                    <div class="indice-lista">
+                        <div class="indice-item clickable" data-target="contenido-datos-centro">
+                            <span class="indice-texto">Datos del Centro Educativo</span>
+                            <span class="indice-puntos">..........................................................................................</span>
+                            <span class="indice-pagina">7</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-datos-maestro">
+                            <span class="indice-texto">Datos del Maestro o Maestra</span>
+                            <span class="indice-puntos">.........................................................................................</span>
+                            <span class="indice-pagina">7</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-rmi-15oct">
+                            <span class="indice-texto">Resumen de matrícula inicial al 15 de octubre</span>
+                            <span class="indice-puntos">.........................................................................</span>
+                            <span class="indice-pagina">8</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-estudiante">
+                            <span class="indice-texto">Datos del Estudiante</span>
+                            <span class="indice-puntos">..................................................................................</span>
+                            <span class="indice-pagina">10</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-datos-pmt">
+                            <span class="indice-texto">Datos relativos al padre, madre, tutor o tutora</span>
+                            <span class="indice-puntos">........................................................................</span>
+                            <span class="indice-pagina">13</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-asistencia">
+                            <span class="indice-texto">Control de asistencia y puntualidad</span>
+                            <span class="indice-puntos">............................................................................................</span>
+                            <span class="indice-pagina">16</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-resumen-anual">
+                            <span class="indice-texto">Resumen anual de asistencia</span>
+                            <span class="indice-puntos">.........................................................................................................</span>
+                            <span class="indice-pagina">31</span>
+                            <span class="indice-estado" style="background:#1a73e8; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-resumen-inscritos">
+                            <span class="indice-texto">Resumen de inscritos e inscritas de la sección</span>
+                            <span class="indice-puntos">......................................................................</span>
+                            <span class="indice-pagina">34</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-evaluacion">
+                            <span class="indice-texto">Registro de evaluación</span>
+                            <span class="indice-puntos">.....................................................................................................................</span>
+                            <span class="indice-pagina">77</span>
+                            <span class="indice-estado" style="background:#1a73e8; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-acta">
+                            <span class="indice-texto">Acta de rendimiento del/de la estudiante de fin del año escolar</span>
+                            <span class="indice-puntos">.....................................</span>
+                            <span class="indice-pagina">110</span>
+                            <span class="indice-estado" style="background:#1a73e8; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-lista-estudiantes">
+                            <span class="indice-texto">Listado de Estudiantes</span>
+                            <span class="indice-puntos">.................................................................................................</span>
+                            <span class="indice-pagina">1</span>
+                            <span class="indice-estado" style="background:#28a745; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-cumpleanos">
+                            <span class="indice-texto">🎂 Alertas de Cumpleaños</span>
+                            <span class="indice-puntos">................................................................................................</span>
+                            <span class="indice-pagina">🎈</span>
+                            <span class="indice-estado" style="background:#E74C3C; color:white;">🎉 Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-estadisticas">
+                            <span class="indice-texto">📊 Estadísticas rápidas</span>
+                            <span class="indice-puntos">................................................................................................</span>
+                            <span class="indice-pagina">📈</span>
+                            <span class="indice-estado" style="background:#2E86C1; color:white;">✅ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-top-estudiantes">
+                            <span class="indice-texto">🏆 Top de estudiantes</span>
+                            <span class="indice-puntos">................................................................................................</span>
+                            <span class="indice-pagina">🏅</span>
+                            <span class="indice-estado" style="background:#F1C40F; color:#7D6608;">⭐ Activo</span>
+                        </div>
+                        <div class="indice-item clickable" data-target="contenido-riesgo">
+                            <span class="indice-texto">⚠️ Estudiantes en riesgo</span>
+                            <span class="indice-puntos">................................................................................................</span>
+                            <span class="indice-pagina">🔴</span>
+                            <span class="indice-estado" style="background:#C0392B; color:white;">⚠️ Activo</span>
+                        </div>
+                    </div>
+                    <div class="bottom-line-indice"></div>
+                    <div class="watermark-indice">Ministerio de Educación • República Dominicana</div>
+                </div>
+            </div>
+
+            <!-- PÁGINAS CON IFRAMES ADICIONALES -->
+            <div id="contenido-datos-centro" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DATOS-DEL-CENTRO.html" style="width:100%; height:100%; min-height:600px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-datos-maestro" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DATOS-DEL-MAESTRO.html" style="width:100%; height:100%; min-height:600px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-rmi-15oct" class="contenido-pagina" style="padding: 20px; display: none;">
+                <div style="max-width: 95%; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #d0d0d0; border-radius: 8px; overflow: hidden;">
+                    <iframe src="RMI-15OCT.html" style="width:100%; min-height:950px; border:none; background:white;" frameborder="0" scrolling="auto"></iframe>
+                </div>
+            </div>
+
+            <div id="contenido-estudiante" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DATOS-DEL-ESTUDIANTE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-datos-pmt" class="contenido-pagina" style="padding: 20px; display: none;">
+                <div style="max-width: 95%; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border: 1px solid #d0d0d0; border-radius: 8px; overflow: hidden;">
+                    <iframe src="dtos-relativo-pmt.html" style="width:100%; min-height:950px; border:none; background:white;" frameborder="0" scrolling="auto"></iframe>
+                </div>
+            </div>
+
+            <div id="contenido-asistencia" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ASISTENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-resumen-anual" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="RESUMEN-ANUAL-ASISTENCIA.html" style="width:100%; height:100%; min-height:600px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-resumen-inscritos" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="RESUMEN-INSCRITOS.html" style="width:100%; height:100%; min-height:600px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-evaluacion" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="REGISTRO-EVALUACION.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-acta" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ACTA-RENDIMIENTO.html" style="width:100%; height:100%; min-height:600px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-cumpleanos" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ALERTAS DE CUMPLEANOS.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-cronometro" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="CONOMETRO DE PERIODO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-notificaciones" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="NOTIFICACIONES ACTIVAS.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-estadisticas" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ESTADITICA RAPIDA.HTML" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-dashboard-docente" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DASHBOARD DEL DOCENTE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-top-estudiantes" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="TOP DE ESTUDIANTES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-riesgo" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ESTUDIANTES EN RIESGO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-foto-estudiante" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="GALERIA-ESTUDIANTES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-datos-generales" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DATOS GENERALES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-condicion-inicial" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="CONDICION-INICIAL.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-preprimario" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="PREPRIMARIO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-control-movimiento" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="CONTROL-MOVIMIENTO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-datos-padres" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DATOS-PADRES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-historial-medico" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="HISTORIAL-MEDICO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-directorio-padres" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="DIRECTORIO-PADRES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-mapa-procedencia" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="MAPA-PROCEDENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-neae" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="NEAE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-ajustes-curriculares" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="AJUSTES-CURRICULARES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-estadisticas-sobreedad" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ESTADISTICAS-SOBREEDAD.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-reporte-automatico" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="REPORTE-AUTOMATICO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-vista-responsiva" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="VISTA-RESPONSIVA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-modo-offline" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="MODO-OFFLINE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-logo-personalizado" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="LOGO-PERSONALIZADO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-selector-mes" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="SELECTOR-DE-MES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-leyenda-asistencia" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="LEYENDA-ASISTENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-tabla-mensual" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="TABLA-MENSUAL-ASISTENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-escanear-asistencia" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ESCANEAR-ASISTENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-resumen-mes" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="RESUMEN-MES-ASISTENCIA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-alertas-automaticas" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ALERTAS-AUTOMATICAS.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-calculo-automatico" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="CALCULO-AUTOMATICO.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-trazo-azul" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="TRAZO-AZUL.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-notificaciones-push" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="NOTIFICACIONES-PUSH.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-fechas-recuperaciones" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="FECHAS-RECUPERACIONES.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <div id="contenido-alertas-cierre" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="ALERTAS-CIERRE.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <!-- NUEVO: Contenedor del Formulario SIGERD -->
+            <div id="contenido-formulario-sigerd" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="FORMULARIO-SIGERD.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+            <!-- NUEVO: Contenedor para la Ayuda completa -->
+            <div id="contenido-ayuda-completa" class="contenido-pagina" style="padding: 20px; display: none;">
+                <iframe src="AYUDA.html" style="width:100%; height:100%; min-height:850px; border:1px solid #d0d8e0; border-radius:8px; background:white;"></iframe>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL DE COLORES INSTITUCIONALES
+         ============================================ -->
+    <div class="modal-colores" id="modalColores">
+        <div class="modal-contenido">
+            <button class="modal-close" id="btnCerrarColores">✕</button>
+            
+            <h2>🎨 Colores Institucionales</h2>
+            <p class="modal-sub">Personaliza todos los colores del sistema. Selecciona entre colores predefinidos o elige tu propio color.</p>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">🖼️ Color de Fondo <span class="badge">Fondo general</span></div>
+                <div class="grid-colores">
+                    <div class="color-item"><label>Fondo principal</label><input type="color" id="colorFondoPrincipal" value="#e8ecf1"></div>
+                    <div class="color-item"><label>Fondo de tarjetas</label><input type="color" id="colorFondoTarjetas" value="#ffffff"></div>
+                    <div class="color-item"><label>Fondo de secciones</label><input type="color" id="colorFondoSecciones" value="#f5f6f8"></div>
+                </div>
+                <div class="color-picker-grupo" id="coloresFondoPredefinidos">
+                    <div class="color-opcion" style="background:#e8ecf1;" data-target="colorFondoPrincipal" data-color="#e8ecf1"></div>
+                    <div class="color-opcion" style="background:#f0f4f8;" data-target="colorFondoPrincipal" data-color="#f0f4f8"></div>
+                    <div class="color-opcion" style="background:#fafbfc;" data-target="colorFondoPrincipal" data-color="#fafbfc"></div>
+                    <div class="color-opcion" style="background:#d4edda;" data-target="colorFondoPrincipal" data-color="#d4edda"></div>
+                    <div class="color-opcion" style="background:#fff3cd;" data-target="colorFondoPrincipal" data-color="#fff3cd"></div>
+                    <div class="color-opcion" style="background:#f8d7da;" data-target="colorFondoPrincipal" data-color="#f8d7da"></div>
+                    <div class="color-opcion" style="background:#cce5ff;" data-target="colorFondoPrincipal" data-color="#cce5ff"></div>
+                    <div class="color-opcion" style="background:#d6d8db;" data-target="colorFondoPrincipal" data-color="#d6d8db"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">📝 Color de Texto <span class="badge">Textos generales</span></div>
+                <div class="grid-colores">
+                    <div class="color-item"><label>Texto principal</label><input type="color" id="colorTextoPrincipal" value="#1a2a4a"></div>
+                    <div class="color-item"><label>Texto secundario</label><input type="color" id="colorTextoSecundario" value="#718096"></div>
+                    <div class="color-item"><label>Texto claro</label><input type="color" id="colorTextoClaro" value="#ffffff"></div>
+                </div>
+                <div class="color-picker-grupo" id="coloresTextoPredefinidos">
+                    <div class="color-opcion" style="background:#1a2a4a;" data-target="colorTextoPrincipal" data-color="#1a2a4a"></div>
+                    <div class="color-opcion" style="background:#2d3748;" data-target="colorTextoPrincipal" data-color="#2d3748"></div>
+                    <div class="color-opcion" style="background:#4a5568;" data-target="colorTextoPrincipal" data-color="#4a5568"></div>
+                    <div class="color-opcion" style="background:#718096;" data-target="colorTextoPrincipal" data-color="#718096"></div>
+                    <div class="color-opcion" style="background:#1a202c;" data-target="colorTextoPrincipal" data-color="#1a202c"></div>
+                    <div class="color-opcion" style="background:#c53030;" data-target="colorTextoPrincipal" data-color="#c53030"></div>
+                    <div class="color-opcion" style="background:#2b6cb0;" data-target="colorTextoPrincipal" data-color="#2b6cb0"></div>
+                    <div class="color-opcion" style="background:#276749;" data-target="colorTextoPrincipal" data-color="#276749"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">🔵 Color Principal <span class="badge">Elementos destacados</span></div>
+                <div class="grid-colores-2">
+                    <div class="color-item"><label>Color principal</label><input type="color" id="colorPrincipal" value="#1a2a4a"></div>
+                    <div class="color-item"><label>Color principal claro</label><input type="color" id="colorPrincipalClaro" value="#2a4a7a"></div>
+                    <div class="color-item"><label>Color de botones</label><input type="color" id="colorBotones" value="#1a2a4a"></div>
+                    <div class="color-item"><label>Color de hover</label><input type="color" id="colorHover" value="#2a3a5a"></div>
+                </div>
+                <div class="color-picker-grupo" id="coloresPrincipalesPredefinidos">
+                    <div class="color-opcion" style="background:#1a2a4a;" data-target="colorPrincipal" data-color="#1a2a4a"></div>
+                    <div class="color-opcion" style="background:#1a3a6b;" data-target="colorPrincipal" data-color="#1a3a6b"></div>
+                    <div class="color-opcion" style="background:#2b6cb0;" data-target="colorPrincipal" data-color="#2b6cb0"></div>
+                    <div class="color-opcion" style="background:#276749;" data-target="colorPrincipal" data-color="#276749"></div>
+                    <div class="color-opcion" style="background:#c53030;" data-target="colorPrincipal" data-color="#c53030"></div>
+                    <div class="color-opcion" style="background:#6b46c1;" data-target="colorPrincipal" data-color="#6b46c1"></div>
+                    <div class="color-opcion" style="background:#d69e2e;" data-target="colorPrincipal" data-color="#d69e2e"></div>
+                    <div class="color-opcion" style="background:#c05621;" data-target="colorPrincipal" data-color="#c05621"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">📐 Bordes y Líneas <span class="badge">Separadores</span></div>
+                <div class="grid-colores-2">
+                    <div class="color-item"><label>Borde principal</label><input type="color" id="colorBorde" value="#d0d8e0"></div>
+                    <div class="color-item"><label>Borde destacado</label><input type="color" id="colorBordeDestacado" value="#1a3a6b"></div>
+                    <div class="color-item"><label>Línea divisoria</label><input type="color" id="colorLinea" value="#e8ecf1"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">📊 Barra Superior <span class="badge">Top bar</span></div>
+                <div class="grid-colores-2">
+                    <div class="color-item"><label>Fondo de barra</label><input type="color" id="colorBarraFondo" value="#1a2a4a"></div>
+                    <div class="color-item"><label>Texto de barra</label><input type="color" id="colorBarraTexto" value="#ffffff"></div>
+                    <div class="color-item"><label>Borde de barra</label><input type="color" id="colorBarraBorde" value="#1a3a6b"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">📑 Pestañas (Tabs) <span class="badge">Navegación</span></div>
+                <div class="grid-colores-2">
+                    <div class="color-item"><label>Fondo de pestañas</label><input type="color" id="colorTabsFondo" value="#1a2a4a"></div>
+                    <div class="color-item"><label>Texto inactivo</label><input type="color" id="colorTabsTextoInactivo" value="#a0b0c0"></div>
+                    <div class="color-item"><label>Texto activo</label><input type="color" id="colorTabsTextoActivo" value="#ffffff"></div>
+                    <div class="color-item"><label>Borde activo</label><input type="color" id="colorTabsBordeActivo" value="#4a8ab5"></div>
+                </div>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">👁️ Vista Previa <span class="badge">Cómo se verá</span></div>
+                <div class="preview-colores" id="previewColores">
+                    <div class="preview-item"><span>Fondo:</span><div class="preview-cuadrado" id="previewFondo" style="background:#e8ecf1;"></div></div>
+                    <div class="preview-item"><span>Texto:</span><div class="preview-cuadrado" id="previewTexto" style="background:#1a2a4a;"></div></div>
+                    <div class="preview-item"><span>Principal:</span><div class="preview-cuadrado" id="previewPrincipal" style="background:#1a2a4a;"></div></div>
+                    <div class="preview-item"><span>Borde:</span><div class="preview-cuadrado" id="previewBorde" style="background:#d0d8e0;"></div></div>
+                    <div class="preview-item"><span>Barra:</span><div class="preview-cuadrado" id="previewBarra" style="background:#1a2a4a;"></div></div>
+                </div>
+            </div>
+
+            <button class="btn-guardar-colores" id="btnGuardarColores">💾 Guardar Colores</button>
+            <button class="btn-restablecer" id="btnRestablecerColores">🔄 Restablecer valores predeterminados</button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL DE AYUDA (NUEVO)
+         ============================================ -->
+    <div class="modal-colores" id="modalAyuda">
+        <div class="modal-contenido" style="max-width: 750px;">
+            <button class="modal-close" id="btnCerrarAyuda">✕</button>
+            <h2>❓ Ayuda — Registro de Grado</h2>
+            <p class="modal-sub">Guía rápida de uso del sistema</p>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">📌 Navegación principal</div>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.8; color: #1a2a4a;">
+                    <li>Usa las <b>pestañas superiores</b> para cambiar de sección: Inicio, Estudiantes, Asistencia, Evaluación, Reportes, Comunicación, Configuración y SIGERD.</li>
+                    <li>En cada pestaña verás una <b>lista de funciones</b>. Haz clic en cualquiera para abrirla.</li>
+                    <li>El botón <b>↩️ Retornar al Índice</b> te devuelve a la vista general 3×3.</li>
+                    <li>El menú <b>⚙️</b> (engranaje) contiene: Inicio, Ayuda, Acerca de, Configuración y Cerrar Sesión.</li>
+                </ul>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">🎓 Flujo recomendado</div>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.8; color: #1a2a4a;">
+                    <li><b>1.</b> Completa <i>Datos del Centro</i> y <i>Datos del Maestro</i>.</li>
+                    <li><b>2.</b> Registra los estudiantes en <i>Formulario del Estudiante</i>.</li>
+                    <li><b>3.</b> Lleva el control de <i>Asistencia</i> y <i>Evaluación</i>.</li>
+                    <li><b>4.</b> Genera <i>Reportes</i>, <i>Actas</i> y exporta a PDF.</li>
+                    <li><b>5.</b> Sincroniza con <i>SIGERD</i> al final del período.</li>
+                </ul>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">🎨 Personalización</div>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.8; color: #1a2a4a;">
+                    <li><b>Colores institucionales:</b> Inicio → 🎨 Colores institucionales.</li>
+                    <li><b>Logo personalizado:</b> Inicio → 🖼️ Logo personalizado.</li>
+                    <li>Los colores y el logo se guardan en tu navegador (localStorage).</li>
+                </ul>
+            </div>
+
+            <div class="seccion-colores">
+                <div class="seccion-titulo">💾 Datos y respaldos</div>
+                <ul style="padding-left: 20px; font-size: 14px; line-height: 1.8; color: #1a2a4a;">
+                    <li>La información se guarda automáticamente en el navegador.</li>
+                    <li>En <b>Configuración → Exportar respaldo</b> puedes descargar una copia.</li>
+                    <li>En <b>Configuración → Importar respaldo</b> puedes restaurarla.</li>
+                </ul>
+            </div>
+
+            <div style="display:flex; gap:10px; margin-top:15px;">
+                <button class="btn-guardar-colores" id="btnEntendidoAyuda" style="flex:1;">✅ Entendido</button>
+                <button class="btn-restablecer" id="btnAbrirAyudaCompleta" style="flex:1; margin-top:0;">📖 Ver guía completa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TOAST MENSAJE ========== -->
+    <div id="toastMensaje" class="toast-mensaje">📌 Función seleccionada</div>
+
+    <!-- ========== SCRIPTS PRINCIPALES ========== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ============================================
+        // 1. MOSTRAR GRADO + SECCIÓN + TANDA EN LA BARRA
+        // ============================================
+        function mostrarGradoEnBarra() {
+            const gradoDisplay = document.getElementById('gradoActualDisplay');
+            if (!gradoDisplay) return;
+
+            let grado = window.__gradoActual || '';
+            let seccion = window.__seccionActual || '';
+            let tanda = window.__tandaActual || '';
+
+            // Fallback: URL
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!grado && urlParams.get('grado'))     grado = decodeURIComponent(urlParams.get('grado'));
+                if (!seccion && urlParams.get('seccion')) seccion = decodeURIComponent(urlParams.get('seccion'));
+                if (!tanda && urlParams.get('tanda'))     tanda = decodeURIComponent(urlParams.get('tanda'));
+            } catch (e) {}
+
+            // Fallback: localStorage
+            if (!grado)   grado   = localStorage.getItem('minerd_grado_actual') || '';
+            if (!seccion) seccion = localStorage.getItem('minerd_seccion_actual') || '';
+            if (!tanda)   tanda   = localStorage.getItem('minerd_tanda_actual') || '';
+
+            // Fallback: minerd_grado_completo
+            if ((!grado || !seccion || !tanda)) {
+                try {
+                    const completo = JSON.parse(localStorage.getItem('minerd_grado_completo') || 'null');
+                    if (completo) {
+                        if (!grado && completo.grado) grado = completo.grado;
+                        if (!seccion && completo.seccion) seccion = completo.seccion;
+                        if (!tanda && completo.tanda) tanda = completo.tanda;
+                    }
+                } catch (e) {}
+            }
+
+            // Fallback: sesión
+            if ((!grado || !seccion || !tanda) && typeof AuthSystem !== 'undefined') {
+                try {
+                    const sesion = AuthSystem.obtenerSesion();
+                    if (sesion) {
+                        if (!grado) grado = sesion.grado || '';
+                        if (!grado && sesion.cedula) {
+                            grado = AuthSystem.obtenerGradoSeleccionado(sesion.cedula) || '';
+                        }
+                        if (!seccion) seccion = sesion.seccion || '';
+                        if (!tanda) tanda = sesion.tanda || sesion.turno || '';
+                    }
+                } catch (e) {}
+            }
+
+            // Construir texto final
+            let texto = '🎓 ';
+            if (grado) {
+                texto += grado;
+                if (seccion) texto += ' · Sec. ' + seccion;
+                if (tanda)   texto += ' · ' + tanda;
+            } else {
+                texto += 'Sin grado seleccionado';
+            }
+
+            gradoDisplay.textContent = texto;
+            console.log('📌 Barra superior:', texto);
+        }
+        mostrarGradoEnBarra();
+
+        // ============================================
+        // 2. CARGAR LOGO PERSONALIZADO
+        // ============================================
+        function cargarLogoPersonalizado() {
+            const logoImg = document.getElementById('logoPersonalizado');
+            try {
+                const guardado = localStorage.getItem('logoPersonalizado');
+                if (guardado) {
+                    const data = JSON.parse(guardado);
+                    if (data && data.logoBase64) {
+                        logoImg.src = data.logoBase64;
+                        logoImg.classList.add('visible');
+                        if (data.config && data.config.colorFondo) {
+                            const topBar = document.querySelector('.top-bar');
+                            if (topBar) {
+                                topBar.style.background = data.config.colorFondo;
+                            }
+                        }
+                        return;
+                    }
+                }
+            } catch (e) { /* Ignorar */ }
+            logoImg.classList.remove('visible');
+        }
+        cargarLogoPersonalizado();
+
+        document.addEventListener('logoPersonalizadoActualizado', function(e) {
+            const logoImg = document.getElementById('logoPersonalizado');
+            if (e.detail && e.detail.logoBase64) {
+                logoImg.src = e.detail.logoBase64;
+                logoImg.classList.add('visible');
+                if (e.detail.config && e.detail.config.colorFondo) {
+                    const topBar = document.querySelector('.top-bar');
+                    if (topBar) {
+                        topBar.style.background = e.detail.config.colorFondo;
+                    }
+                }
+            } else {
+                logoImg.classList.remove('visible');
+            }
+        });
+
+        // ============================================
+        // 3. TOAST
+        // ============================================
+        const toast = document.getElementById('toastMensaje');
+        function mostrarToast(texto) {
+            toast.textContent = texto || '📌 Función seleccionada';
+            toast.classList.add('visible');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 2800);
+        }
+
+        // ============================================
+        // 4. FUNCIONES DE PESTAÑAS
+        // ============================================
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        function activarTab(tabId) {
+            tabs.forEach(t => t.classList.remove('active'));
+            panels.forEach(p => p.classList.remove('activo'));
+            
+            var tabActivo = document.querySelector('.tab-btn[data-tab="' + tabId + '"]');
+            if (tabActivo) tabActivo.classList.add('active');
+            
+            var panelActivo = document.getElementById(tabId);
+            if (panelActivo) panelActivo.classList.add('activo');
+            
+            document.querySelectorAll('.contenido-pagina').forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('activo');
+            });
+            
+            document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'block');
+            
+            const contenedorIndice = document.getElementById('contenedorIndice3x3');
+            if (contenedorIndice) contenedorIndice.style.display = 'none';
+            
+            ocultarBotonRetornar();
+        }
+
+        tabs.forEach(function(tab) {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                var tabId = this.getAttribute('data-tab');
+                activarTab(tabId);
+            });
+        });
+
+        // ============================================
+        // 5. FUNCIONES DEL BOTÓN RETORNAR
+        // ============================================
+        const btnRetornar = document.getElementById('btnRetornar');
+
+        function mostrarBotonRetornar() {
+            if (btnRetornar) btnRetornar.classList.add('visible');
+        }
+
+        function ocultarBotonRetornar() {
+            if (btnRetornar) btnRetornar.classList.remove('visible');
+        }
+
+        function mostrarIndice3x3() {
+            document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+            document.querySelectorAll('.contenido-pagina').forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('activo');
+            });
+            const contenedor = document.getElementById('contenedorIndice3x3');
+            if (contenedor) contenedor.style.display = 'block';
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            const tabInicio = document.querySelector('.tab-btn[data-tab="tab-inicio"]');
+            if (tabInicio) tabInicio.classList.add('active');
+            
+            panels.forEach(p => p.classList.remove('activo'));
+            const panelInicio = document.getElementById('tab-inicio');
+            if (panelInicio) panelInicio.classList.add('activo');
+            
+            mostrarBotonRetornar();
+        }
+
+        if (btnRetornar) {
+            btnRetornar.addEventListener('click', function() {
+                const contenidoActivo = document.querySelector('.contenido-pagina.activo');
+                if (contenidoActivo) {
+                    document.querySelectorAll('.contenido-pagina').forEach(c => {
+                        c.style.display = 'none';
+                        c.classList.remove('activo');
+                    });
+                    mostrarIndice3x3();
+                    mostrarToast('↩️ Retornando al Índice');
+                } else {
+                    mostrarIndice3x3();
+                    mostrarToast('📑 Índice 3×3');
+                }
+            });
+        }
+
+        // ============================================
+        // 6. MENÚ DE ENGRANAJE
+        // ============================================
+        var btnEngranaje = document.getElementById('btnEngranaje');
+        var menuDropdown = document.getElementById('menuDropdown');
+
+        if (btnEngranaje && menuDropdown) {
+            btnEngranaje.addEventListener('click', function(e) {
+                e.stopPropagation();
+                menuDropdown.classList.toggle('active');
+            });
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.menu-engranaje')) {
+                    menuDropdown.classList.remove('active');
+                }
+            });
+            document.querySelectorAll('.menu-item').forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var action = this.getAttribute('data-action');
+                    menuDropdown.classList.remove('active');
+                    switch(action) {
+                        case 'inicio':
+                            window.location.href = '../Index.html';
+                            break;
+                        case 'cerrar-sesion':
+                            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                                if (typeof AuthSystem !== 'undefined') AuthSystem.cerrarSesion();
+                                window.location.href = '../Index.html';
+                            }
+                            break;
+                        case 'ayuda':
+                            abrirModalAyuda();
+                            break;
+                        case 'acerca':
+                            mostrarToast('ℹ️ Registro de Grado - Nivel Primario v1.0 · MINERD RD');
+                            break;
+                        case 'configuracion':
+                            mostrarToast('⚙️ Configuración - Función disponible próximamente');
+                            break;
+                        default:
+                            mostrarToast('Función en desarrollo...');
+                    }
+                });
+            });
+        }
+
+        // ============================================
+        // 7. FUNCIONES DE MENSAJES
+        // ============================================
+        function mostrarMensajeNoDisponible(funcionNombre) {
+            var div = document.createElement('div');
+            div.className = 'mensaje-no-disponible';
+            div.innerHTML = '<span class="icono-grande">🚧</span><h3>No está disponible</h3>' +
+                '<p>La función "<strong>' + funcionNombre + '</strong>" aún no está disponible.</p>' +
+                '<button class="cerrar-btn">✕ Cerrar</button>';
+            document.body.appendChild(div);
+            div.querySelector('.cerrar-btn').addEventListener('click', function() { div.remove(); });
+            div.addEventListener('click', function(e) { if (e.target === div) div.remove(); });
+        }
+
+        // ============================================
+        // 8. MOSTRAR CONTENIDO DE PÁGINAS
+        // ============================================
+        function mostrarContenido(targetId) {
+            document.querySelectorAll('.contenido-pagina').forEach(function(content) {
+                content.style.display = 'none';
+                content.classList.remove('activo');
+            });
+            
+            var target = document.getElementById(targetId);
+            if (!target) {
+                console.warn('⚠️ No se encontró:', targetId);
+                return;
+            }
+            target.style.display = 'block';
+            target.classList.add('activo');
+            mostrarBotonRetornar();
+        }
+
+        // ============================================
+        // 9. MANEJADORES DE CLICK EN LISTA DE FUNCIONES
+        // ============================================
+        const RUTAS_PAGINAS = {
+            'Generación de Informes': 'contenido-boletin',
+            'Informe individual': 'contenido-boletin',
+            'Reporte automático': 'contenido-boletin',
+            'Exportar a PDF': 'contenido-boletin',
+            'Calendario escolar': 'contenido-calendario',
+            'Contraseña': 'contenido-cambio-password',
+            'Agenda de citas': 'contenido-agenda-citas',
+            'Formulario': 'contenido-formulario',
+            'Lista de estudiantes': 'contenido-lista-estudiantes',
+            'Búsqueda rápida': 'contenido-busqueda-rapida',
+            'Acta de rendimiento': 'contenido-acta',
+            'Datos del Centro Educativo': 'contenido-datos-centro',
+            'Datos del Maestro o Maestra': 'contenido-datos-maestro',
+            'Resumen de matrícula inicial al 15 de octubre': 'contenido-rmi-15oct',
+            'Datos del Estudiante': 'contenido-estudiante',
+            'Datos relativos al padre, madre, tutor o tutora': 'contenido-datos-pmt',
+            'Control de asistencia y puntualidad': 'contenido-asistencia',
+            'Resumen anual de asistencia': 'contenido-resumen-anual',
+            'Resumen de inscritos e inscritas de la sección': 'contenido-resumen-inscritos',
+            'Inscritos por sección': 'contenido-resumen-inscritos',
+            'Registro de evaluación': 'contenido-evaluacion',
+            'Cronómetro de períodos': 'contenido-cronometro',
+            'Alertas de cumpleaños': 'contenido-cumpleanos',
+            'Notificaciones activas': 'contenido-notificaciones',
+            'Estadísticas rápidas': 'contenido-estadisticas',
+            'Dashboard del docente': 'contenido-dashboard-docente',
+            'Top de estudiantes': 'contenido-top-estudiantes',
+            'Estudiantes en riesgo': 'contenido-riesgo',
+            'Foto del estudiante': 'contenido-foto-estudiante',
+            'Datos generales': 'contenido-datos-generales',
+            'Condición inicial': 'contenido-condicion-inicial',
+            'Preprimario': 'contenido-preprimario',
+            'Control de movimiento': 'contenido-control-movimiento',
+            'Datos de padres/tutores': 'contenido-datos-padres',
+            'Historial médico': 'contenido-historial-medico',
+            'Directorio de padres': 'contenido-directorio-padres',
+            'Mapa de procedencia': 'contenido-mapa-procedencia',
+            'NEAE': 'contenido-neae',
+            'Ajustes curriculares': 'contenido-ajustes-curriculares',
+            'Estadísticas de sobreedad': 'contenido-estadisticas-sobreedad',
+            'Vista responsiva': 'contenido-vista-responsiva',
+            'Modo offline': 'contenido-modo-offline',
+            'Logo personalizado': 'contenido-logo-personalizado',
+            'Selector de mes': 'contenido-selector-mes',
+            'Leyenda': 'contenido-leyenda-asistencia',
+            'Tabla mensual': 'contenido-tabla-mensual',
+            'Escanear asistencia': 'contenido-escanear-asistencia',
+            'Resumen del mes': 'contenido-resumen-mes',
+            'Alertas automáticas': 'contenido-alertas-automaticas',
+            'Cálculo automático': 'contenido-calculo-automatico',
+            'Trazo azul': 'contenido-trazo-azul',
+            'Notificaciones push': 'contenido-notificaciones-push',
+            'Fechas de recuperaciones': 'contenido-fechas-recuperaciones',
+            'Alertas de cierre': 'contenido-alertas-cierre',
+            // NUEVA RUTA SIGERD
+            'Formulario SIGERD': 'contenido-formulario-sigerd'
+        };
+
+        document.querySelectorAll('.lista-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var funcionNombre = this.getAttribute('data-funcion') || this.textContent.trim();
+                var nombreLimpio = funcionNombre.replace(/^[^\w]+/, '').trim();
+
+                if (nombreLimpio === 'indice' || this.id === 'itemIndice3x3') {
+                    mostrarIndice3x3();
+                    mostrarToast('📑 Índice 3×3');
+                    return;
+                }
+
+                if (nombreLimpio === 'Colores institucionales' || this.id === 'btnColoresInstitucionales') {
+                    abrirModalColores();
+                    return;
+                }
+
+                if (RUTAS_PAGINAS[nombreLimpio]) {
+                    var destino = RUTAS_PAGINAS[nombreLimpio];
+                    mostrarToast('📄 Abriendo: ' + nombreLimpio);
+                    setTimeout(function() {
+                        document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+                        const contenedor = document.getElementById('contenedorIndice3x3');
+                        if (contenedor) contenedor.style.display = 'none';
+                        mostrarContenido(destino);
+                    }, 200);
+                    return;
+                }
+
+                var encontrado = false;
+                for (var clave in RUTAS_PAGINAS) {
+                    if (nombreLimpio.includes(clave) || clave.includes(nombreLimpio)) {
+                        var destino2 = RUTAS_PAGINAS[clave];
+                        mostrarToast('📄 Abriendo: ' + clave);
+                        setTimeout(function() {
+                            document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+                            const contenedor = document.getElementById('contenedorIndice3x3');
+                            if (contenedor) contenedor.style.display = 'none';
+                            mostrarContenido(destino2);
+                        }, 200);
+                        encontrado = true;
+                        break;
+                    }
+                }
+                if (encontrado) return;
+
+                mostrarMensajeNoDisponible(funcionNombre);
+            });
+        });
+
+        // ============================================
+        // 10. ITEM ÍNDICE
+        // ============================================
+        document.querySelector('.item-indice')?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            mostrarIndice3x3();
+            mostrarToast('📑 Índice 3×3');
+        });
+
+        // ============================================
+        // 11. NAVEGACIÓN POR ÍNDICE CLÁSICO
+        // ============================================
+        document.querySelectorAll('.indice-item.clickable').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var targetId = this.getAttribute('data-target');
+                if (targetId) {
+                    document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+                    const contenedor = document.getElementById('contenedorIndice3x3');
+                    if (contenedor) contenedor.style.display = 'none';
+                    mostrarContenido(targetId);
+                }
+            });
+        });
+
+        // ============================================
+        // 12. MANEJADOR DE ÍTEMS DEL GRID 3×3
+        // ============================================
+        function manejarGridItem(e) {
+            var item = e.currentTarget;
+            var target = item.getAttribute('data-target');
+            var funcion = item.getAttribute('data-funcion') || 'Función';
+            if (!target) return;
+
+            if (target === 'tab-inicio') {
+                activarTab('tab-inicio');
+                const contenedor = document.getElementById('contenedorIndice3x3');
+                if (contenedor) contenedor.style.display = 'none';
+                document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'block');
+                ocultarBotonRetornar();
+                mostrarToast('🏠 Volviendo al Inicio');
+                return;
+            }
+
+            if (target.startsWith('contenido-')) {
+                mostrarToast('📄 ' + funcion);
+                setTimeout(function() {
+                    document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+                    const contenedor = document.getElementById('contenedorIndice3x3');
+                    if (contenedor) contenedor.style.display = 'none';
+                    mostrarContenido(target);
+                }, 200);
+            } else {
+                mostrarToast('📌 ' + funcion);
+            }
+        }
+
+        document.querySelectorAll('.grid-item[data-target]').forEach(function(item) {
+            item.addEventListener('click', manejarGridItem);
+        });
+
+        // ============================================
+        // 13. MODAL DE COLORES INSTITUCIONALES
+        // ============================================
+        const modalColores = document.getElementById('modalColores');
+        const btnCerrarColores = document.getElementById('btnCerrarColores');
+        const btnGuardarColores = document.getElementById('btnGuardarColores');
+        const btnRestablecerColores = document.getElementById('btnRestablecerColores');
+
+        const VALORES_DEFAULT = {
+            colorFondoPrincipal: '#e8ecf1',
+            colorFondoTarjetas: '#ffffff',
+            colorFondoSecciones: '#f5f6f8',
+            colorTextoPrincipal: '#1a2a4a',
+            colorTextoSecundario: '#718096',
+            colorTextoClaro: '#ffffff',
+            colorPrincipal: '#1a2a4a',
+            colorPrincipalClaro: '#2a4a7a',
+            colorBotones: '#1a2a4a',
+            colorHover: '#2a3a5a',
+            colorBorde: '#d0d8e0',
+            colorBordeDestacado: '#1a3a6b',
+            colorLinea: '#e8ecf1',
+            colorBarraFondo: '#1a2a4a',
+            colorBarraTexto: '#ffffff',
+            colorBarraBorde: '#1a3a6b',
+            colorTabsFondo: '#1a2a4a',
+            colorTabsTextoInactivo: '#a0b0c0',
+            colorTabsTextoActivo: '#ffffff',
+            colorTabsBordeActivo: '#4a8ab5'
+        };
+
+        function cargarColoresGuardados() {
+            try {
+                const guardado = localStorage.getItem('coloresInstitucionales');
+                if (guardado) {
+                    const colores = JSON.parse(guardado);
+                    Object.keys(VALORES_DEFAULT).forEach(key => {
+                        if (colores[key] !== undefined) {
+                            const input = document.getElementById(key);
+                            if (input) input.value = colores[key];
+                        }
+                    });
+                    actualizarPreview();
+                }
+            } catch(e) {}
+        }
+
+        function guardarColores() {
+            const colores = {};
+            Object.keys(VALORES_DEFAULT).forEach(key => {
+                const input = document.getElementById(key);
+                if (input) colores[key] = input.value;
+            });
+            localStorage.setItem('coloresInstitucionales', JSON.stringify(colores));
+            aplicarColores();
+            mostrarToast('✅ Colores institucionales guardados correctamente');
+            cerrarModalColores();
+        }
+
+        function aplicarColores() {
+            try {
+                const guardado = localStorage.getItem('coloresInstitucionales');
+                if (!guardado) return;
+                const colores = JSON.parse(guardado);
+
+                document.documentElement.style.setProperty('--color-fondo-principal', colores.colorFondoPrincipal || '#e8ecf1');
+                document.documentElement.style.setProperty('--color-fondo-tarjetas', colores.colorFondoTarjetas || '#ffffff');
+                document.documentElement.style.setProperty('--color-texto-principal', colores.colorTextoPrincipal || '#1a2a4a');
+                document.documentElement.style.setProperty('--color-principal', colores.colorPrincipal || '#1a2a4a');
+                document.documentElement.style.setProperty('--color-borde', colores.colorBorde || '#d0d8e0');
+                document.documentElement.style.setProperty('--color-barra-fondo', colores.colorBarraFondo || '#1a2a4a');
+                document.documentElement.style.setProperty('--color-barra-texto', colores.colorBarraTexto || '#ffffff');
+                document.documentElement.style.setProperty('--color-tabs-fondo', colores.colorTabsFondo || '#1a2a4a');
+
+                document.body.style.background = colores.colorFondoPrincipal || '#e8ecf1';
+                
+                const topBar = document.querySelector('.top-bar');
+                if (topBar) {
+                    topBar.style.background = colores.colorBarraFondo || '#1a2a4a';
+                    topBar.style.borderBottomColor = colores.colorBarraBorde || '#1a3a6b';
+                }
+
+                const tabsContainer = document.querySelector('.tabs-container');
+                if (tabsContainer) {
+                    tabsContainer.style.background = colores.colorTabsFondo || '#1a2a4a';
+                    tabsContainer.style.borderBottomColor = colores.colorTabsBordeActivo || '#4a8ab5';
+                }
+
+                document.querySelectorAll('.tab-btn').forEach(tab => {
+                    tab.style.color = colores.colorTabsTextoInactivo || '#a0b0c0';
+                    if (tab.classList.contains('active')) {
+                        tab.style.color = colores.colorTabsTextoActivo || '#ffffff';
+                        tab.style.borderBottomColor = colores.colorTabsBordeActivo || '#4a8ab5';
+                    }
+                });
+
+            } catch(e) { console.error('Error aplicando colores:', e); }
+        }
+
+        function restablecerColores() {
+            if (!confirm('¿Restablecer todos los colores a los valores predeterminados?')) return;
+            Object.keys(VALORES_DEFAULT).forEach(key => {
+                const input = document.getElementById(key);
+                if (input) input.value = VALORES_DEFAULT[key];
+            });
+            localStorage.removeItem('coloresInstitucionales');
+            actualizarPreview();
+            aplicarColores();
+            mostrarToast('🔄 Colores restablecidos a valores predeterminados');
+        }
+
+        function actualizarPreview() {
+            const previewFondo = document.getElementById('previewFondo');
+            const previewTexto = document.getElementById('previewTexto');
+            const previewPrincipal = document.getElementById('previewPrincipal');
+            const previewBorde = document.getElementById('previewBorde');
+            const previewBarra = document.getElementById('previewBarra');
+
+            if (previewFondo) previewFondo.style.background = document.getElementById('colorFondoPrincipal').value;
+            if (previewTexto) previewTexto.style.background = document.getElementById('colorTextoPrincipal').value;
+            if (previewPrincipal) previewPrincipal.style.background = document.getElementById('colorPrincipal').value;
+            if (previewBorde) previewBorde.style.background = document.getElementById('colorBorde').value;
+            if (previewBarra) previewBarra.style.background = document.getElementById('colorBarraFondo').value;
+        }
+
+        function abrirModalColores() {
+            cargarColoresGuardados();
+            modalColores.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+            actualizarPreview();
+        }
+
+        function cerrarModalColores() {
+            modalColores.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+
+        btnCerrarColores.addEventListener('click', cerrarModalColores);
+        modalColores.addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalColores();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalColores.classList.contains('activo')) cerrarModalColores();
+        });
+
+        btnGuardarColores.addEventListener('click', guardarColores);
+        btnRestablecerColores.addEventListener('click', restablecerColores);
+
+        document.querySelectorAll('#modalColores input[type="color"]').forEach(input => {
+            input.addEventListener('input', actualizarPreview);
+        });
+
+        document.querySelectorAll('.color-opcion').forEach(opcion => {
+            opcion.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const color = this.getAttribute('data-color');
+                const input = document.getElementById(targetId);
+                if (input) {
+                    input.value = color;
+                    actualizarPreview();
+                }
+                document.querySelectorAll('.color-opcion').forEach(o => o.classList.remove('seleccionada'));
+                this.classList.add('seleccionada');
+                setTimeout(() => this.classList.remove('seleccionada'), 1500);
+            });
+        });
+
+        // ============================================
+        // 14. INICIALIZACIÓN
+        // ============================================
+        activarTab('tab-inicio');
+        cargarColoresGuardados();
+        aplicarColores();
+
+        // ============================================
+        // 15. CONEXIÓN CON ALERTAS DE CUMPLEAÑOS
+        // ============================================
+        window.cargarEstudiantesACumpleanos = function(datosEstudiantes) {
+            const iframeCumple = document.querySelector('#contenido-cumpleanos iframe');
+            if (iframeCumple && iframeCumple.contentWindow) {
+                if (typeof iframeCumple.contentWindow.cargarEstudiantes === 'function') {
+                    iframeCumple.contentWindow.cargarEstudiantes(datosEstudiantes);
+                    console.log('✅ Datos enviados a Alertas de Cumpleaños');
+                    return true;
+                } else {
+                    console.warn('⚠️ La función cargarEstudiantes no está disponible en el iframe');
+                    return false;
+                }
+            } else {
+                console.warn('⚠️ No se encontró el iframe de Alertas de Cumpleaños');
+                return false;
+            }
+        };
+
+        // ============================================
+        // 16. MODAL DE AYUDA (NUEVO)
+        // ============================================
+        const modalAyuda = document.getElementById('modalAyuda');
+        const btnCerrarAyuda = document.getElementById('btnCerrarAyuda');
+        const btnEntendidoAyuda = document.getElementById('btnEntendidoAyuda');
+        const btnAbrirAyudaCompleta = document.getElementById('btnAbrirAyudaCompleta');
+
+        window.abrirModalAyuda = function() {
+            if (!modalAyuda) return;
+            modalAyuda.classList.add('activo');
+            document.body.style.overflow = 'hidden';
+        };
+
+        function cerrarModalAyuda() {
+            if (!modalAyuda) return;
+            modalAyuda.classList.remove('activo');
+            document.body.style.overflow = '';
+        }
+
+        if (btnCerrarAyuda) btnCerrarAyuda.addEventListener('click', cerrarModalAyuda);
+        if (btnEntendidoAyuda) btnEntendidoAyuda.addEventListener('click', cerrarModalAyuda);
+        if (modalAyuda) {
+            modalAyuda.addEventListener('click', function(e) {
+                if (e.target === modalAyuda) cerrarModalAyuda();
+            });
+        }
+
+        // Botón "Ver guía completa" → abre AYUDA.html en el iframe interno
+        if (btnAbrirAyudaCompleta) {
+            btnAbrirAyudaCompleta.addEventListener('click', function() {
+                cerrarModalAyuda();
+                document.querySelectorAll('.lista-funciones').forEach(l => l.style.display = 'none');
+                const cont = document.getElementById('contenedorIndice3x3');
+                if (cont) cont.style.display = 'none';
+                mostrarContenido('contenido-ayuda-completa');
+                mostrarToast('📖 Abriendo guía completa');
+            });
+        }
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalAyuda && modalAyuda.classList.contains('activo')) {
+                cerrarModalAyuda();
+            }
+        });
+
+        // ============================================
+        // 17. LOGS DE CONFIRMACIÓN
+        // ============================================
+        console.log('✅ REGISTRO-DE-GRADO.html cargado correctamente');
+        console.log('🎓 Barra superior ahora muestra: Grado · Sección · Tanda');
+        console.log('🎨 Colores institucionales listos');
+        console.log('❓ Botón de Ayuda ACTIVADO - abre modal con guía rápida');
+        console.log('📖 Guía completa disponible en AYUDA.html (iframe interno)');
+        console.log('↩️ Botón Retornar CORREGIDO - ahora funciona en todas las páginas de contenido');
+        console.log('📌 Botón "Inscritos por sección" → carga RESUMEN-INSCRITOS.html');
+        console.log('⏰ Cronómetro de períodos ACTIVADO - carga CONOMETRO ESCOLAR.html');
+        console.log('🎂 Alertas de cumpleaños ACTIVADO - carga ALERTA-CUMPLEANOS.html');
+        console.log('🔔 Notificaciones activas ACTIVADO - carga NOTIFICACIONES ACTIVAS.html');
+        console.log('📊 Estadísticas rápidas ACTIVADO - carga ESTADITICA RAPIDA.HTML');
+        console.log('📈 Dashboard del docente ACTIVADO - carga DASHBOARD-DOCENTE.html');
+        console.log('🏆 Top de estudiantes ACTIVADO - carga TOP DE ESTUDIANTES.html');
+        console.log('⚠️ Estudiantes en riesgo ACTIVADO - carga ESTUDIANTES EN RIESGO.html');
+        console.log('📸 Foto del estudiante ACTIVADO - carga GALERIA-ESTUDIANTES.html');
+        console.log('📋 Datos generales ACTIVADO - carga DATOS-GENERALES.html');
+        console.log('📝 Condición inicial ACTIVADO - carga CONDICION-INICIAL.html');
+        console.log('🧒 Preprimario ACTIVADO - carga PREPRIMARIO.html');
+        console.log('🔄 Control de movimiento ACTIVADO - carga CONTROL-MOVIMIENTO.html');
+        console.log('👨‍👩‍👧 Datos de padres/tutores ACTIVADO - carga DATOS-PADRES.html');
+        console.log('🏥 Historial médico ACTIVADO - carga HISTORIAL-MEDICO.html');
+        console.log('📞 Directorio de padres ACTIVADO - carga DIRECTORIO-PADRES.html');
+        console.log('📍 Mapa de procedencia ACTIVADO - carga MAPA-PROCEDENCIA.html');
+        console.log('🧩 NEAE ACTIVADO - carga NEAE.html');
+        console.log('🎯 Ajustes curriculares ACTIVADO - carga AJUSTES-CURRICULARES.html');
+        console.log('📊 Estadísticas de sobreedad ACTIVADO - carga ESTADISTICAS-SOBREEDAD.html');
+        console.log('📄 Reporte automático ACTIVADO - carga REPORTE-AUTOMATICO.html');
+        console.log('📱 Vista responsiva ACTIVADO - carga VISTA-RESPONSIVA.html');
+        console.log('📶 Modo offline ACTIVADO - carga MODO-OFFLINE.html');
+        console.log('🖼️ Logo personalizado ACTIVADO - carga LOGO-PERSONALIZADO.html');
+        console.log('📅 Selector de mes ACTIVADO - carga SELECTOR-DE-MES.html');
+        console.log('📝 Leyenda ACTIVADO - carga LEYENDA-ASISTENCIA.html');
+        console.log('📊 Tabla mensual ACTIVADO - carga TABLA-MENSUAL-ASISTENCIA.html');
+        console.log('📷 Escanear asistencia ACTIVADO - carga ESCANEAR-ASISTENCIA.html');
+        console.log('📊 Resumen del mes ACTIVADO - carga RESUMEN-MES-ASISTENCIA.html');
+        console.log('🔔 Alertas automáticas ACTIVADO - carga ALERTAS-AUTOMATICAS.html');
+        console.log('🧮 Cálculo automático ACTIVADO - carga CALCULO-AUTOMATICO.html');
+        console.log('🔵 Trazo azul ACTIVADO - carga TRAZO-AZUL.html');
+        console.log('🔔 Notificaciones push ACTIVADO - carga NOTIFICACIONES-PUSH.html');
+        console.log('📝 Fechas de recuperaciones ACTIVADO - carga FECHAS-RECUPERACIONES.html');
+        console.log('🔔 Alertas de cierre ACTIVADO - carga ALERTAS-CIERRE.html');
+        console.log('📋 SIGERD ACTIVADO - carga FORMULARIO-SIGERD.html');
+        console.log('📥 Usa window.cargarEstudiantesACumpleanos(datos) para enviar estudiantes');
+
+    });
+    </script>
+
+</body>
+</html>
