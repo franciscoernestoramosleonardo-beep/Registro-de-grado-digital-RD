@@ -696,7 +696,8 @@
                 
                 AuthSystem.guardarGradoSeleccionado(cedula, grado);
                 
-                let url = 'PORTADA.html?grado=' + encodeURIComponent(grado);
+                // CAMBIO A MINÚSCULA: portada.html
+                let url = 'portada.html?grado=' + encodeURIComponent(grado);
                 if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
                 if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
                 
@@ -764,7 +765,8 @@
                         
                         AuthSystem.guardarGradoSeleccionado(cedula, grado);
                         
-                        let url = 'PORTADA.html?grado=' + encodeURIComponent(grado);
+                        // CAMBIO A MINÚSCULA: portada.html
+                        let url = 'portada.html?grado=' + encodeURIComponent(grado);
                         if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
                         if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
                         
@@ -876,6 +878,7 @@
                 }
                 
                 setTimeout(() => {
+                    // CAMBIO A MINÚSCULA: admin.html
                     window.location.href = 'admin.html';
                 }, 800);
                 return;
@@ -1004,7 +1007,8 @@
                 document.getElementById('bienvenidaGrande').style.display = 'none';
                 mostrarSelectorGrados(cedula, nombre);
             } else {
-                window.location.href = 'PORTADA.html';
+                // CAMBIO A MINÚSCULA: portada.html
+                window.location.href = 'portada.html';
             }
         });
 
@@ -1030,7 +1034,8 @@
     </script>
 
     <div style="text-align: center; margin-top: 20px; padding: 10px;">
-        <a href="PORTADA.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
+        <!-- CAMBIO A MINÚSCULA: portada.html -->
+        <a href="portada.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
     </div>
 </body>
 </html>
