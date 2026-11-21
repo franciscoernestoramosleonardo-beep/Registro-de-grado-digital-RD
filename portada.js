@@ -1,17 +1,17 @@
 /**
-main.js - Registro de Grado
-FUNCIONALIDADES:
-Autocompletado de centros educativos (solo muestra el nombre, no el código)
-Al seleccionar un centro, se llena automáticamente: código, regional y distrito
-Al escribir un código en el campo "Código" y presionar ENTER o ESPACIO, se buscan los datos
-El código completo del distrito (ej: "0101") contiene la regional (01) y el distrito (01)
-Guardado automático en localStorage
-VERIFICACIÓN DE AUTENTICACIÓN antes de redirigir
-Redirección a REGISTRO-DE-GRADO.html
-GRADO SELECCIONADO Y BLOQUEADO - No permite cambiar el grado
-SECCIÓN Y TANDA BLOQUEADAS - Solo el administrador las asigna
-VARIABLE DE DATOS: datosdelcentroeducativo (cargada desde datos-generales/datos-generales.js)
-*/
+ * portada.js - Registro de Grado
+ * FUNCIONALIDADES:
+ * - Autocompletado de centros educativos (solo muestra el nombre, no el código)
+ * - Al seleccionar un centro, se llena automáticamente: código, regional y distrito
+ * - Al escribir un código en el campo "Código" y presionar ENTER o ESPACIO, se buscan los datos
+ * - El código completo del distrito (ej: "0101") contiene la regional (01) y el distrito (01)
+ * - Guardado automático en localStorage
+ * - VERIFICACIÓN DE AUTENTICACIÓN antes de redirigir
+ * - Redirección a registro-de-grado.html (en minúsculas)
+ * - GRADO SELECCIONADO Y BLOQUEADO - No permite cambiar el grado
+ * - SECCIÓN Y TANDA BLOQUEADAS - Solo el administrador las asigna
+ * - VARIABLE DE DATOS: datosdelcentroeducativo (cargada desde datos-del centro-educativo.js)
+ */
 
 // ============================================
 // CONFIGURACIÓN DE RUTAS (DINÁMICA)
@@ -317,8 +317,8 @@ function bloquearCamposFormulario() {
     const camposBloqueables = [
         'centroEducativo',
         'codigo',
-        'seccion',
-        'tanda',
+        'seccionAsignada',
+        'tandaAsignada',
         'regional',
         'distrito',
         'anioInicio',
@@ -370,8 +370,6 @@ function desbloquearCamposFormulario() {
     const camposBloqueables = [
         'centroEducativo',
         'codigo',
-        'seccion',
-        'tanda',
         'regional',
         'distrito',
         'anioInicio',
@@ -381,15 +379,6 @@ function desbloquearCamposFormulario() {
     camposBloqueables.forEach(id => {
         const campo = document.getElementById(id);
         if (campo) {
-            // Si es sección o tanda, NO se desbloquean (son permanentes)
-            if (id === 'seccion' || id === 'tanda') {
-                campo.disabled = true;
-                campo.style.background = '#f0f0f0';
-                campo.style.color = '#666';
-                campo.style.cursor = 'not-allowed';
-                campo.style.opacity = '0.8';
-                return;
-            }
             campo.disabled = false;
             campo.style.background = '';
             campo.style.color = '';
@@ -438,7 +427,9 @@ function desbloquearAlEditar() {
             'centroEducativo',
             'codigo',
             'regional',
-            'distrito'
+            'distrito',
+            'anioInicio',
+            'anioFin'
         ];
         camposBloqueables.forEach(id => {
             const campo = document.getElementById(id);
@@ -548,7 +539,7 @@ window.adminBloqueoActivo = false;
 let datosGlobales = window.datosdelcentroeducativo || null;
 if (!datosGlobales) {
     console.error('❌ ERROR: No se cargó la variable datosdelcentroeducativo');
-    console.log('⚠️ Verifica que el archivo datos-generales/datos-generales.js se haya cargado correctamente');
+    console.log('⚠️ Verifica que el archivo "datos-del centro-educativo.js" se haya cargado correctamente en el HTML');
 } else {
     console.log('✅ datosdelcentroeducativo cargado:', datosGlobales.length, 'registros');
 }
@@ -976,27 +967,47 @@ function mostrarMensaje(texto, tipo) {
 // ============================================
 function limpiarError(campo) {
     campo.classList.remove('error', 'success');
-    const errorSpan = document.getElementById(campo.id + 'Error');
-    if (errorSpan) errorSpan.textContent = '';
+    const errorSpan = document.getElementById(campo.id + 'Error'); // Nota: en el HTML los IDs de error son 'errorCentroEducativo', etc.
+    // Para ser consistentes con el HTML, usaremos una lógica más robusta abajo, pero esto funciona si los IDs coinciden.
 }
 
 function marcarError(campo, mensaje) {
     campo.classList.add('error');
     campo.classList.remove('success');
-    const errorSpan = document.getElementById(campo.id + 'Error');
+    // Mapeo correcto de IDs de error según el HTML proporcionado
+    let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
+    if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
+    if (campo.id === 'regional') errorId = 'errorRegional';
+    if (campo.id === 'distrito') errorId = 'errorDistrito';
+    
+    const errorSpan = document.getElementById(errorId);
     if (errorSpan) errorSpan.textContent = '❌ ' + mensaje;
 }
 
 function marcarExito(campo) {
     campo.classList.remove('error');
     campo.classList.add('success');
-    const errorSpan = document.getElementById(campo.id + 'Error');
+    let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
+    if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
+    if (campo.id === 'regional') errorId = 'errorRegional';
+    if (campo.id === 'distrito') errorId = 'errorDistrito';
+
+    const errorSpan = document.getElementById(errorId);
     if (errorSpan) errorSpan.textContent = '✅ OK';
 }
 
 function validarCampo(campo, tipo) {
     const valor = campo.value.trim();
-    limpiarError(campo);
+    campo.classList.remove('error', 'success');
+    
+    // Limpiar mensaje de error específico
+    let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
+    if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
+    if (campo.id === 'regional') errorId = 'errorRegional';
+    if (campo.id === 'distrito') errorId = 'errorDistrito';
+    const errorSpan = document.getElementById(errorId);
+    if (errorSpan) errorSpan.textContent = '';
+
     switch (tipo) {
         case 'texto':
             if (valor === '') { marcarError(campo, 'Obligatorio'); return false; }
@@ -1094,7 +1105,9 @@ function limpiarTodo() {
         'centroEducativo',
         'codigo',
         'regional',
-        'distrito'
+        'distrito',
+        'anioInicio',
+        'anioFin'
     ];
     camposBloqueables.forEach(id => {
         const campo = document.getElementById(id);
@@ -1140,7 +1153,11 @@ function limpiarTodo() {
     document.querySelectorAll('.field-input, .field-select').forEach(campo => {
         if (campo.id !== 'grado' && campo.id !== 'seccionAsignada' && campo.id !== 'tandaAsignada') {
             campo.classList.remove('error', 'success');
-            const errorSpan = document.getElementById(campo.id + 'Error');
+            let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
+            if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
+            if (campo.id === 'regional') errorId = 'errorRegional';
+            if (campo.id === 'distrito') errorId = 'errorDistrito';
+            const errorSpan = document.getElementById(errorId);
             if (errorSpan) errorSpan.textContent = '';
         }
     });
@@ -1153,6 +1170,7 @@ function limpiarTodo() {
 // ============================================
 // ENTRAR AL SISTEMA
 // ✅ CORREGIDO: No envía el placeholder "Sin asignar" como dato real
+// ✅ CORREGIDO: Redirección en minúsculas 'registro-de-grado.html'
 // ============================================
 function entrarAlSistema() {
     if (!window.formularioValidado) {
@@ -1227,9 +1245,9 @@ function entrarAlSistema() {
 
     guardarDatos();
 
-    // ✅ Redirigir a REGISTRO-DE-GRADO.html con el grado, sección y tanda en la URL
+    // ✅ Redirigir a registro-de-grado.html (EN MINÚSCULAS) con el grado, sección y tanda en la URL
     setTimeout(() => {
-        let url = 'REGISTRO-DE-GRADO.html?';
+        let url = 'registro-de-grado.html?';
         if (grado) url += 'grado=' + encodeURIComponent(grado);
         if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
         if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
@@ -1245,7 +1263,10 @@ centroInput.addEventListener('blur', function() {
     if (valor !== '') {
         validarCentroYLlenarCampos();
     } else {
-        limpiarError(this);
+        this.classList.remove('error', 'success');
+        let errorId = 'errorCentroEducativo';
+        const errorSpan = document.getElementById(errorId);
+        if (errorSpan) errorSpan.textContent = '';
         codigoInput.value = '';
         regionalSelect.value = '';
         distritoSelect.value = '';
@@ -1259,7 +1280,8 @@ centroInput.addEventListener('blur', function() {
 centroInput.addEventListener('input', function() {
     this.value = this.value.toUpperCase();
     this.classList.remove('error', 'success');
-    const errorSpan = document.getElementById('errorCentroEducativo');
+    let errorId = 'errorCentroEducativo';
+    const errorSpan = document.getElementById(errorId);
     if (errorSpan) errorSpan.textContent = '';
 
     const valor = this.value.trim();
@@ -1305,7 +1327,10 @@ codigoInput.addEventListener('blur', function() {
     if (valor !== '') {
         validarCampo(this, 'codigo');
     } else {
-        limpiarError(this);
+        this.classList.remove('error', 'success');
+        let errorId = 'errorCodigo';
+        const errorSpan = document.getElementById(errorId);
+        if (errorSpan) errorSpan.textContent = '';
     }
 });
 
@@ -1313,7 +1338,8 @@ codigoInput.addEventListener('input', function() {
     this.value = this.value.replace(/[^0-9]/g, '');
     if (this.classList.contains('error') || this.classList.contains('success')) {
         this.classList.remove('error', 'success');
-        const errorSpan = document.getElementById('errorCodigo');
+        let errorId = 'errorCodigo';
+        const errorSpan = document.getElementById(errorId);
         if (errorSpan) errorSpan.textContent = '';
     }
     guardarDatos();
@@ -1374,7 +1400,7 @@ function cargarEstadoBloqueo() {
 
 function aplicarBloqueoAdmin(bloqueado) {
     window.adminBloqueoActivo = bloqueado;
-    const mensajeMantenimiento = document.getElementById('mensajeMantenimientoAdmin');
+    const mensajeMantenimiento = document.getElementById('mensajeBloqueoAdmin'); // Corregido ID según HTML
 
     const camposBloqueables = [
         'centroEducativo',
@@ -1388,7 +1414,7 @@ function aplicarBloqueoAdmin(bloqueado) {
             mensajeMantenimiento.classList.add('visible');
             console.log('✅ Mensaje de mantenimiento MOSTRADO');
         } else {
-            console.error('❌ No se encontró el elemento mensajeMantenimientoAdmin');
+            console.error('❌ No se encontró el elemento mensajeBloqueoAdmin');
         }
 
         camposBloqueables.forEach(id => {
