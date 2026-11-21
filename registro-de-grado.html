@@ -1766,7 +1766,7 @@ body { padding: 0 !important; margin: 0 !important; background: white !important
 <span class="tab-icon">💬</span> Comunicación
 </button>
 <button class="tab-btn" data-tab="tab-configuracion">
-<span class="tab-icon">⚙️</span> Configuración
+<span class="tab-icon">⚙️</span> Configuracion
 <span class="tab-badge">!</span>
 </button>
 <!-- NUEVA PESTAÑA SIGERD -->
@@ -1774,7 +1774,7 @@ body { padding: 0 !important; margin: 0 !important; background: white !important
 <span class="tab-icon">📋</span> SIGERD
 </button>
 <!-- BOTÓN RETORNAR -->
-<button class="btn-retornar" id="btnRetornar">↩️ Retornar al Indice</button>
+<button class="btn-retornar" id="btnRetornar">↩️ Retornar al indice</button>
 </div>
 <!-- ========== CONTENIDO DE PESTAÑAS ========== -->
 <div class="tab-content-container" id="tabContentContainer">
@@ -1784,7 +1784,7 @@ body { padding: 0 !important; margin: 0 !important; background: white !important
 <div class="lista-titulo">🏠 Inicio</div>
 <div class="lista-items">
 <div class="lista-item item-formulario" data-funcion="Formulario">📋 Formulario del Estudiante</div>
-<div class="lista-item item-indice" id="itemIndice3x3" data-funcion="indice">📑 Índice</div>
+<div class="lista-item item-indice" id="itemIndice3x3" data-funcion="indice">📑 indice</div>
 <div class="lista-item item-estadisticas" data-funcion="Estadísticas rápidas">
 <span class="icono-estadisticas">📊</span> Estadísticas rápidas
 </div>
@@ -2719,12 +2719,12 @@ var action = this.getAttribute('data-action');
 menuDropdown.classList.remove('active');
 switch(action) {
 case 'inicio':
-window.location.href = '../index.html';
+window.location.href = 'index.html';
 break;
 case 'cerrar-sesion':
 if (confirm('¿Está seguro que desea cerrar sesión?')) {
 if (typeof AuthSystem !== 'undefined') AuthSystem.cerrarSesion();
-window.location.href = '../index.html';
+window.location.href = 'index.html';
 }
 break;
 case 'ayuda':
