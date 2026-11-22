@@ -12,7 +12,7 @@
     <!-- ============================================================
     SISTEMA DE OBSERVACIONES AUTOMÁTICAS
     ⚠️ ORDEN CRÍTICO - NO CAMBIAR:
-    1. observaciones.js          → Define OBSERVACIONES_BANCO
+    1. observaciones.js        → Define OBSERVACIONES_BANCO
     2. generadorObservaciones.js → Usa OBSERVACIONES_BANCO (obs generales)
     3. observacionesPeriodo.js   → Usa OBSERVACIONES_BANCO (obs P1-P4)
     ============================================================ -->
@@ -36,6 +36,19 @@
                 <select id="selectorEstudiante">
                     <option value="">-- Seleccionar estudiante --</option>
                 </select>
+                
+                <!-- 📌 NUEVO: Selector de Grado -->
+                <label for="selectorGrado">📚 Grado:</label>
+                <select id="selectorGrado">
+                    <option value="">-- Seleccionar grado --</option>
+                    <option value="1ro">1ro de Primaria</option>
+                    <option value="2do">2do de Primaria</option>
+                    <option value="3ro">3ro de Primaria</option>
+                    <option value="4to">4to de Primaria</option>
+                    <option value="5to">5to de Primaria</option>
+                    <option value="6to">6to de Primaria</option>
+                </select>
+                
                 <button id="btnSeleccionar" class="btn btn-seleccionar">👤 Cargar</button>
             </div>
 
@@ -73,6 +86,10 @@
                 <!-- PÁGINA 1 -->
                 <div class="page page1" id="page1">
                     <div class="page1-left">
+                        
+                        <!-- 🖼️ IMAGEN QUE CAMBIA SEGÚN EL GRADO -->
+                        <img id="imagenBoletin" src="" alt="Encabezado del boletín" style="width:100%; max-width:800px; display:block; margin:0 auto 15px auto;">
+                        
                         <!-- FIRMA DEL PADRE, MADRE O TUTOR -->
                         <div class="firma-box">
                             <div class="firma-box-header">FIRMA DEL PADRE, MADRE O TUTOR</div>
@@ -194,6 +211,43 @@
             Estudiante <span id="posicionActual">0</span> de <span id="totalEstudiantes">0</span>
         </div>
     </div>
+
+    <!-- ============================================================
+    SCRIPT PARA CAMBIAR IMAGEN SEGÚN EL GRADO
+    ============================================================ -->
+    <script>
+        // 📌 MAPA DE IMÁGENES POR GRADO
+        const imagenesPorGrado = {
+            "1ro": "1ro_p1_recorte.png",
+            "2do": "2do_p1_recorte.png",
+            "3ro": "3ro_p1_recorte.png",
+            "4to": "4to_p1_recorte.png",
+            "5to": "5to_p1_recorte.png",
+            "6to": "6to_p1_recorte.png"
+        };
+
+        // Función para actualizar la imagen
+        function actualizarImagenBoletin(grado) {
+            const imagen = document.getElementById('imagenBoletin');
+            if (grado && imagenesPorGrado[grado]) {
+                imagen.src = imagenesPorGrado[grado];
+                imagen.style.display = "block";
+            } else {
+                imagen.src = "";
+                imagen.style.display = "none";
+            }
+        }
+
+        // Cuando el usuario cambie el grado en el menú
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectorGrado = document.getElementById('selectorGrado');
+            if (selectorGrado) {
+                selectorGrado.addEventListener('change', function() {
+                    actualizarImagenBoletin(this.value);
+                });
+            }
+        });
+    </script>
 
     <!-- ============================================================
     SCRIPT PRINCIPAL DEL BOLETÍN
