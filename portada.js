@@ -16,7 +16,7 @@
 // ============================================
 // CONFIGURACIÓN DE RUTAS (DINÁMICA)
 // ============================================
-const RUTA_BASE = '';
+const rutaBase = '';
 
 // ============================================
 // 📚 DETECCIÓN DE GRADO SELECCIONADO
@@ -906,10 +906,11 @@ function restaurarGradoDefault() {
 function mostrarImagenGrado(grado) {
     const datos = mapaGrados[grado];
     if (datos && grado !== '') {
-        portadaImg.src = RUTA_BASE + 'img/' + datos.imagen;
+        // ✅ CORREGIDO: Se eliminó 'img/' porque las imágenes están en la raíz
+        portadaImg.src = rutaBase + datos.imagen;
         portadaImg.alt = 'Registro - ' + grado;
         portadaImg.className = 'portada-img visible';
-        console.log('🖼️ Mostrando imagen para:', grado);
+        console.log('🖼️ Mostrando imagen para:', grado, '| Ruta:', portadaImg.src);
     } else {
         portadaImg.src = '';
         portadaImg.alt = 'Seleccione un grado';
@@ -967,14 +968,12 @@ function mostrarMensaje(texto, tipo) {
 // ============================================
 function limpiarError(campo) {
     campo.classList.remove('error', 'success');
-    const errorSpan = document.getElementById(campo.id + 'Error'); // Nota: en el HTML los IDs de error son 'errorCentroEducativo', etc.
-    // Para ser consistentes con el HTML, usaremos una lógica más robusta abajo, pero esto funciona si los IDs coinciden.
+    const errorSpan = document.getElementById(campo.id + 'Error');
 }
 
 function marcarError(campo, mensaje) {
     campo.classList.add('error');
     campo.classList.remove('success');
-    // Mapeo correcto de IDs de error según el HTML proporcionado
     let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
     if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
     if (campo.id === 'regional') errorId = 'errorRegional';
@@ -1000,7 +999,6 @@ function validarCampo(campo, tipo) {
     const valor = campo.value.trim();
     campo.classList.remove('error', 'success');
     
-    // Limpiar mensaje de error específico
     let errorId = 'error' + campo.id.charAt(0).toUpperCase() + campo.id.slice(1);
     if (campo.id === 'centroEducativo') errorId = 'errorCentroEducativo';
     if (campo.id === 'regional') errorId = 'errorRegional';
@@ -1036,7 +1034,6 @@ function validarCampo(campo, tipo) {
 // VALIDAR TODOS LOS CAMPOS
 // ============================================
 function validarTodos() {
-    // Si está bloqueado por admin, no hacer nada
     if (window.adminBloqueoActivo) {
         mostrarMensaje('🔒 Página en mantenimiento por el administrador', 'warning');
         return;
@@ -1053,8 +1050,6 @@ function validarTodos() {
 
     if (!validarCampo(centroInput, 'texto')) todoValido = false;
     if (!validarCampo(codigoInput, 'codigo')) todoValido = false;
-    // El grado YA está bloqueado, no se valida
-    // Sección y Tanda NO se validan porque están bloqueadas por el admin
     if (!validarCampo(regionalSelect, 'select')) todoValido = false;
     if (!validarCampo(distritoSelect, 'select')) todoValido = false;
 
@@ -1063,17 +1058,14 @@ function validarTodos() {
         window.camposBloqueados = true;
         guardarDatos();
 
-        // BLOQUEAR CAMPOS
         bloquearCamposFormulario();
 
-        // ✅ EL BOTÓN VALIDAR SIGUE VISIBLE PERO DESHABILITADO
         const btnValidar = document.getElementById('btnValidar');
         if (btnValidar) {
             btnValidar.disabled = true;
             btnValidar.textContent = '✅ Validado';
         }
 
-        // Mostrar botón Ingresar
         const buttonRow = document.getElementById('buttonRow');
         const buttonRowIngresar = document.getElementById('buttonRowIngresar');
         if (buttonRow) buttonRow.style.display = 'flex';
@@ -1094,13 +1086,11 @@ function validarTodos() {
 function limpiarTodo() {
     if (!confirm('¿Estás seguro de que quieres limpiar todos los campos?')) return;
 
-    // Si está bloqueado por admin, no hacer nada
     if (window.adminBloqueoActivo) {
         mostrarMensaje('🔒 Página en mantenimiento por el administrador', 'warning');
         return;
     }
 
-    // Desbloquear campos (excepto sección y tanda que son permanentes)
     const camposBloqueables = [
         'centroEducativo',
         'codigo',
@@ -1120,7 +1110,6 @@ function limpiarTodo() {
         }
     });
 
-    // Limpiar valores
     centroInput.value = '';
     codigoInput.value = '';
     regionalSelect.value = '';
@@ -1128,11 +1117,9 @@ function limpiarTodo() {
     autocompleteItems.classList.remove('show');
     autocompleteItems.innerHTML = '';
 
-    // Resetear estados
     window.formularioValidado = false;
     window.camposBloqueados = false;
 
-    // Restaurar botón Validar
     const btnValidar = document.getElementById('btnValidar');
     const btnLimpiar = document.getElementById('btnLimpiar');
     const buttonRow = document.getElementById('buttonRow');
@@ -1169,8 +1156,6 @@ function limpiarTodo() {
 
 // ============================================
 // ENTRAR AL SISTEMA
-// ✅ CORREGIDO: No envía el placeholder "Sin asignar" como dato real
-// ✅ CORREGIDO: Redirección en minúsculas 'registro-de-grado.html'
 // ============================================
 function entrarAlSistema() {
     if (!window.formularioValidado) {
@@ -1213,11 +1198,9 @@ function entrarAlSistema() {
     let seccion = seccionAsignada || document.getElementById('seccionAsignada')?.value || '';
     let tanda = tandaAsignada || document.getElementById('tandaAsignada')?.value || '';
 
-    // ✅ Limpiar placeholder
     if (seccion === 'Sin asignar') seccion = '';
     if (tanda === 'Sin asignar') tanda = '';
 
-    // ✅ Asegurar que el grado esté guardado en localStorage
     if (grado && sesionActiva.cedula) {
         AuthSystem.guardarGradoSeleccionado(sesionActiva.cedula, grado);
     }
@@ -1245,7 +1228,6 @@ function entrarAlSistema() {
 
     guardarDatos();
 
-    // ✅ Redirigir a registro-de-grado.html (EN MINÚSCULAS) con el grado, sección y tanda en la URL
     setTimeout(() => {
         let url = 'registro-de-grado.html?';
         if (grado) url += 'grado=' + encodeURIComponent(grado);
@@ -1356,7 +1338,6 @@ codigoInput.addEventListener('keydown', function(e) {
     }
 });
 
-// Selects (EXCEPTO GRADO - ya está bloqueado)
 regionalSelect.addEventListener('change', function() {
     validarCampo(this, 'select');
     guardarDatos();
@@ -1400,7 +1381,7 @@ function cargarEstadoBloqueo() {
 
 function aplicarBloqueoAdmin(bloqueado) {
     window.adminBloqueoActivo = bloqueado;
-    const mensajeMantenimiento = document.getElementById('mensajeBloqueoAdmin'); // Corregido ID según HTML
+    const mensajeMantenimiento = document.getElementById('mensajeBloqueoAdmin');
 
     const camposBloqueables = [
         'centroEducativo',
@@ -1499,10 +1480,6 @@ camposEdicion.forEach(id => {
 
 // ============================================
 // 📂 CARGAR DATOS GENERALES GUARDADOS (BASE)
-// ✅ NUEVA FUNCIÓN: Se ejecuta ANTES de inicializarGrado() para que
-// la asignación actual (URL/login) siempre tenga la última palabra.
-// ⚠️ Aquí NO se restauran sección ni tanda: esos valores vienen
-// únicamente de la asignación del administrador.
 // ============================================
 function cargarDatosGuardados() {
     try {
@@ -1512,10 +1489,8 @@ function cargarDatosGuardados() {
         const datos = JSON.parse(guardado);
         const gradoActual = obtenerGradoSeleccionado();
 
-        // ✅ Detectar si el docente cambió de grado
         const cambioDeGrado = datos.grado && gradoActual && datos.grado !== gradoActual;
 
-        // Restaurar datos del centro (siempre, porque suele ser el mismo)
         if (datos.centro) centroInput.value = datos.centro;
         if (datos.codigo) codigoInput.value = datos.codigo;
         if (datos.regional) regionalSelect.value = datos.regional;
@@ -1524,8 +1499,6 @@ function cargarDatosGuardados() {
         if (datos.anioFin) anioFin.value = datos.anioFin;
 
         if (cambioDeGrado) {
-            // ✅ El grado cambió: reiniciar estado de validación
-            // (el nuevo grado debe validarse de nuevo)
             window.formularioValidado = false;
             window.camposBloqueados = false;
             console.log(`🔄 Grado cambió de "${datos.grado}" a "${gradoActual}" - validación reiniciada`);
@@ -1555,9 +1528,6 @@ function cargarDatosGuardados() {
 
 // ============================================
 // INICIALIZACIÓN PRINCIPAL
-// ✅ CORREGIDO: Se invirtió el orden.
-// ANTES: inicializarGrado() → carga de registroGradoData (pisaba la asignación)
-// AHORA: cargarDatosGuardados() → inicializarGrado() (la asignación gana)
 // ============================================
 function inicializar() {
     construirMapas();
@@ -1565,19 +1535,14 @@ function inicializar() {
     setInterval(actualizarAnioEscolar, 60000);
     restaurarGradoDefault();
 
-    // ✅ 1. PRIMERO: cargar datos generales guardados (base)
     cargarDatosGuardados();
-
-    // ✅ 2. SEGUNDO: inicializar el grado seleccionado.
-    // La asignación actual (URL / minerd_grado_actual) SOBREESCRIBE
-    // los datos viejos cargados en el paso anterior.
     inicializarGrado();
 
     console.log('%c📚 Registro de Grado - Nivel Primario', 'font-size: 16px; font-weight: bold; color: #1a3a6b;');
     console.log('%c🇩🇴 Ministerio de Educación - República Dominicana', 'font-size: 12px; color: #555;');
     console.log('%c🔒 GRADO BLOQUEADO - Solo modificable desde el login', 'font-size: 12px; color: #dc3545;');
     console.log('%c🔒 SECCIÓN Y TANDA BLOQUEADAS - Solo el administrador las asigna', 'font-size: 12px; color: #dc3545;');
-    console.log('%c📂 RUTA BASE DETECTADA: ' + RUTA_BASE, 'font-size: 12px; color: #FF6B6B;');
+    console.log('%c📂 RUTA BASE DETECTADA: ' + rutaBase, 'font-size: 12px; color: #FF6B6B;');
     console.log('%c✅ El botón Validar SIEMPRE es visible', 'font-size: 12px; color: #28a745;');
     console.log('%c🔄 Al editar un campo, se desbloquea automáticamente', 'font-size: 12px; color: #1a3a6b;');
     console.log('%c🔧 Mensaje de mantenimiento por admin listo', 'font-size: 12px; color: #ff6b6b;');
@@ -1589,7 +1554,6 @@ function inicializar() {
         }
     }, 500);
 
-    // Inicializar bloqueo de admin
     setTimeout(() => {
         const bloqueado = cargarEstadoBloqueo();
         aplicarBloqueoAdmin(bloqueado);
