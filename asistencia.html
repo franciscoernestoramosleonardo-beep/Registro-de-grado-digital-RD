@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Asistencia - Registro de Grado</title>
+    <link rel="stylesheet" href="asistencia.css">
+</head>
+<body>
+    <div class="carta-page">
+        <!-- TÍTULO -->
+        <div class="page-title">Control de Asistencia y Puntualidad</div>
+
+        <!-- ENCABEZADO DE CONTROLES -->
+        <div class="header-controls">
+            <div class="school-year-display">
+                Año Escolar: <strong id="schoolYearText">2025-2026</strong>
+            </div>
+            <div>
+                <label for="monthSelector">Mes:</label>
+                <select id="monthSelector" onchange="cambiarMes()">
+                    <option value="0">Agosto</option>
+                    <option value="1">Septiembre</option>
+                    <option value="2">Octubre</option>
+                    <option value="3">Noviembre</option>
+                    <option value="4">Diciembre</option>
+                    <option value="5">Enero</option>
+                    <option value="6">Febrero</option>
+                    <option value="7">Marzo</option>
+                    <option value="8">Abril</option>
+                    <option value="9">Mayo</option>
+                    <option value="10">Junio</option>
+                </select>
+            </div>
+            <div class="days-worked">
+                <label for="daysWorked">Días trabajados:</label>
+                <input type="text" id="daysWorked" readonly>
+            </div>
+        </div>
+
+        <!-- LEYENDA -->
+        <div class="legend">
+            <span class="legend-item"><strong>P</strong> (Presente)</span>
+            <span class="legend-item"><strong>A</strong> (Ausente)</span>
+            <span class="legend-item"><strong>T</strong> (Tardanza)</span>
+            <span class="legend-item"><strong>E</strong> (Excusa)</span>
+            <span class="legend-item"><strong>-</strong> (No aplica)</span>
+            <span class="legend-item" style="color:#c62828; font-weight:bold;">🔴 <strong>F</strong> (Feriado - No editable)</span>
+            <span class="legend-item" style="color:#1565C0; font-weight:bold;">🔵 <strong>D</strong> (Día no laborable - No editable)</span>
+            <span class="legend-item" style="color:#6c757d; font-weight:bold;">⚪ <strong>BLOQUEADO</strong> (Sin estudiante registrado)</span>
+        </div>
+
+        <!-- BARRA DE CONTROLES DE FILAS + SINCRONIZACIÓN -->
+        <div class="row-controls">
+            <button class="btn-row-add" id="addRowBtn">➕ Agregar Fila</button>
+            <button class="btn-row-delete" id="deleteRowBtn">➖ Eliminar Fila</button>
+            <span class="row-count-display" id="rowCountDisplay">Filas: 45</span>
+            <span class="row-count-display" id="estudiantesCount" style="background:#e3f2fd; border-color:#1565C0; color:#1565C0;">
+                👨‍🎓 Estudiantes: 0
+            </span>
+            
+            <span class="sync-info" id="syncGradeInfo">📚 3er Grado</span>
+            <span class="sync-info" id="syncSectionInfo">📝 Sección A</span>
+            <span class="sync-info" id="syncTandaInfo">🕐 Matutina</span>
+            <span class="sync-info" id="syncYearInfo">📅 2025-2026</span>
+            <span class="sync-info" id="feriadosInfo" style="background:#fce4ec; border-color:#c62828; color:#c62828;">📅 0 feriados</span>
+            <span class="sync-info" id="noLaborablesInfo" style="background:#e3f2fd; border-color:#1565C0; color:#1565C0;">🔵 0 días no laborables</span>
+        </div>
+
+        <!-- CONTROLES DE DÍAS NO LABORABLES -->
+        <div class="no-laborables-controls">
+            <button class="btn-seleccionar-dias" id="seleccionarDiasBtn">📅 Seleccionar Días No Laborables</button>
+            <button class="btn-limpiar-dias" id="limpiarDiasBtn">🧹 Limpiar Días No Laborables</button>
+            <span class="no-laborables-info" id="noLaborablesList">Ninguno seleccionado</span>
+        </div>
+
+        <!-- TABLA DE ASISTENCIA -->
+        <div id="tabla-container"></div>
+
+        <!-- PIE DE PÁGINA -->
+        <div class="footer">
+            <div class="watermark">Ministerio de Educación • República Dominicana</div>
+            <div class="page-number">Página 1 de 11</div>
+        </div>
+    </div>
+
+    <!-- Cargar datos de feriados desde datos-generales -->
+    <script src="feriado-2026-2027.js"></script>
+    <script src="asistencia.js"></script>
+</body>
+</html>
