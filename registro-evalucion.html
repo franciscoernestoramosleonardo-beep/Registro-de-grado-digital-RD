@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Evaluación - Registro de Grado</title>
+    <link rel="stylesheet" href="Registro-evalucion.css">
+    <style>
+        /* ESTILOS PARA EL BADGE DE ASIGNACIÓN */
+        .badge-asignacion-eval {
+            background: #002D62;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #C8102E;
+            font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 4px 15px rgba(0, 45, 98, 0.2);
+        }
+
+        .badge-asignacion-eval button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .badge-asignacion-eval button:hover {
+            background: #5a6268;
+            transform: scale(1.02);
+        }
+
+        .eval-config-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .eval-config-bar label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333333;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .eval-config-bar select {
+            padding: 6px 12px;
+            border: 2px solid #1a73e8;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #ffffff;
+            cursor: pointer;
+            outline: none;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .eval-config-bar select:focus {
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+
+        #contenido-evaluacion .eval-config-bar {
+            display: none !important;
+        }
+
+        #contenido-evaluacion .eval-header-container p {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="carta-page" style="padding: 20px; max-width: 1100px; margin: 0 auto;">
+        
+        <!-- ENCABEZADO DE EVALUACIÓN -->
+        <div class="eval-header-container" id="evalHeaderContainer">
+            <h1>📚 Registro de Evaluación</h1>
+            <p>Sistema integrado para registro de calificaciones por competencias</p>
+            
+            <!-- BADGE DE ASIGNACIÓN -->
+            <div id="evalBadgeContainer"></div>
+
+                <!-- ✅ SOLO UN AÑO ESCOLAR -->
+                <span style="font-size:12px; color:#2e7d32; font-weight:bold;">
+                    📅 Año Escolar: <strong id="schoolYearDisplayEval">2026-2027</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- NAVEGACIÓN SUPERIOR -->
+        <div style="display:flex; justify-content:center;">
+            <div class="eval-nav-container" style="margin:10px auto;">
+                <button class="eval-nav-btn" id="evalPrevBtn" title="Anterior">◀</button>
+                <span class="eval-page-indicator">
+                    <span id="evalPageLabel">Materia</span>:
+                    <span id="evalCurrentPage">1</span> de
+                    <span id="evalTotalPages">7</span>
+                </span>
+                <button class="eval-nav-btn" id="evalNextBtn" title="Siguiente">▶</button>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="eval-action-bar">
+            <button class="eval-btn-action eval-btn-add-row" id="evalAddRowBtn">➕ Agregar Fila</button>
+            <button class="eval-btn-action eval-btn-delete-row" id="evalDeleteRowBtn">➖ Eliminar Fila</button>
+            <button class="eval-btn-action eval-btn-print" id="evalPrintBtn">🖨️ Imprimir</button>
+            <button class="eval-btn-action eval-btn-clear" id="evalClearBtn">🗑️ Borrar Datos</button>
+        </div>
+
+        <!-- CONTENEDOR DE TABLAS -->
+        <div id="evalAppContainer"></div>
+
+        <!-- NAVEGACIÓN INFERIOR -->
+        <div style="display:flex; justify-content:center;">
+            <div class="eval-nav-container" style="margin:10px auto;">
+                <button class="eval-nav-btn" id="evalPrevBtn2" title="Anterior">◀</button>
+                <span class="eval-page-indicator">
+                    <span id="evalPageLabel2">Materia</span>:
+                    <span id="evalCurrentPage2">1</span> de
+                    <span id="evalTotalPages2">7</span>
+                </span>
+                <button class="eval-nav-btn" id="evalNextBtn2" title="Siguiente">▶</button>
+            </div>
+        </div>
+
+        <!-- MODAL -->
+        <div class="eval-modal-overlay" id="evalStudentNotFoundModal">
+            <div class="eval-modal-box">
+                <div class="modal-icon">⚠️</div>
+                <h3>No existe ningún estudiante en esta fila</h3>
+                <p>
+                    La fila <span class="student-not-found-row" id="evalStudentNotFoundRowNum">Nº 0</span> no tiene un estudiante registrado.
+                    <br><br>
+                    <strong>Primero debe registrar el nombre del estudiante</strong> en la sección de Datos del Estudiante.
+                </p>
+                <button id="evalCloseModalBtn">Cerrar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="Registro-evalucion.js"></script>
+</body>
+</html>
