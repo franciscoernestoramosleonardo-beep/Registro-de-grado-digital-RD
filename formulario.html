@@ -1,0 +1,2535 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario Digital RD - Sigerd</title>
+  <link rel="stylesheet" href="formulario.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    .required {
+      color: #c0392b !important;
+      font-weight: 700 !important;
+      font-size: 1.1rem !important;
+      display: inline !important;
+      margin-left: 2px !important;
+    }
+    label {
+      font-size: 0.75rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      color: #1a2a3a !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.3rem !important;
+    }
+    .label-hint {
+      font-weight: 400 !important;
+      color: #6a8a9e !important;
+      font-size: 0.6rem !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+    }
+
+    /* ============================================
+       BOTÓN RETORNAR A CUMPLEAÑOS
+       ============================================ */
+    #btnRetornarCumple {
+      display: none !important;
+    }
+
+    #btnRetornarCumple.visible {
+      display: inline-flex !important;
+      background: #FFD700 !important;
+      color: #1a2a4a !important;
+      border: 2px solid #f0c000 !important;
+      padding: 0.75rem 1.8rem !important;
+      border-radius: 50px !important;
+      font-weight: 700 !important;
+      font-size: 0.85rem !important;
+      cursor: pointer !important;
+      font-family: inherit !important;
+      transition: all 0.3s ease !important;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3) !important;
+      align-items: center !important;
+      gap: 8px !important;
+      animation: fadeInUp 0.5s ease !important;
+    }
+
+    #btnRetornarCumple.visible:hover {
+      transform: scale(1.05) !important;
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5) !important;
+      background: #f0c000 !important;
+    }
+
+    #btnRetornarCumple.visible:active {
+      transform: scale(0.95) !important;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .badge-grupo-cumple {
+      background: rgba(255, 215, 0, 0.25) !important;
+      border: 2px solid #FFD700 !important;
+      border-radius: 12px !important;
+      padding: 4px 12px !important;
+    }
+
+    .toast-mensaje-formulario {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a2a4a;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      z-index: 99999;
+      font-weight: 500;
+      max-width: 90%;
+      text-align: center;
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .badge-cumple {
+      background: #FFD700 !important;
+      color: #1a2a4a !important;
+    }
+
+    .btn-bloquear-orden {
+        padding: 0.6rem 1.4rem;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+    }
+
+    .btn-bloquear-orden::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-bloquear-orden:hover::before {
+        left: 100%;
+    }
+
+    .btn-bloquear-orden:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.35);
+    }
+
+    .btn-bloquear-orden.bloqueado {
+        background: #dc3545;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-bloquear-orden.bloqueado:hover {
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .indicador-bloqueo {
+        display: inline-block;
+        color: #dc3545;
+        font-weight: 700;
+        font-size: 0.7rem;
+        background: #f8d7da;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        border: 2px solid #dc3545;
+        animation: pulseBloqueo 2s ease-in-out infinite;
+        margin-left: 0.5rem;
+    }
+
+    @keyframes pulseBloqueo {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.02); }
+    }
+
+    @media (max-width: 768px) {
+        .btn-bloquear-orden {
+            font-size: 0.6rem;
+            padding: 0.4rem 1rem;
+        }
+        .indicador-bloqueo {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.8rem;
+        }
+    }
+
+    .modal-edad-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 20, 40, 0.85);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        padding: 20px;
+        animation: modalEdadFadeIn 0.3s ease;
+    }
+
+    .modal-edad-overlay.active {
+        display: flex;
+    }
+
+    @keyframes modalEdadFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .modal-edad-box {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 0;
+        max-width: 560px;
+        width: 100%;
+        max-height: 92vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(255, 215, 0, 0.3);
+        animation: modalEdadSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+    }
+
+    @keyframes modalEdadSlideUp {
+        from {
+            transform: translateY(40px) scale(0.95);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+    }
+
+    .modal-edad-header {
+        background: linear-gradient(135deg, #1a3a6b 0%, #2a5a8b 100%);
+        padding: 22px 28px;
+        border-radius: 20px 20px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border-bottom: 4px solid #ffd700;
+    }
+
+    .modal-edad-icono {
+        font-size: 38px;
+        line-height: 1;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+        animation: modalEdadPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes modalEdadPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .modal-edad-header h2 {
+        color: #ffffff;
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        margin: 0;
+        text-transform: uppercase;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-edad-body {
+        padding: 24px 28px;
+    }
+
+    .modal-edad-intro {
+        font-size: 0.9rem;
+        color: #1a2a3a;
+        line-height: 1.5;
+        margin-bottom: 18px;
+        text-align: center;
+    }
+
+    .modal-edad-intro strong {
+        color: #1a3a6b;
+        font-weight: 700;
+    }
+
+    .modal-edad-tabla {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        border: 2px solid #dce4ec;
+    }
+
+    .modal-edad-fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #dce4ec;
+        font-size: 0.85rem;
+    }
+
+    .modal-edad-fila:last-child {
+        border-bottom: none;
+    }
+
+    .modal-edad-label {
+        color: #4a6a8a;
+        font-weight: 600;
+    }
+
+    .modal-edad-valor {
+        color: #1a2a3a;
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+
+    .modal-edad-valor.destacado {
+        color: #1a3a6b;
+        font-size: 1rem;
+        background: #fff8e1;
+        padding: 2px 12px;
+        border-radius: 20px;
+        border: 1px solid #ffd700;
+    }
+
+    .modal-edad-aviso {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 0.8rem;
+        color: #856404;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+
+    .modal-edad-aviso strong {
+        color: #664d03;
+        font-weight: 700;
+    }
+
+    .modal-edad-checkbox-label {
+        display: flex !important;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        padding: 14px 16px;
+        background: #e8f0f8;
+        border: 2px solid #1a3a6b;
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1a2a3a;
+        text-transform: none;
+        letter-spacing: 0;
+        user-select: none;
+    }
+
+    .modal-edad-checkbox-label:hover {
+        background: #d4e8f5;
+        transform: translateY(-1px);
+    }
+
+    .modal-edad-checkbox-label input[type="checkbox"] {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        cursor: pointer;
+        accent-color: #1a3a6b;
+        flex-shrink: 0;
+    }
+
+    .modal-edad-buttons {
+        display: flex;
+        gap: 12px;
+        padding: 0 28px 24px 28px;
+    }
+
+    .modal-edad-btn {
+        flex: 1;
+        padding: 14px 24px;
+        border: none;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: inherit;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .modal-edad-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .modal-edad-btn:hover::before {
+        left: 100%;
+    }
+
+    .modal-edad-btn-aceptar {
+        background: linear-gradient(145deg, #2a7a4a, #1a5a3a);
+        color: white;
+        box-shadow: 0 4px 14px rgba(26, 90, 58, 0.35);
+    }
+
+    .modal-edad-btn-aceptar:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 90, 58, 0.5);
+    }
+
+    .modal-edad-btn-aceptar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(0.5);
+    }
+
+    .modal-edad-btn-cancelar {
+        background: #ffffff;
+        color: #c0392b;
+        border: 2px solid #dc3545;
+    }
+
+    .modal-edad-btn-cancelar:hover {
+        background: #dc3545;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+    }
+
+    @media (max-width: 480px) {
+        .modal-edad-box {
+            max-width: 100%;
+            border-radius: 16px;
+        }
+        .modal-edad-header {
+            padding: 18px 20px;
+        }
+        .modal-edad-header h2 {
+            font-size: 0.95rem;
+        }
+        .modal-edad-icono {
+            font-size: 28px;
+        }
+        .modal-edad-body {
+            padding: 18px 20px;
+        }
+        .modal-edad-fila {
+            font-size: 0.75rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .modal-edad-buttons {
+            flex-direction: column;
+            padding: 0 20px 20px 20px;
+        }
+        .modal-edad-btn {
+            padding: 12px 18px;
+            font-size: 0.8rem;
+        }
+    }
+
+    /* ============================================ */
+    /* CHECKLIST DE SALUD (Enfermedades y Medicamentos) */
+    /* ============================================ */
+    .checklist-salud {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 8px 12px;
+      background: #f8fafc;
+      border: 2px solid #dce4ec;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-top: 4px;
+    }
+
+    .check-salud-item {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.75rem !important;
+      font-weight: 500 !important;
+      color: #1a2a3a !important;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      user-select: none;
+    }
+
+    .check-salud-item:hover {
+      background: #e8f0f8;
+      border-color: #1a3a6b;
+      transform: translateY(-1px);
+    }
+
+    .check-salud-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      cursor: pointer;
+      accent-color: #1a3a6b;
+      flex-shrink: 0;
+      margin: 0;
+    }
+
+    .check-salud-item input[type="checkbox"]:checked + span {
+      color: #1a3a6b;
+      font-weight: 700;
+    }
+
+    .check-salud-item:has(input[type="checkbox"]:checked) {
+      background: #e8f0f8;
+      border-color: #1a3a6b;
+      box-shadow: 0 2px 6px rgba(26, 58, 107, 0.15);
+    }
+
+    .input-otra-salud {
+      width: 100%;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.8rem;
+      border: 2px solid #dce4ec;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #1a2a3a;
+      outline: none;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      font-family: inherit;
+    }
+
+    .input-otra-salud:focus {
+      border-color: #1a3a6b;
+      box-shadow: 0 0 0 4px rgba(26, 58, 107, 0.1);
+    }
+
+    @media (max-width: 480px) {
+      .checklist-salud {
+        grid-template-columns: 1fr;
+        padding: 10px 12px;
+      }
+      .check-salud-item {
+        font-size: 0.7rem !important;
+        padding: 5px 8px;
+      }
+    }
+
+    /* ============================================
+       PANEL DE NAVEGACIÓN DEL LISTADO
+       ============================================ */
+    .panel-listado-estudiantes {
+      display: none;
+      background: linear-gradient(135deg, #1a3a6b 0%, #2a5a8b 100%);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-bottom: 1rem;
+      box-shadow: 0 6px 20px rgba(26, 58, 107, 0.25);
+      color: white;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .panel-listado-estudiantes.activo {
+      display: block;
+    }
+
+    .panel-listado-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-listado-titulo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .panel-listado-titulo .icono {
+      font-size: 1.4rem;
+    }
+
+    .panel-listado-contador {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 16px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border: 2px solid rgba(255, 215, 0, 0.5);
+    }
+
+    .panel-listado-contador strong {
+      color: #FFD700;
+      font-size: 1rem;
+    }
+
+    .panel-listado-controles {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-nav-listado {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-nav-listado:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-nav-listado:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-nav-listado.btn-cerrar-listado {
+      background: #dc3545;
+      border-color: #dc3545;
+    }
+
+    .btn-nav-listado.btn-cerrar-listado:hover {
+      background: #c82333;
+    }
+
+    .panel-listado-info {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .panel-listado-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .panel-listado-info-item strong {
+      color: #FFD700;
+    }
+
+    .barra-progreso-listado {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .barra-progreso-listado-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFD700, #f0c000);
+      border-radius: 50px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Botón subir listado */
+    .btn-subir-listado {
+      background: linear-gradient(145deg, #2a7a4a, #1a5a3a);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 10px rgba(26, 90, 58, 0.3);
+    }
+
+    .btn-subir-listado:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(26, 90, 58, 0.45);
+    }
+
+    /* ============================================
+       MODAL DE MAPEO
+       ============================================ */
+    .modal-mapeo-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10, 20, 40, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      z-index: 99999;
+      padding: 20px;
+      padding-top: 30px;
+      overflow-y: auto;
+    }
+
+    .modal-mapeo-overlay.active {
+      display: flex;
+    }
+
+    .modal-mapeo-box {
+      background: white;
+      border-radius: 18px;
+      max-width: 780px;
+      width: 100%;
+      max-height: 88vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+      animation: modalEdadSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: 20px;
+    }
+
+    .modal-mapeo-header {
+      background: linear-gradient(135deg, #1a3a6b 0%, #2a5a8b 100%);
+      padding: 22px 28px;
+      border-radius: 18px 18px 0 0;
+      color: white;
+      border-bottom: 4px solid #ffd700;
+      flex-shrink: 0;
+    }
+
+    .modal-mapeo-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-mapeo-header-sub {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    .modal-mapeo-body {
+      padding: 22px 28px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-mapeo-intro {
+      font-size: 0.85rem;
+      color: #1a2a3a;
+      margin-bottom: 16px;
+      line-height: 1.5;
+      background: #e8f0f8;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border-left: 4px solid #1a3a6b;
+    }
+
+    .modal-mapeo-intro strong {
+      color: #1a3a6b;
+    }
+
+    .mapeo-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .mapeo-item {
+      display: grid;
+      grid-template-columns: 1fr auto 1.3fr;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 2px solid #dce4ec;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .mapeo-item:hover {
+      border-color: #1a3a6b;
+      background: #eef5fc;
+    }
+
+    .mapeo-item.autodetectado {
+      border-color: #2a7a4a;
+      background: #e8f5ee;
+    }
+
+    .mapeo-item.no-detectado {
+      border-color: #ffc107;
+      background: #fff8e1;
+    }
+
+    .mapeo-columna-nombre {
+      font-weight: 700;
+      color: #1a3a6b;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      word-break: break-word;
+      flex-wrap: wrap;
+    }
+
+    .mapeo-columna-nombre .badge-auto {
+      background: #2a7a4a;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 50px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .mapeo-columna-nombre .badge-manual {
+      background: #2a5a8b;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 50px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .mapeo-columna-nombre .badge-pendiente {
+      background: #e67e22;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      border-radius: 50px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .mapeo-flecha {
+      color: #6a8a9e;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .mapeo-item select {
+      padding: 8px 12px;
+      border: 2px solid #dce4ec;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+      color: #1a2a3a;
+    }
+
+    .mapeo-item select:focus {
+      outline: none;
+      border-color: #1a3a6b;
+      box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.15);
+    }
+
+    .mapeo-item select.opcion-detectada {
+      background: #e8f5ee;
+      border-color: #2a7a4a;
+      color: #1a5a3a;
+    }
+
+    .modal-mapeo-footer {
+      padding: 16px 28px 22px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      flex-shrink: 0;
+    }
+
+    .modal-mapeo-btn {
+      padding: 11px 24px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .modal-mapeo-btn-cancelar {
+      background: #ffffff;
+      color: #c0392b;
+      border: 2px solid #dc3545;
+    }
+
+    .modal-mapeo-btn-cancelar:hover {
+      background: #dc3545;
+      color: white;
+    }
+
+    .modal-mapeo-btn-cargar {
+      background: linear-gradient(145deg, #2a7a4a, #1a5a3a);
+      color: white;
+      box-shadow: 0 4px 14px rgba(26, 90, 58, 0.35);
+    }
+
+    .modal-mapeo-btn-cargar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26, 90, 58, 0.5);
+    }
+
+    .mapeo-resumen {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mapeo-resumen-item {
+      background: white;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 2px solid #dce4ec;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mapeo-resumen-item strong {
+      color: #1a3a6b;
+      font-size: 1rem;
+    }
+
+    .mapeo-leyenda {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      font-size: 0.75rem;
+      color: #4a6a8a;
+    }
+
+    .mapeo-leyenda-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mapeo-leyenda-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .mapeo-leyenda-dot.verde { background: #2a7a4a; }
+    .mapeo-leyenda-dot.amarillo { background: #e67e22; }
+    .mapeo-leyenda-dot.gris { background: #dce4ec; }
+
+    @media (max-width: 600px) {
+      .mapeo-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .mapeo-flecha {
+        display: none;
+      }
+      .modal-mapeo-overlay {
+        padding-top: 15px;
+      }
+      .modal-mapeo-box {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <!-- ==========================================
+  ENCABEZADO
+  ========================================== -->
+  <div class="form-header">
+    <div class="form-header-left">
+      <div class="logo-icon">RD</div>
+      <h1>
+        formulario digital
+        <small>Sigerd · Registro de Estudiantes</small>
+      </h1>
+    </div>
+    <div class="form-header-right">
+      <span class="badge" id="badgeEstado">📋 nuevo registro</span>
+      <div class="badge-grupo" id="badgeGrupo">
+        <span class="badge-grado-item" id="badgeGradoPortada">
+          🎓 <span id="gradoMostrado">Cargando...</span>
+        </span>
+        <span class="badge-grado-item" id="badgeSeccionPortada">
+          📚 <span id="seccionMostrado">-</span>
+        </span>
+        <span class="badge-grado-item" id="badgeTandaPortada">
+          🕐 <span id="tandaMostrado">-</span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+  SECCIÓN: FORMULARIO
+  ========================================== -->
+  <div id="seccionFormulario">
+    <!-- BARRA DE HERRAMIENTAS -->
+    <div class="barra-herramientas">
+      <div class="campo-busqueda">
+        <input type="text" id="busquedaEstudiante" placeholder="🔍 Buscar por ID, Nombre o Apellido..." />
+        <button type="button" class="btn-buscar" id="btnBuscar">Buscar</button>
+        <button type="button" class="btn-limpiar-busqueda" id="btnLimpiarBusqueda">✕</button>
+      </div>
+      <button type="button" class="btn-subir-listado" id="btnSubirListado">📥 Subir listado</button>
+      <button type="button" class="btn-ver-historial" id="btnVerHistorial">📊 Ver historial</button>
+      <button type="button" class="btn-cancelar-formulario" id="btnCancelarFormulario" style="padding:0.5rem 1.5rem;background:#dc3545;color:white;border:none;border-radius:50px;font-weight:600;cursor:pointer;font-size:0.75rem;font-family:inherit;transition:all 0.2s ease;">✕ Cancelar</button>
+    </div>
+
+    <!-- ==========================================
+    PANEL DE NAVEGACIÓN DEL LISTADO
+    ========================================== -->
+    <div class="panel-listado-estudiantes" id="panelListadoEstudiantes">
+      <div class="panel-listado-header">
+        <div class="panel-listado-titulo">
+          <span class="icono">📋</span>
+          <span>Listado de estudiantes cargado</span>
+        </div>
+        <div class="panel-listado-contador">
+          Estudiante <strong id="contadorActual">1</strong> de <strong id="contadorTotal">0</strong>
+        </div>
+      </div>
+      <div class="panel-listado-controles">
+        <button type="button" class="btn-nav-listado" id="btnPrimeroListado">⏮ Primero</button>
+        <button type="button" class="btn-nav-listado" id="btnAnteriorListado">◀ Anterior</button>
+        <button type="button" class="btn-nav-listado" id="btnSiguienteListado">Siguiente ▶</button>
+        <button type="button" class="btn-nav-listado" id="btnUltimoListado">Último ⏭</button>
+        <button type="button" class="btn-nav-listado btn-cerrar-listado" id="btnCerrarListado">✕ Cerrar listado</button>
+      </div>
+      <div class="panel-listado-info">
+        <div class="panel-listado-info-item">
+          <span>👤</span>
+          <span>Nombre actual:</span>
+          <strong id="infoNombreActual">-</strong>
+        </div>
+        <div class="panel-listado-info-item">
+          <span>📊</span>
+          <span>Progreso:</span>
+          <strong id="infoProgreso">0%</strong>
+        </div>
+      </div>
+      <div class="barra-progreso-listado">
+        <div class="barra-progreso-listado-fill" id="barraProgresoListado" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- FOTO DEL ESTUDIANTE -->
+    <div class="foto-estudiante-container">
+      <div class="foto-estudiante-wrapper">
+        <div class="foto-preview" id="fotoPreview">
+          <span class="foto-placeholder">📷</span>
+          <img id="fotoImagen" style="display:none;" alt="Foto del estudiante" />
+        </div>
+        <div class="foto-controls">
+          <div class="foto-controls-row">
+            <label class="btn-foto">
+              📷 Subir foto 2x2
+              <input type="file" id="inputFoto" accept="image/*" />
+            </label>
+            <button type="button" class="btn-foto-eliminar" id="btnEliminarFoto">CANCELAR</button>
+          </div>
+          <span class="foto-hint">Formatos: JPG, PNG · Tamaño recomendado: 2x2 · Máx. 5MB</span>
+        </div>
+      </div>
+    </div>
+
+    <form id="registroForm" onsubmit="return false;">
+      <div class="form-grid">
+
+        <!-- ==========================================
+        SECCIÓN 1 - PÁGINA 1 (DATOS DEL ESTUDIANTE)
+        ========================================== -->
+        <div class="seccion-titulo full-width">
+          📋 SECCIÓN 1: Datos del Estudiante
+          <span class="badge-seccion">Pág 1</span>
+        </div>
+
+        <!-- Número de orden -->
+        <div class="field-group">
+          <label for="orden">Número de orden</label>
+          <input type="text" id="orden" name="orden" readonly placeholder="Automático" value="1" />
+          <span class="inline-hint">Se genera automáticamente</span>
+        </div>
+
+        <!-- ID - OPCIONAL -->
+        <div class="field-group">
+          <label for="idEstudiante">ID (Sigerd) <span class="label-hint">(Opcional)</span></label>
+          <input type="text" id="idEstudiante" name="idEstudiante" placeholder="8 dígitos numéricos" maxlength="8" inputmode="numeric" pattern="[0-9]*" />
+          <span class="inline-hint" id="idHint">6 a 8 dígitos numéricos (opcional)</span>
+          <div id="idError" class="error-mensaje" style="display:none;"></div>
+        </div>
+
+        <!-- ⭐ NOMBRE - OBLIGATORIO -->
+        <div class="field-group">
+          <label for="nombre">Nombre <span class="required">*</span></label>
+          <input type="text" id="nombre" name="nombre" placeholder="Ej. JUAN CARLOS" required />
+          <span class="inline-hint">Nombre completo del estudiante (OBLIGATORIO)</span>
+        </div>
+
+        <!-- ⭐ APELLIDO - OBLIGATORIO -->
+        <div class="field-group">
+          <label for="apellido">Apellido <span class="required">*</span></label>
+          <input type="text" id="apellido" name="apellido" placeholder="Ej. PÉREZ MARTÍNEZ" required />
+          <span class="inline-hint">Apellido completo del estudiante (OBLIGATORIO)</span>
+        </div>
+
+        <!-- NACIONALIDAD - OPCIONAL -->
+        <div class="field-group">
+          <label for="nacionalidad">Nacionalidad</label>
+          <select id="nacionalidad" name="nacionalidad">
+            <option value="" disabled selected>Seleccionar nacionalidad</option>
+          </select>
+          <span class="inline-hint">Países de América y continentes (opcional)</span>
+        </div>
+
+        <!-- PARENTESCO - OPCIONAL -->
+        <div class="field-group">
+          <label for="parentescoEstudiante">Parentesco</label>
+          <select id="parentescoEstudiante" name="parentescoEstudiante">
+            <option value="" disabled selected>Seleccionar parentesco</option>
+          </select>
+          <span class="inline-hint">Parentesco de la persona con quien vive (opcional)</span>
+        </div>
+
+        <!-- SEXO - OPCIONAL -->
+        <div class="field-group">
+          <label>Sexo</label>
+          <div class="sexo-campos">
+            <label class="sexo-opcion">
+              <input type="radio" name="sexo" value="FEMENINO" id="sexoFemenino" />
+              <span>Femenino</span>
+            </label>
+            <label class="sexo-opcion">
+              <input type="radio" name="sexo" value="MASCULINO" id="sexoMasculino" />
+              <span>Masculino</span>
+            </label>
+          </div>
+          <span class="inline-hint">selecciona el sexo del estudiante (opcional)</span>
+        </div>
+
+        <!-- FECHA DE NACIMIENTO - OPCIONAL -->
+        <div class="field-group">
+          <label>Fecha de nacimiento</label>
+          <div class="fecha-campos">
+            <div class="fecha-item">
+              <select id="diaNacimiento">
+                <option value="">Día</option>
+              </select>
+            </div>
+            <div class="fecha-item">
+              <select id="mesNacimiento">
+                <option value="">Mes</option>
+              </select>
+            </div>
+            <div class="fecha-item">
+              <select id="anoNacimiento">
+                <option value="">Año</option>
+              </select>
+            </div>
+            <div class="edad-container">
+              <label for="edad">Edad</label>
+              <input type="text" id="edad" name="edad" readonly placeholder="0 años" />
+            </div>
+          </div>
+          <span class="inline-hint" id="edadHint">selecciona día, mes y año (opcional)</span>
+        </div>
+
+        <!-- LIBRO - OPCIONAL -->
+        <div class="field-group">
+          <label for="libro">📖 Libro</label>
+          <input type="text" id="libro" name="libro" placeholder="N° de libro" />
+          <span class="inline-hint">Número de libro de registro (opcional)</span>
+        </div>
+
+        <!-- FOLIO - OPCIONAL -->
+        <div class="field-group">
+          <label for="folio">📄 Folio</label>
+          <input type="text" id="folio" name="folio" placeholder="N° de folio" />
+          <span class="inline-hint">numero de folio de registro (opcional)</span>
+        </div>
+
+        <!-- ==========================================
+        SECCIÓN 2 - PÁGINA 2
+        ========================================== -->
+        <div class="seccion-titulo full-width" style="margin-top:1rem;">
+          📋 SECCIÓN 2: Datos del Estudiante
+          <span class="badge-seccion">Pág 2</span>
+        </div>
+
+        <!-- DIRECCIÓN - OPCIONAL -->
+        <div class="field-group full-width">
+          <label for="direccionEstudiante">Dirección</label>
+          <input type="text" id="direccionEstudiante" name="direccionEstudiante" placeholder="Calle, No. de Casa, Referencia" />
+          <span class="inline-hint">Dirección completa (opcional)</span>
+        </div>
+
+        <!-- PROVINCIA - OPCIONAL -->
+        <div class="field-group">
+          <label for="provincia">Provincia</label>
+          <select id="provincia" name="provincia">
+            <option value="" disabled selected>Cargando provincias...</option>
+          </select>
+          <span class="inline-hint">Selecciona provincia (opcional)</span>
+        </div>
+
+        <!-- MUNICIPIO - OPCIONAL -->
+        <div class="field-group">
+          <label for="municipio">Municipio</label>
+          <select id="municipio" name="municipio">
+            <option value="" disabled selected>Primero selecciona provincia</option>
+          </select>
+          <span class="inline-hint">Selecciona el municipio (opcional)</span>
+        </div>
+
+        <!-- BARRIO - OPCIONAL -->
+        <div class="field-group">
+          <label for="barrio">Barrio / Paraje / Sector</label>
+          <select id="barrio" name="barrio">
+            <option value="" disabled selected>Selecciona municipio primero</option>
+          </select>
+          <span class="inline-hint">Carga automática (opcional)</span>
+        </div>
+
+        <!-- TELÉFONO ESTUDIANTE - OPCIONAL -->
+        <div class="field-group full-width">
+          <label for="telefono">Teléfono</label>
+          <input type="text" id="telefono" name="telefono" placeholder="809-000-0000" maxlength="12" />
+          <span class="inline-hint">Formato: 000-000-0000 · 809/829/849 (opcional)</span>
+        </div>
+
+        <!-- NUEVO INSCRITO - OPCIONAL -->
+        <div class="field-group full-width">
+          <label>📅 Nuevo Inscrito</label>
+          <div class="fecha-campos">
+            <div class="fecha-item">
+              <select id="nuevoDia"><option value="">Día</option></select>
+            </div>
+            <div class="fecha-item">
+              <select id="nuevoMes">
+                <option value="">Mes</option>
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </div>
+            <div class="fecha-item">
+              <select id="nuevoAnio"><option value="">Año</option></select>
+            </div>
+          </div>
+          <span class="inline-hint">Fecha de inscripción (opcional)</span>
+        </div>
+
+        <!-- RETIRADO - OPCIONAL -->
+        <div class="field-group full-width">
+          <label>📅 Retirado</label>
+          <div class="fecha-campos">
+            <div class="fecha-item">
+              <select id="retiradoDia"><option value="">Día</option></select>
+            </div>
+            <div class="fecha-item">
+              <select id="retiradoMes">
+                <option value="">Mes</option>
+                <option value="1">Enero</option><option value="2">Febrero</option>
+                <option value="3">Marzo</option><option value="4">Abril</option>
+                <option value="5">Mayo</option><option value="6">Junio</option>
+                <option value="7">Julio</option><option value="8">Agosto</option>
+                <option value="9">Septiembre</option><option value="10">Octubre</option>
+                <option value="11">Noviembre</option><option value="12">Diciembre</option>
+              </select>
+            </div>
+            <div class="fecha-item">
+              <select id="retiradoAnio"><option value="">Año</option></select>
+            </div>
+          </div>
+          <span class="inline-hint">Fecha de retiro (opcional)</span>
+        </div>
+
+        <!-- CONDICIÓN - OPCIONAL -->
+        <div class="field-group full-width">
+          <label>Condición inicial</label>
+          <div class="checkbox-group">
+            <label class="checkbox-opcion">
+              <input type="checkbox" name="condicion" value="NUEVO INGRESO" />
+              <span>Nuevo Ingreso</span>
+            </label>
+            <label class="checkbox-opcion">
+              <input type="checkbox" name="condicion" value="PROMOVIDO" />
+              <span>Promovido</span>
+            </label>
+            <label class="checkbox-opcion">
+              <input type="checkbox" name="condicion" value="REENTRANTE" />
+              <span>Reentrante</span>
+            </label>
+          </div>
+          <span class="inline-hint">Selecciona la condición (opcional)</span>
+        </div>
+
+        <!-- PREPRIMARIO - OPCIONAL -->
+        <div class="field-group full-width">
+          <label>Realizó el Preprimario</label>
+          <div class="checkbox-group">
+            <label class="checkbox-opcion">
+              <input type="checkbox" name="preprimario" value="SI" />
+              <span>Sí</span>
+            </label>
+            <label class="checkbox-opcion">
+              <input type="checkbox" name="preprimario" value="NO" />
+              <span>No</span>
+            </label>
+          </div>
+          <span class="inline-hint">Indica si realizó preprimario (opcional)</span>
+        </div>
+
+        <!-- ==========================================
+        SECCIÓN 3 - PÁGINA 3
+        ========================================== -->
+        <div class="seccion-titulo full-width" style="margin-top:1rem;">
+          🏥 SECCIÓN 3: Datos del Estudiante
+          <span class="badge-seccion">Pág 3</span>
+        </div>
+
+        <!-- NEAE -->
+        <div class="field-group full-width">
+          <label for="neae">NEAE <span class="label-hint">(Necesidades Específicas de Apoyo Educativo)</span></label>
+          <select id="neae" name="neae">
+            <option value="">— Ninguna / No aplica —</option>
+            <optgroup label="Asociada a discapacidad">
+              <option value="VISUAL">Visual</option>
+              <option value="AUDITIVA">Auditiva</option>
+              <option value="FISICO-MOTORA">Físico-Motora</option>
+              <option value="INTELECTUAL">Intelectual</option>
+              <option value="ASOCIADA-OTRA">Otra (asociada a discapacidad)</option>
+            </optgroup>
+            <optgroup label="No asociada a discapacidad">
+              <option value="APRENDIZAJE">De aprendizaje</option>
+              <option value="SOCIOAFECTIVA">Socioafectiva</option>
+              <option value="NO-ASOCIADA-OTRA">Otra (no asociada a discapacidad)</option>
+            </optgroup>
+          </select>
+          <span class="inline-hint">Selecciona el tipo de NEAE (opcional)</span>
+        </div>
+
+        <!-- ENFERMEDADES -->
+        <div class="field-group full-width">
+          <label>🩺 Enfermedades o alérgico a</label>
+          <div class="checklist-salud" id="checklistEnfermedades">
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="ASMA" />
+              <span>Asma</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="ALERGIA AL POLEN" />
+              <span>Alergia al polen</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="ALERGIA A ALIMENTOS" />
+              <span>Alergia a alimentos</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="ALERGIA A MEDICAMENTOS" />
+              <span>Alergia a medicamentos</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="DIABETES" />
+              <span>Diabetes</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="EPILEPSIA" />
+              <span>Epilepsia</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="CARDIOPATÍA" />
+              <span>Cardiopatía</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="ANEMIA" />
+              <span>Anemia</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="CEFALEA / MIGRAÑA" />
+              <span>Cefalea / Migraña</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="enfermedad" value="OTRA" id="checkEnfermedadOtra" />
+              <span>Otra</span>
+            </label>
+          </div>
+          <input type="text" id="enfermedadesOtra" class="input-otra-salud" placeholder="Especificar otra enfermedad o alergia..." style="display:none; margin-top:8px;" />
+          <span class="inline-hint">Marca todas las que apliquen (opcional)</span>
+        </div>
+
+        <!-- MEDICAMENTOS -->
+        <div class="field-group full-width">
+          <label>💊 Medicamentos que usa</label>
+          <div class="checklist-salud" id="checklistMedicamentos">
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="SALBUTAMOL (INHALADOR)" />
+              <span>Salbutamol (inhalador)</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="LORATADINA" />
+              <span>Loratadina</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="PARACETAMOL" />
+              <span>Paracetamol</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="IBUPROFENO" />
+              <span>Ibuprofeno</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="INSULINA" />
+              <span>Insulina</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="ANTICONVULSIVOS" />
+              <span>Anticonvulsivos</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="ANTIBIÓTICOS" />
+              <span>Antibióticos</span>
+            </label>
+            <label class="check-salud-item">
+              <input type="checkbox" data-tipo="medicamento" value="OTRA" id="checkMedicamentoOtra" />
+              <span>Otro</span>
+            </label>
+          </div>
+          <input type="text" id="medicamentosOtra" class="input-otra-salud" placeholder="Especificar otro medicamento..." style="display:none; margin-top:8px;" />
+          <span class="inline-hint">Marca todos los que apliquen (opcional)</span>
+        </div>
+
+        <!-- BLOQUE TUTOR -->
+        <div class="tutor-block">
+          <div class="field-group">
+            <label for="tutorTipo">Padre / Madre / Tutor</label>
+            <input type="text" id="tutorTipo" name="tutorTipo" placeholder="Ej. PADRE, MADRE, TUTOR" />
+            <span class="inline-hint">Parentesco del tutor (opcional)</span>
+          </div>
+          <div class="field-group">
+            <label for="tutorCedula">Cédula / ID</label>
+            <input type="text" id="tutorCedula" name="tutorCedula" placeholder="000-0000000-0" maxlength="13" />
+            <span class="inline-hint">Formato: 000-0000000-0 (opcional)</span>
+          </div>
+          <div class="field-group">
+            <label for="tutorDireccion">Dirección</label>
+            <input type="text" id="tutorDireccion" name="tutorDireccion" placeholder="Dirección completa del tutor" />
+            <span class="inline-hint">Dirección del tutor (opcional)</span>
+          </div>
+          <div class="field-group">
+            <label for="tutorTelefono">Teléfono</label>
+            <input type="text" id="tutorTelefono" name="tutorTelefono" placeholder="809-000-0000" maxlength="12" />
+            <span class="inline-hint">Formato: 000-000-0000 · 809/829/849 (opcional)</span>
+          </div>
+          <div class="field-group">
+            <label for="tutorEscolaridad">🎓 Nivel de escolaridad</label>
+            <select id="tutorEscolaridad" name="tutorEscolaridad">
+              <option value="">— Seleccionar —</option>
+              <option value="SIN ESCOLARIDAD">Sin escolaridad</option>
+              <option value="PRIMARIA INCOMPLETA">Primaria incompleta</option>
+              <option value="PRIMARIA COMPLETA">Primaria completa</option>
+              <option value="SECUNDARIA INCOMPLETA">Secundaria incompleta</option>
+              <option value="SECUNDARIA COMPLETA">Secundaria completa</option>
+              <option value="SUPERIOR INCOMPLETO">Superior incompleto</option>
+              <option value="SUPERIOR COMPLETO">Superior completo</option>
+              <option value="DESCONOCIDO">Desconocido</option>
+            </select>
+            <span class="inline-hint">Nivel educativo del tutor (opcional)</span>
+          </div>
+          <div class="field-group">
+            <label for="tutorOcupacion">💼 Ocupación u oficio</label>
+            <select id="tutorOcupacion" name="tutorOcupacion">
+              <option value="">— Seleccionar —</option>
+              <option value="MÉDICO">Médico</option>
+              <option value="MÉDICA">Médica</option>
+              <option value="MAESTRO">Maestro</option>
+              <option value="MAESTRA">Maestra</option>
+              <option value="OBRERO">Obrero</option>
+              <option value="OBRERA">Obrera</option>
+              <option value="VASTENDER">Vastender</option>
+              <option value="HOTELERO">Hotelero</option>
+              <option value="HOTELERA">Hotelera</option>
+              <option value="ALBAÑIL">Albañil</option>
+              <option value="INGENIERO">Ingeniero</option>
+              <option value="INGENIERA">Ingeniera</option>
+              <option value="AMA DE CASA">Ama de casa</option>
+              <option value="ESTUDIANTE">Estudiante</option>
+              <option value="ENFERMERO">Enfermero</option>
+              <option value="ENFERMERA">Enfermera</option>
+              <option value="MOTO TAXI">Moto Taxi</option>
+              <option value="OTROS OFICIO">Otros oficio</option>
+            </select>
+            <span class="inline-hint">Ocupación u oficio del tutor (opcional)</span>
+          </div>
+        </div>
+
+        <!-- NOMBRE DE EMERGENCIA -->
+        <div class="field-group">
+          <label for="emergenciaNombre">👤 Nombre de emergencia</label>
+          <input type="text" id="emergenciaNombre" name="emergenciaNombre" placeholder="Nombre del contacto de emergencia" />
+          <span class="inline-hint">Contacto de emergencia (opcional)</span>
+        </div>
+
+        <!-- TELÉFONO DE EMERGENCIA -->
+        <div class="field-group">
+          <label for="emergenciaTelefono">📞 Teléfono de emergencia</label>
+          <input type="text" id="emergenciaTelefono" name="emergenciaTelefono" placeholder="809-000-0000" maxlength="12" />
+          <span class="inline-hint">Formato: 000-000-0000 · 809/829/849 (opcional)</span>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="btn-group">
+          <button type="button" class="btn-submit" id="btnGuardar">✔ Guardar registro</button>
+          <button type="button" class="btn-submit-editar" id="btnActualizar" style="display:none;">✏️ Actualizar registro</button>
+          <button type="button" class="btn-reset" id="btnResetOrden">🔄 Reiniciar conteo</button>
+          <button type="button" class="btn-reset btn-cancelar" id="btnCancelarEdicion" style="display:none;">✕ Cancelar edición</button>
+          <button type="button" class="btn-retornar-cumple" id="btnRetornarCumple">
+            🎂 Retornar a Cumpleaños
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+
+ <!-- ==========================================
+  SECCIÓN: TABLA DE REGISTROS
+  ========================================== -->
+  <div id="seccionTabla" style="display:none;">
+    <div class="tabla-header">
+      <div class="tabla-header-izq">
+        <h2>📊 Historial de registros</h2>
+        <span class="total-registros" id="totalRegistros">Total: 0 registros</span>
+        <button type="button" class="btn-ordenar" id="btnOrdenarAZ">🔤 Ordenar A-Z</button>
+        <button type="button" class="btn-bloquear-orden" id="btnBloquearOrden">🔒 Bloquear Orden</button>
+        <span class="indicador-bloqueo" id="indicadorBloqueoOrden" style="display:none;">🔒 Orden BLOQUEADO</span>
+      </div>
+      <div class="tabla-header-der">
+        <button type="button" class="btn-volver-formulario" id="btnVolverFormulario">← Volver</button>
+        <button type="button" class="btn-reset-danger" id="btnLimpiarTabla">🗑️ Limpiar todo</button>
+      </div>
+    </div>
+    <div class="tabla-scroll">
+      <table id="tablaRegistros">
+        <thead>
+          <tr>
+            <th>#</th><th>ID</th><th>Foto</th><th>Nombre</th><th>Apellido</th>
+            <th>Grado</th><th>Sección</th><th>Tanda</th><th>Nacionalidad</th>
+            <th>Parentesco</th><th>Sexo</th><th>Fecha Nac.</th><th>Edad</th>
+            <th>Libro</th><th>Folio</th><th>Dirección</th><th>Provincia</th>
+            <th>Municipio</th><th>Barrio</th><th>Teléfono</th>
+            <th>Nuevo Inscrito</th><th>Retirado</th><th>Condición</th>
+            <th>Preprimario</th><th>NEAE</th><th>Enfermedades</th>
+            <th>Medicamentos</th><th>Emergencia</th><th>Tel. Emergencia</th>
+            <th>Tutor</th><th>Cédula</th><th>Tel. Tutor</th>
+            <th>Dir. Tutor</th><th>Escolaridad</th><th>Ocupación</th><th>Fecha</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- INPUT OCULTO PARA SUBIR ARCHIVO -->
+<input type="file" id="inputArchivoListado" accept=".xlsx,.xls,.csv" style="display:none;" />
+
+<!-- MODAL DE MAPEO -->
+<div class="modal-mapeo-overlay" id="modalMapeoOverlay">
+  <div class="modal-mapeo-box">
+    <div class="modal-mapeo-header">
+      <h2>🔗 Mapeo inteligente de columnas</h2>
+      <div class="modal-mapeo-header-sub" id="mapeoHeaderSub">Detectando columnas del archivo...</div>
+    </div>
+    <div class="modal-mapeo-body">
+      <p class="modal-mapeo-intro">
+        El sistema detectó <strong id="mapeoTotalColumnas">0</strong> columnas en tu archivo. 
+        Se usó <strong>detección inteligente</strong>. Puedes ajustar cualquier asignación manualmente.
+      </p>
+      <div class="mapeo-resumen" id="mapeoResumen">
+        <div class="mapeo-resumen-item">📊 Columnas: <strong id="resumenColumnas">0</strong></div>
+        <div class="mapeo-resumen-item">✅ Detectadas: <strong id="resumenDetectadas">0</strong></div>
+        <div class="mapeo-resumen-item">⚠️ Pendientes: <strong id="resumenPendientes">0</strong></div>
+        <div class="mapeo-resumen-item">👥 Estudiantes: <strong id="resumenEstudiantes">0</strong></div>
+      </div>
+      <div class="mapeo-leyenda">
+        <div class="mapeo-leyenda-item"><div class="mapeo-leyenda-dot verde"></div><span>Auto-detectado</span></div>
+        <div class="mapeo-leyenda-item"><div class="mapeo-leyenda-dot amarillo"></div><span>Requiere asignación manual</span></div>
+        <div class="mapeo-leyenda-item"><div class="mapeo-leyenda-dot gris"></div><span>No mapear</span></div>
+      </div>
+      <div class="mapeo-grid" id="mapeoGrid"></div>
+    </div>
+    <div class="modal-mapeo-footer">
+      <button type="button" class="modal-mapeo-btn modal-mapeo-btn-cancelar" id="btnCancelarMapeo">Cancelar</button>
+      <button type="button" class="modal-mapeo-btn modal-mapeo-btn-cargar" id="btnConfirmarMapeo">✔ Cargar listado</button>
+    </div>
+  </div>
+</div>
+
+<script src="datos-generales/paraje-barrio.js"></script>
+<script src="formulario.js"></script>
+
+<!-- SCRIPT DE BLOQUEO Y CUMPLEAÑOS -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    'use strict';
+    const btnRetornar = document.getElementById('btnRetornarCumple');
+    const badgeEstado = document.getElementById('badgeEstado');
+    const badgeGrupo = document.getElementById('badgeGrupo');
+    const gradoMostrado = document.getElementById('gradoMostrado');
+    const seccionMostrado = document.getElementById('seccionMostrado');
+    const tandaMostrado = document.getElementById('tandaMostrado');
+    const btnBloquearOrden = document.getElementById('btnBloquearOrden');
+    const indicadorBloqueo = document.getElementById('indicadorBloqueoOrden');
+    const btnOrdenarAZ = document.getElementById('btnOrdenarAZ');
+    const btnResetOrden = document.getElementById('btnResetOrden');
+    const urlParams = new URLSearchParams(window.location.search);
+    const origen = urlParams.get('origen');
+    const accion = urlParams.get('accion');
+    const grado = urlParams.get('grado');
+    const seccion = urlParams.get('seccion');
+    const tanda = urlParams.get('tanda');
+    const nombre = urlParams.get('nombre');
+    const fecha = urlParams.get('fecha');
+    const BLOQUEO_ORDEN_KEY = 'minerd_bloqueo_orden';
+    const PASSWORD_HASH = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
+
+    function hashPassword(password) { let hash = 0; for (let i = 0; i < password.length; i++) { const char = password.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash = hash & hash; } return 'hash_' + Math.abs(hash).toString(16).padStart(8, '0'); }
+    function verificarPassword(password) { return hashPassword(password) === PASSWORD_HASH; }
+    function verificarBloqueo() { try { return localStorage.getItem(BLOQUEO_ORDEN_KEY) === 'true'; } catch (e) { return false; } }
+
+    function actualizarUI() {
+        const bloqueado = verificarBloqueo();
+        if (btnBloquearOrden) {
+            if (bloqueado) { btnBloquearOrden.textContent = '🔓 Desbloquear Orden'; btnBloquearOrden.className = 'btn-bloquear-orden bloqueado'; btnBloquearOrden.style.background = '#dc3545'; btnBloquearOrden.style.color = 'white'; }
+            else { btnBloquearOrden.textContent = '🔒 Bloquear Orden'; btnBloquearOrden.className = 'btn-bloquear-orden'; btnBloquearOrden.style.background = '#6c757d'; btnBloquearOrden.style.color = 'white'; }
+        }
+        if (indicadorBloqueo) indicadorBloqueo.style.display = bloqueado ? 'inline-block' : 'none';
+        if (btnOrdenarAZ) { btnOrdenarAZ.disabled = bloqueado; btnOrdenarAZ.style.opacity = bloqueado ? '0.5' : '1'; btnOrdenarAZ.style.cursor = bloqueado ? 'not-allowed' : 'pointer'; btnOrdenarAZ.title = bloqueado ? '🔒 Orden bloqueado' : ''; }
+        if (btnResetOrden) { btnResetOrden.disabled = bloqueado; btnResetOrden.style.opacity = bloqueado ? '0.5' : '1'; btnResetOrden.style.cursor = bloqueado ? 'not-allowed' : 'pointer'; btnResetOrden.title = bloqueado ? '🔒 Orden bloqueado' : ''; }
+        if (badgeEstado && bloqueado) { badgeEstado.textContent = '🔒 ORDEN BLOQUEADO'; badgeEstado.style.background = '#dc3545'; badgeEstado.style.color = 'white'; }
+        else if (badgeEstado && origen !== 'cumpleaños') { badgeEstado.textContent = '📋 NUEVO REGISTRO'; badgeEstado.style.background = '#e8f0f8'; badgeEstado.style.color = '#1a3a6b'; }
+    }
+
+    function toggleBloqueo() {
+        const bloqueado = verificarBloqueo();
+        const mensaje = bloqueado ? '🔓 Ingrese la contraseña para DESBLOQUEAR:' : '🔒 Ingrese la contraseña para BLOQUEAR:';
+        const password = prompt(mensaje);
+        if (password === null) return;
+        let autenticado = verificarPassword(password);
+        if (!autenticado && typeof AuthSystem !== 'undefined') {
+            const sesion = AuthSystem.obtenerSesion();
+            if (sesion && sesion.cedula) { const resultado = AuthSystem.validarPasswordDocente(sesion.cedula, password); if (resultado.exito) autenticado = true; }
+        }
+        if (!autenticado) { mostrarToast('❌ Contraseña incorrecta.'); return; }
+        localStorage.setItem(BLOQUEO_ORDEN_KEY, String(!bloqueado));
+        mostrarToast(!bloqueado ? '🔒 Orden BLOQUEADO' : '✅ Orden DESBLOQUEADO');
+        actualizarUI();
+        setTimeout(() => location.reload(), 500);
+    }
+
+    function mostrarToast(mensaje) {
+        const toastAnterior = document.querySelector('.toast-mensaje-formulario');
+        if (toastAnterior) toastAnterior.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast-mensaje-formulario';
+        toast.textContent = mensaje;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    try { const bloqueoAdmin = localStorage.getItem('minerd_bloqueo_campos'); if (bloqueoAdmin) { const config = JSON.parse(bloqueoAdmin); if (config.bloqueado === true) localStorage.setItem(BLOQUEO_ORDEN_KEY, 'true'); } } catch (e) {}
+
+    actualizarUI();
+    if (btnBloquearOrden) btnBloquearOrden.addEventListener('click', toggleBloqueo);
+    window.addEventListener('storage', function(e) { if (e.key === 'minerd_bloqueo_orden' || e.key === 'minerd_bloqueo_campos') actualizarUI(); });
+
+    if (origen === 'cumpleaños') {
+        if (btnRetornar) { btnRetornar.classList.add('visible'); btnRetornar.classList.remove('oculto'); }
+        if (badgeEstado) { badgeEstado.textContent = '🎂 Desde Cumpleaños'; badgeEstado.classList.add('badge-cumple'); }
+        if (badgeGrupo) badgeGrupo.classList.add('badge-grupo-cumple');
+        if (grado && gradoMostrado) gradoMostrado.textContent = decodeURIComponent(grado);
+        if (seccion && seccionMostrado) seccionMostrado.textContent = decodeURIComponent(seccion);
+        if (tanda && tandaMostrado) tandaMostrado.textContent = decodeURIComponent(tanda);
+    } else {
+        if (btnRetornar) { btnRetornar.classList.remove('visible'); btnRetornar.classList.add('oculto'); btnRetornar.style.display = 'none'; }
+        if (badgeGrupo) badgeGrupo.classList.remove('badge-grupo-cumple');
+    }
+
+    function calcularEdadManual() {
+        const dia = parseInt(document.getElementById('diaNacimiento')?.value);
+        const mes = parseInt(document.getElementById('mesNacimiento')?.value);
+        const anio = parseInt(document.getElementById('anoNacimiento')?.value);
+        const edadInput = document.getElementById('edad');
+        if (!edadInput || !dia || !mes || !anio) { edadInput.value = ''; return; }
+        const fechaNac = new Date(anio, mes - 1, dia);
+        const fechaActual = new Date();
+        if (isNaN(fechaNac.getTime())) { edadInput.value = ''; return; }
+        let edad = fechaActual.getFullYear() - fechaNac.getFullYear();
+        const m = fechaActual.getMonth() - fechaNac.getMonth();
+        if (m < 0 || (m === 0 && fechaActual.getDate() < fechaNac.getDate())) edad--;
+        if (edad >= 0 && edad <= 120) edadInput.value = `${edad} años`;
+        else edadInput.value = '';
+    }
+
+    if (btnRetornar) {
+        btnRetornar.addEventListener('click', function() {
+            const gradoText = gradoMostrado?.textContent || 'No asignado';
+            const seccionText = seccionMostrado?.textContent || 'A';
+            const tandaText = tandaMostrado?.textContent || 'Matutina';
+            window.location.href = `ALERTAS DE CUMPLEANOS.html?grado=${encodeURIComponent(gradoText)}&seccion=${encodeURIComponent(seccionText)}&tanda=${encodeURIComponent(tandaText)}`;
+        });
+    }
+
+    window.mostrarToastFormulario = mostrarToast;
+    window.calcularEdadManual = calcularEdadManual;
+    window.verificarBloqueoOrden = verificarBloqueo;
+    window.actualizarEstadoBloqueoOrden = actualizarUI;
+});
+</script>
+
+<!-- MODAL DE ADVERTENCIA DE EDAD -->
+<div class="modal-edad-overlay" id="modalEdadOverlay">
+    <div class="modal-edad-box">
+        <div class="modal-edad-header">
+            <div class="modal-edad-icono" id="modalEdadIcono">⚠️</div>
+            <h2 id="modalEdadTitulo">Advertencia de Edad</h2>
+        </div>
+        <div class="modal-edad-body">
+            <p class="modal-edad-intro">El estudiante <strong id="modalEdadNombre">(sin nombre)</strong> tiene una edad que no corresponde al grado actual.</p>
+            <div class="modal-edad-tabla">
+                <div class="modal-edad-fila"><span class="modal-edad-label">📚 Grado:</span><span class="modal-edad-valor" id="modalEdadGrado">-</span></div>
+                <div class="modal-edad-fila"><span class="modal-edad-label">👤 Edad del estudiante:</span><span class="modal-edad-valor destacado" id="modalEdadEdad">-</span></div>
+                <div class="modal-edad-fila"><span class="modal-edad-label">✅ Edad esperada:</span><span class="modal-edad-valor" id="modalEdadEsperada">-</span></div>
+                <div class="modal-edad-fila"><span class="modal-edad-label">📊 Rango aceptado:</span><span class="modal-edad-valor" id="modalEdadRango">-</span></div>
+                <div class="modal-edad-fila"><span class="modal-edad-label">⚡ Diferencia:</span><span class="modal-edad-valor destacado" id="modalEdadDiferencia">-</span></div>
+                <div class="modal-edad-fila"><span class="modal-edad-label">🏷️ Estado:</span><span class="modal-edad-valor" id="modalEdadTipo">-</span></div>
+            </div>
+            <div class="modal-edad-aviso">⚠️ <strong>Esta situación debe ser reportada al Distrito Educativo</strong> y documentada en el expediente del estudiante según normativa MINERD.</div>
+            <label class="modal-edad-checkbox-label"><input type="checkbox" id="modalEdadCheckbox" /><span>Sí, acepto y deseo continuar con el registro de este estudiante</span></label>
+        </div>
+        <div class="modal-edad-buttons">
+            <button type="button" class="modal-edad-btn modal-edad-btn-aceptar" id="modalEdadAceptar">✅ ACEPTAR</button>
+            <button type="button" class="modal-edad-btn modal-edad-btn-cancelar" id="modalEdadCancelar">❌ CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPT COMPLETO DE CARGA DE LISTADO -->
+<script>
+(function() {
+    'use strict';
+
+    const ListadoEstudiantes = {
+        datos: [], indiceActual: 0, mapeo: {}, columnasArchivo: [], activo: false
+    };
+
+    const NOMBRES_MESES = {
+        'enero': 1, 'ene': 1, 'jan': 1, 'january': 1, 'janvier': 1, 'janero': 1,
+        'febrero': 2, 'feb': 2, 'february': 2, 'fevrier': 2, 'febr': 2,
+        'marzo': 3, 'mar': 3, 'march': 3, 'mars': 3, 'mrz': 3,
+        'abril': 4, 'abr': 4, 'apr': 4, 'april': 4, 'avril': 4, 'abl': 4,
+        'mayo': 5, 'may': 5, 'mai': 5,
+        'junio': 6, 'jun': 6, 'june': 6, 'juin': 6,
+        'julio': 7, 'jul': 7, 'july': 7, 'juillet': 7, 'jullio': 7,
+        'agosto': 8, 'ago': 8, 'aug': 8, 'august': 8, 'aout': 8, 'agto': 8,
+        'septiembre': 9, 'sep': 9, 'sept': 9, 'september': 9, 'septembre': 9, 'setiembre': 9, 'set': 9, 'septbre': 9,
+        'octubre': 10, 'oct': 10, 'october': 10, 'octobre': 10, 'octbre': 10,
+        'noviembre': 11, 'nov': 11, 'november': 11, 'novembre': 11, 'novbre': 11, 'noviember': 11,
+        'diciembre': 12, 'dic': 12, 'dec': 12, 'december': 12, 'decembre': 12, 'dicbre': 12, 'disiembre': 12
+    };
+
+    const ALIAS_NACIONALIDADES = {
+        'dominicana': ['dominicana', 'republica dominicana', 'rd', 'dominican', 'dom'],
+        'haitiana': ['haitiana', 'haiti', 'haitian', 'hayitiana'],
+        'venezolana': ['venezolana', 'venezuela', 'venezolan', 'venez'],
+        'colombiana': ['colombiana', 'colombia', 'colombian'],
+        'puertorriquena': ['puertorriquena', 'puertorriqueña', 'puerto rico', 'pr'],
+        'cubana': ['cubana', 'cuba', 'cuban'],
+        'estadounidense': ['estadounidense', 'estados unidos', 'usa', 'american', 'americano', 'americana', 'eeuu', 'norteamericana'],
+        'mexicana': ['mexicana', 'mexico', 'méxico', 'mexican'],
+        'espanola': ['espanola', 'española', 'españa', 'espana', 'spanish'],
+        'italiana': ['italiana', 'italia', 'italian'],
+        'francesa': ['francesa', 'francia', 'french'],
+        'alemana': ['alemana', 'alemania', 'german'],
+        'china': ['china', 'chino', 'chinese'],
+        'japonesa': ['japonesa', 'japon', 'japanese'],
+        'brasileña': ['brasileña', 'brasil', 'brazilian'],
+        'argentina': ['argentina', 'argentino', 'argentin'],
+        'chilena': ['chilena', 'chile', 'chilean'],
+        'peruana': ['peruana', 'peru', 'perú', 'peruvian'],
+        'ecuatoriana': ['ecuatoriana', 'ecuador', 'ecuadorian'],
+        'panamena': ['panamena', 'panameña', 'panama', 'panamanian'],
+        'costarricense': ['costarricense', 'costa rica', 'costa rican'],
+        'guatemalteca': ['guatemalteca', 'guatemala', 'guatemalan'],
+        'hondurena': ['hondurena', 'hondureña', 'honduras', 'honduran'],
+        'salvadorena': ['salvadorena', 'salvadoreña', 'el salvador', 'salvadoran'],
+        'nicaragüense': ['nicaraguense', 'nicaragua', 'nicaraguan'],
+        'uruguaya': ['uruguaya', 'uruguay', 'uruguayan'],
+        'paraguaya': ['paraguaya', 'paraguay', 'paraguayan'],
+        'boliviana': ['boliviana', 'bolivia', 'bolivian'],
+        'canadiense': ['canadiense', 'canada', 'canadá', 'canadian'],
+        'jamaicana': ['jamaicana', 'jamaica', 'jamaican']
+    };
+
+    const CAMPOS_FORMULARIO = [
+        { id: 'nombre', label: '👤 Nombre' }, { id: 'apellido', label: '👤 Apellido' },
+        { id: 'idEstudiante', label: '🆔 ID (Sigerd)' }, { id: 'nacionalidad', label: '🌎 Nacionalidad' },
+        { id: 'parentescoEstudiante', label: '👨‍👩‍👧 Parentesco' }, { id: 'sexo', label: '⚧ Sexo' },
+        { id: 'fechaNacimiento', label: '🎂 Fecha de Nacimiento' }, { id: 'libro', label: '📖 Libro' },
+        { id: 'folio', label: '📄 Folio' }, { id: 'direccionEstudiante', label: '🏠 Dirección' },
+        { id: 'provincia', label: '🗺️ Provincia' }, { id: 'municipio', label: '🏘️ Municipio' },
+        { id: 'barrio', label: '📍 Barrio / Sector' }, { id: 'telefono', label: '📞 Teléfono' },
+        { id: 'nuevoInscrito', label: '📅 Fecha Nuevo Inscrito' }, { id: 'retirado', label: '📅 Fecha Retirado' },
+        { id: 'condicion', label: '🏷️ Condición' }, { id: 'preprimario', label: '🎒 Preprimario' },
+        { id: 'neae', label: '♿ NEAE' }, { id: 'enfermedades', label: '🩺 Enfermedades' },
+        { id: 'medicamentos', label: '💊 Medicamentos' }, { id: 'tutorTipo', label: '👨‍👩‍👧 Tipo de Tutor' },
+        { id: 'tutorCedula', label: '🆔 Cédula Tutor' }, { id: 'tutorDireccion', label: '🏠 Dirección Tutor' },
+        { id: 'tutorTelefono', label: '📞 Teléfono Tutor' }, { id: 'tutorEscolaridad', label: '🎓 Escolaridad Tutor' },
+        { id: 'tutorOcupacion', label: '💼 Ocupación Tutor' }, { id: 'emergenciaNombre', label: '🚨 Nombre Emergencia' },
+        { id: 'emergenciaTelefono', label: '📞 Teléfono Emergencia' }
+    ];
+
+    const ALIAS_COLUMNAS = {
+        'nombre': ['nombre', 'nombres', 'primer nombre', 'nombre estudiante', 'primer nombre estudiante', 'nombre del estudiante', 'nom', 'nombres estudiante', '1er nombre', 'nombre1', 'nombre 1', 'name', 'first name'],
+        'apellido': ['apellido', 'apellidos', 'primer apellido', 'apellido estudiante', 'segundo apellido', 'apellido del estudiante', 'ape', 'apellidos estudiante', '1er apellido', 'apellido1', 'apellido 1', 'last name', 'surname', 'family name'],
+        'idEstudiante': ['id', 'id estudiante', 'código', 'codigo', 'sigerd', 'id sigerd', 'matricula', 'matrícula', 'codigo estudiante', 'código estudiante', 'cod', 'cod estudiante', 'cod.', 'no.', 'numero', 'número', 'no estudiante', 'num', 'num estudiante', 'id alumno', 'codigo alumno', 'código alumno', 'student id', 'code'],
+        'nacionalidad': ['nacionalidad', 'pais', 'país', 'nacionalidad estudiante', 'nacionalidad del estudiante', 'nacionalidad alumno', 'nation', 'country', 'ciudadania', 'ciudadanía'],
+        'parentescoEstudiante': ['parentesco', 'relacion', 'relación', 'con quien vive', 'vive con', 'parentesco estudiante', 'relacion estudiante', 'relación estudiante', 'parentezco', 'convive con', 'quien vive', 'quién vive'],
+        'sexo': ['sexo', 'género', 'genero', 'sexo estudiante', 'genero estudiante', 'género estudiante', 'm/f', 'masculino/femenino', 'sex'],
+        'fechaNacimiento': ['fecha nacimiento', 'fecha de nacimiento', 'fec. nac.', 'fec nac', 'nacimiento', 'fecha_nacimiento', 'fec. nac', 'fecha nac', 'fecha nac.', 'fnac', 'f. nac', 'f.nac', 'dob', 'birth date', 'birthdate', 'fecha de nac', 'dia de nacimiento', 'dia nacimiento', 'fecha nacimento'],
+        'libro': ['libro', 'n° libro', 'no libro', 'numero libro', 'nro libro', 'num libro', 'libro registro', 'n libro', 'no. libro'],
+        'folio': ['folio', 'n° folio', 'no folio', 'numero folio', 'nro folio', 'num folio', 'folio registro', 'n folio', 'no. folio'],
+        'direccionEstudiante': ['direccion', 'dirección', 'domicilio', 'direccion estudiante', 'dirección estudiante', 'dirección del estudiante', 'direccion del estudiante', 'residencia', 'calle', 'address', 'domicilio estudiante', 'direccion alumno', 'dirección alumno'],
+        'provincia': ['provincia', 'prov', 'prov.', 'provincia estudiante', 'provincia residencia', 'provincia domicilio'],
+        'municipio': ['municipio', 'mun', 'mun.', 'municipio estudiante', 'municipio residencia'],
+        'barrio': ['barrio', 'sector', 'paraje', 'comunidad', 'barrio estudiante', 'sector estudiante', 'zona', 'localidad', 'comunidad estudiante'],
+        'telefono': ['telefono', 'teléfono', 'tel', 'celular', 'telefono estudiante', 'teléfono estudiante', 'tel estudiante', 'celular estudiante', 'phone', 'cel', 'cel.', 'telefono del estudiante', 'teléfono del estudiante', 'no telefono', 'número teléfono', 'numero telefono'],
+        'nuevoInscrito': ['fecha inscrito', 'fecha nuevo inscrito', 'fecha de inscripcion', 'fecha inscripción', 'inscrito', 'fecha inscripcion', 'fecha de inscripción', 'fecha ingreso', 'fecha de ingreso', 'dia inscrito', 'fecha nuevo ingreso'],
+        'retirado': ['fecha retirado', 'fecha retiro', 'fecha de retiro', 'retirado', 'fecha de retirado', 'dia retirado', 'dia retiro'],
+        'condicion': ['condicion', 'condición', 'estado', 'tipo estudiante', 'estado estudiante', 'condicion estudiante', 'condición estudiante', 'tipo', 'status', 'condicion inicial', 'condición inicial'],
+        'preprimario': ['preprimario', 'realizo preprimario', 'realizó preprimario', 'pre-primario', 'educacion inicial', 'educación inicial', 'nivel inicial', 'pre kinder'],
+        'neae': ['neae', 'necesidades especiales', 'nee', 'necesidades educativas', 'nee estudiante', 'necesidad especial', 'neae estudiante', 'necesidades de apoyo', 'apoyo educativo'],
+        'enfermedades': ['enfermedades', 'alergias', 'enfermedad', 'alergia', 'enfermedades estudiante', 'alergias estudiante', 'condicion salud', 'condición de salud', 'salud', 'enfermo', 'alergico', 'alérgico'],
+        'medicamentos': ['medicamentos', 'medicacion', 'medicación', 'medicina', 'medicamentos estudiante', 'medicación estudiante', 'tratamiento', 'medicinas', 'farmacos', 'fármacos'],
+        'tutorTipo': ['tutor', 'tipo tutor', 'parentesco tutor', 'representante', 'padre madre tutor', 'tutor legal', 'tipo de tutor', 'representante legal', 'encargado', 'acudiente', 'guardian', 'guardián', 'tipo representante'],
+        'tutorCedula': ['cedula tutor', 'cédula tutor', 'cedula representante', 'id tutor', 'cedula padre', 'cédula padre', 'cedula del tutor', 'cédula del tutor', 'id representante', 'cedula representante legal', 'cédula representante', 'cedula encargato', 'cédula encargado'],
+        'tutorDireccion': ['direccion tutor', 'dirección tutor', 'domicilio tutor', 'direccion representante', 'dirección del tutor', 'direccion del tutor', 'domicilio representante', 'direccion representante legal'],
+        'tutorTelefono': ['telefono tutor', 'teléfono tutor', 'celular tutor', 'telefono representante', 'teléfono del tutor', 'telefono del tutor', 'celular representante', 'telefono representante legal', 'tel tutor'],
+        'tutorEscolaridad': ['escolaridad tutor', 'nivel educativo tutor', 'estudios tutor', 'escolaridad', 'nivel educativo', 'nivel de escolaridad', 'grado estudios', 'escolaridad representante', 'educacion tutor', 'educación tutor'],
+        'tutorOcupacion': ['ocupacion tutor', 'oficio tutor', 'ocupación tutor', 'trabajo tutor', 'ocupacion', 'oficio', 'profesion', 'profesión', 'ocupacion representante', 'trabajo', 'empleo', 'ocupacion del tutor'],
+        'emergenciaNombre': ['nombre emergencia', 'contacto emergencia', 'emergencia nombre', 'nombre de emergencia', 'contacto de emergencia', 'persona emergencia', 'contacto emergencias', 'nombre contacto emergencia'],
+        'emergenciaTelefono': ['telefono emergencia', 'teléfono emergencia', 'tel emergencia', 'telefono de emergencia', 'teléfono de emergencia', 'celular emergencia', 'tel emergencias', 'telefono contacto emergencia']
+    };
+
+    const btnSubirListado = document.getElementById('btnSubirListado');
+    const inputArchivoListado = document.getElementById('inputArchivoListado');
+    const panelListado = document.getElementById('panelListadoEstudiantes');
+    const contadorActual = document.getElementById('contadorActual');
+    const contadorTotal = document.getElementById('contadorTotal');
+    const infoNombreActual = document.getElementById('infoNombreActual');
+    const infoProgreso = document.getElementById('infoProgreso');
+    const barraProgreso = document.getElementById('barraProgresoListado');
+    const btnPrimero = document.getElementById('btnPrimeroListado');
+    const btnAnterior = document.getElementById('btnAnteriorListado');
+    const btnSiguiente = document.getElementById('btnSiguienteListado');
+    const btnUltimo = document.getElementById('btnUltimoListado');
+    const btnCerrarListado = document.getElementById('btnCerrarListado');
+    const modalMapeoOverlay = document.getElementById('modalMapeoOverlay');
+    const mapeoGrid = document.getElementById('mapeoGrid');
+    const btnCancelarMapeo = document.getElementById('btnCancelarMapeo');
+    const btnConfirmarMapeo = document.getElementById('btnConfirmarMapeo');
+    const mapeoTotalColumnas = document.getElementById('mapeoTotalColumnas');
+    const mapeoHeaderSub = document.getElementById('mapeoHeaderSub');
+    const resumenColumnas = document.getElementById('resumenColumnas');
+    const resumenDetectadas = document.getElementById('resumenDetectadas');
+    const resumenEstudiantes = document.getElementById('resumenEstudiantes');
+    const resumenPendientes = document.getElementById('resumenPendientes');
+
+    if (btnSubirListado) btnSubirListado.addEventListener('click', () => inputArchivoListado.click());
+
+    if (inputArchivoListado) {
+        inputArchivoListado.addEventListener('change', function(e) {
+            const archivo = e.target.files[0];
+            if (!archivo) return;
+            const extension = archivo.name.split('.').pop().toLowerCase();
+            if (!['xlsx', 'xls', 'csv'].includes(extension)) {
+                mostrarToast('❌ Formato no válido. Usa Excel (.xlsx, .xls) o CSV (.csv)');
+                inputArchivoListado.value = '';
+                return;
+            }
+            leerArchivoExcel(archivo);
+            inputArchivoListado.value = '';
+        });
+    }
+
+    function leerArchivoExcel(archivo) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonDatos = XLSX.utils.sheet_to_json(primeraHoja, { defval: '', raw: false, dateNF: 'dd/mm/yyyy' });
+
+                if (!jsonDatos || jsonDatos.length === 0) {
+                    mostrarToast('❌ El archivo está vacío o no tiene datos válidos');
+                    return;
+                }
+
+                ListadoEstudiantes.columnasArchivo = Object.keys(jsonDatos[0]);
+                ListadoEstudiantes.datos = jsonDatos;
+
+                console.log('📋 PRIMER ESTUDIANTE:', jsonDatos[0]);
+                console.log('📋 COLUMNAS:', ListadoEstudiantes.columnasArchivo);
+
+                mostrarToast(`✅ Archivo cargado: ${jsonDatos.length} estudiantes detectados`);
+                abrirModalMapeo();
+            } catch (err) {
+                console.error('Error al leer archivo:', err);
+                mostrarToast('❌ Error al leer el archivo. Verifica el formato.');
+            }
+        };
+        reader.readAsArrayBuffer(archivo);
+    }
+
+    function normalizarTexto(txt) {
+        return String(txt || '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function obtenerPalabras(txt) {
+        return normalizarTexto(txt).split(' ').filter(p => p.length > 2);
+    }
+
+    function distanciaLevenshtein(a, b) {
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+            for (let j = 1; j <= a.length; j++) {
+                if (b.charAt(i - 1) === a.charAt(j - 1)) matrix[i][j] = matrix[i - 1][j - 1];
+                else matrix[i][j] = Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+            }
+        }
+        return matrix[b.length][a.length];
+    }
+
+    function similitudLevenshtein(a, b) {
+        const maxLen = Math.max(a.length, b.length);
+        if (maxLen === 0) return 1;
+        return 1 - (distanciaLevenshtein(a, b) / maxLen);
+    }
+
+    function detectarCampoInteligente(nombreColumna) {
+        const colNorm = normalizarTexto(nombreColumna);
+        const colPalabras = obtenerPalabras(nombreColumna);
+        let mejorCampo = null;
+        let mejorPuntuacion = 0;
+
+        for (const [campoId, alias] of Object.entries(ALIAS_COLUMNAS)) {
+            let puntuacionCampo = 0;
+            for (const aliasOriginal of alias) {
+                const aliasNorm = normalizarTexto(aliasOriginal);
+                const aliasPalabras = obtenerPalabras(aliasOriginal);
+
+                if (aliasNorm === colNorm) { puntuacionCampo = Math.max(puntuacionCampo, 100); continue; }
+                if (colNorm.includes(aliasNorm) || aliasNorm.includes(colNorm)) {
+                    const ratio = Math.min(colNorm.length, aliasNorm.length) / Math.max(colNorm.length, aliasNorm.length);
+                    puntuacionCampo = Math.max(puntuacionCampo, 80 * ratio);
+                    continue;
+                }
+                if (colPalabras.length > 0 && aliasPalabras.length > 0) {
+                    let palabrasCoincidentes = 0;
+                    for (const pCol of colPalabras) {
+                        for (const pAlias of aliasPalabras) {
+                            if (pCol === pAlias || pCol.includes(pAlias) || pAlias.includes(pCol)) { palabrasCoincidentes++; break; }
+                        }
+                    }
+                    const ratioPalabras = palabrasCoincidentes / Math.max(colPalabras.length, aliasPalabras.length);
+                    if (ratioPalabras >= 0.5) puntuacionCampo = Math.max(puntuacionCampo, 70 * ratioPalabras);
+                }
+                const similitud = similitudLevenshtein(colNorm, aliasNorm);
+                if (similitud >= 0.75) puntuacionCampo = Math.max(puntuacionCampo, 60 * similitud);
+            }
+            if (puntuacionCampo > mejorPuntuacion) { mejorPuntuacion = puntuacionCampo; mejorCampo = campoId; }
+        }
+
+        if (mejorPuntuacion >= 40) return { campoId: mejorCampo, confianza: mejorPuntuacion };
+        return { campoId: null, confianza: 0 };
+    }
+
+    function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+    function abrirModalMapeo() {
+        mapeoGrid.innerHTML = '';
+        const totalColumnas = ListadoEstudiantes.columnasArchivo.length;
+        const totalEstudiantes = ListadoEstudiantes.datos.length;
+        let detectadas = 0, pendientes = 0;
+
+        if (mapeoTotalColumnas) mapeoTotalColumnas.textContent = totalColumnas;
+        if (resumenColumnas) resumenColumnas.textContent = totalColumnas;
+        if (resumenEstudiantes) resumenEstudiantes.textContent = totalEstudiantes;
+        if (mapeoHeaderSub) mapeoHeaderSub.textContent = `${totalColumnas} columnas detectadas · ${totalEstudiantes} estudiantes`;
+
+        const columnasConDeteccion = ListadoEstudiantes.columnasArchivo.map(col => ({ columna: col, deteccion: detectarCampoInteligente(col) }));
+        columnasConDeteccion.sort((a, b) => {
+            if (a.deteccion.campoId && !b.deteccion.campoId) return -1;
+            if (!a.deteccion.campoId && b.deteccion.campoId) return 1;
+            return b.deteccion.confianza - a.deteccion.confianza;
+        });
+
+        columnasConDeteccion.forEach(({ columna, deteccion }) => {
+            const item = document.createElement('div');
+            item.className = 'mapeo-item';
+            const autoDetectado = deteccion.campoId !== null;
+            if (autoDetectado) { item.classList.add('autodetectado'); detectadas++; }
+            else { item.classList.add('no-detectado'); pendientes++; }
+
+            const colDiv = document.createElement('div');
+            colDiv.className = 'mapeo-columna-nombre';
+            let badgeHtml = '';
+            if (autoDetectado) {
+                const nivelConfianza = deteccion.confianza >= 80 ? 'Alta' : deteccion.confianza >= 60 ? 'Media' : 'Baja';
+                badgeHtml = `<span class="badge-auto">Auto ${nivelConfianza}</span>`;
+            } else {
+                badgeHtml = `<span class="badge-pendiente">Pendiente</span>`;
+            }
+            colDiv.innerHTML = `<span>📊 ${escapeHtml(columna)}</span>${badgeHtml}`;
+
+            const flecha = document.createElement('div');
+            flecha.className = 'mapeo-flecha';
+            flecha.textContent = '→';
+
+            const select = document.createElement('select');
+            select.dataset.columnaArchivo = columna;
+            const optVacia = document.createElement('option');
+            optVacia.value = '';
+            optVacia.textContent = '— No mapear —';
+            select.appendChild(optVacia);
+
+            CAMPOS_FORMULARIO.forEach(campo => {
+                const opt = document.createElement('option');
+                opt.value = campo.id;
+                opt.textContent = campo.label;
+                if (deteccion.campoId === campo.id) { opt.selected = true; select.classList.add('opcion-detectada'); }
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', function() {
+                const badge = colDiv.querySelector('.badge-auto, .badge-pendiente, .badge-manual');
+                if (this.value) {
+                    this.classList.add('opcion-detectada');
+                    item.classList.remove('no-detectado');
+                    item.classList.add('autodetectado');
+                    if (badge) { badge.className = 'badge-manual'; badge.textContent = 'Manual'; }
+                    else { const nuevoBadge = document.createElement('span'); nuevoBadge.className = 'badge-manual'; nuevoBadge.textContent = 'Manual'; colDiv.appendChild(nuevoBadge); }
+                } else {
+                    this.classList.remove('opcion-detectada');
+                    item.classList.remove('autodetectado');
+                    item.classList.add('no-detectado');
+                    if (badge) { badge.className = 'badge-pendiente'; badge.textContent = 'Pendiente'; }
+                }
+                actualizarContadores();
+            });
+
+            item.appendChild(colDiv);
+            item.appendChild(flecha);
+            item.appendChild(select);
+            mapeoGrid.appendChild(item);
+        });
+
+        if (resumenDetectadas) resumenDetectadas.textContent = detectadas;
+        if (resumenPendientes) resumenPendientes.textContent = pendientes;
+        modalMapeoOverlay.classList.add('active');
+    }
+
+    function actualizarContadores() {
+        let detectadas = 0, pendientes = 0;
+        mapeoGrid.querySelectorAll('.mapeo-item').forEach(item => {
+            if (item.classList.contains('autodetectado')) detectadas++;
+            else if (item.classList.contains('no-detectado')) pendientes++;
+        });
+        if (resumenDetectadas) resumenDetectadas.textContent = detectadas;
+        if (resumenPendientes) resumenPendientes.textContent = pendientes;
+    }
+
+    if (btnCancelarMapeo) btnCancelarMapeo.addEventListener('click', function() {
+        modalMapeoOverlay.classList.remove('active');
+        ListadoEstudiantes.datos = [];
+        ListadoEstudiantes.columnasArchivo = [];
+    });
+
+    if (btnConfirmarMapeo) btnConfirmarMapeo.addEventListener('click', function() {
+        ListadoEstudiantes.mapeo = {};
+        let tieneNombreOApellido = false;
+        mapeoGrid.querySelectorAll('select').forEach(sel => {
+            const colArchivo = sel.dataset.columnaArchivo;
+            const campoForm = sel.value;
+            if (campoForm) {
+                ListadoEstudiantes.mapeo[colArchivo] = campoForm;
+                if (campoForm === 'nombre' || campoForm === 'apellido') tieneNombreOApellido = true;
+            }
+        });
+        if (!tieneNombreOApellido) { mostrarToast('⚠️ Debes mapear al menos el campo Nombre o Apellido'); return; }
+        modalMapeoOverlay.classList.remove('active');
+        activarListado();
+    });
+
+    function activarListado() {
+        ListadoEstudiantes.activo = true;
+        ListadoEstudiantes.indiceActual = 0;
+        panelListado.classList.add('activo');
+        actualizarPanelNavegacion();
+        cargarEstudianteEnFormulario(0);
+        mostrarToast(`📋 Listado activado. Navega con los botones o las flechas del teclado.`);
+    }
+
+    function actualizarPanelNavegacion() {
+        const total = ListadoEstudiantes.datos.length;
+        const actual = ListadoEstudiantes.indiceActual + 1;
+        const porcentaje = total > 0 ? Math.round((actual / total) * 100) : 0;
+        contadorActual.textContent = actual;
+        contadorTotal.textContent = total;
+        infoProgreso.textContent = porcentaje + '%';
+        barraProgreso.style.width = porcentaje + '%';
+        const est = ListadoEstudiantes.datos[ListadoEstudiantes.indiceActual];
+        if (est) {
+            const nom = obtenerValorCampo(est, 'nombre') || '';
+            const ape = obtenerValorCampo(est, 'apellido') || '';
+            infoNombreActual.textContent = (nom + ' ' + ape).trim() || '(sin nombre)';
+        }
+        btnPrimero.disabled = ListadoEstudiantes.indiceActual === 0;
+        btnAnterior.disabled = ListadoEstudiantes.indiceActual === 0;
+        btnSiguiente.disabled = ListadoEstudiantes.indiceActual === total - 1;
+        btnUltimo.disabled = ListadoEstudiantes.indiceActual === total - 1;
+    }
+
+    function obtenerValorCampo(estudiante, campoId) {
+        let colArchivo = null;
+        for (const [col, campo] of Object.entries(ListadoEstudiantes.mapeo)) {
+            if (campo === campoId) { colArchivo = col; break; }
+        }
+        if (!colArchivo) return '';
+        const val = estudiante[colArchivo];
+        return val === undefined || val === null ? '' : String(val).trim();
+    }
+
+    function asignarValorSelect(selectId, valor) {
+        if (!valor) return false;
+        const select = document.getElementById(selectId);
+        if (!select) return false;
+        const valorStr = String(valor).trim();
+        const valorNorm = normalizarTexto(valor);
+
+        for (const opt of select.options) {
+            if (opt.value && String(opt.value).trim() === valorStr) { select.value = opt.value; select.dispatchEvent(new Event('change', { bubbles: true })); return true; }
+        }
+        for (const opt of select.options) {
+            if (normalizarTexto(opt.text) === valorNorm) { select.value = opt.value; select.dispatchEvent(new Event('change', { bubbles: true })); return true; }
+        }
+        for (const opt of select.options) {
+            const optNorm = normalizarTexto(opt.text);
+            const optValNorm = normalizarTexto(opt.value);
+            if (optNorm && valorNorm.length > 2 && optNorm.length > 2) {
+                if (optNorm.includes(valorNorm) || valorNorm.includes(optNorm) || optValNorm.includes(valorNorm) || valorNorm.includes(optValNorm)) {
+                    select.value = opt.value; select.dispatchEvent(new Event('change', { bubbles: true })); return true;
+                }
+            }
+        }
+        const valorPalabras = obtenerPalabras(valor);
+        if (valorPalabras.length > 0) {
+            for (const opt of select.options) {
+                const optPalabras = obtenerPalabras(opt.text);
+                let coincidencias = 0;
+                for (const pVal of valorPalabras) {
+                    for (const pOpt of optPalabras) {
+                        if (pVal === pOpt || pVal.includes(pOpt) || pOpt.includes(pVal)) { coincidencias++; break; }
+                    }
+                }
+                if (coincidencias > 0 && coincidencias >= Math.min(valorPalabras.length, Math.max(1, optPalabras.length))) {
+                    select.value = opt.value; select.dispatchEvent(new Event('change', { bubbles: true })); return true;
+                }
+            }
+        }
+        for (const opt of select.options) {
+            const optNorm = normalizarTexto(opt.text);
+            if (optNorm && optNorm.length > 3 && valorNorm.length > 3) {
+                const sim = similitudLevenshtein(valorNorm, optNorm);
+                if (sim >= 0.8) { select.value = opt.value; select.dispatchEvent(new Event('change', { bubbles: true })); return true; }
+            }
+        }
+        return false;
+    }
+
+    function convertirMesANumero(valor) {
+        if (valor === null || valor === undefined || valor === '') return null;
+        const valorStr = String(valor).trim();
+        const valorNorm = normalizarTexto(valorStr);
+        const num = parseInt(valorStr, 10);
+        if (!isNaN(num) && num >= 1 && num <= 12) return num;
+        if (NOMBRES_MESES[valorNorm] !== undefined) return NOMBRES_MESES[valorNorm];
+        for (const [nombreMes, numMes] of Object.entries(NOMBRES_MESES)) {
+            if (valorNorm.includes(nombreMes) || nombreMes.includes(valorNorm)) return numMes;
+        }
+        if (valorNorm.length >= 3) {
+            const abr = valorNorm.substring(0, 3);
+            for (const [nombreMes, numMes] of Object.entries(NOMBRES_MESES)) {
+                if (nombreMes.substring(0, 3) === abr) return numMes;
+            }
+        }
+        return null;
+    }
+
+    function cargarFecha(estudiante, campoId, idDia, idMes, idAnio) {
+        const valor = obtenerValorCampo(estudiante, campoId);
+        if (!valor) return;
+
+        const diaSel = document.getElementById(idDia);
+        const mesSel = document.getElementById(idMes);
+        const anioSel = document.getElementById(idAnio);
+        if (!diaSel || !mesSel || !anioSel) return;
+
+        let dia = null, mes = null, anio = null;
+
+        if (valor instanceof Date && !isNaN(valor.getTime())) {
+            dia = valor.getDate();
+            mes = valor.getMonth() + 1;
+            anio = valor.getFullYear();
+        } else if (typeof valor === 'string') {
+            const str = valor.trim();
+            let partes = str.split(/[\/\-\.]/);
+            if (partes.length === 3) {
+                const p1 = partes[0].trim();
+                const p2 = partes[1].trim();
+                const p3 = partes[2].trim();
+                const mesConvertido = convertirMesANumero(p2);
+                if (mesConvertido !== null) {
+                    dia = parseInt(p1, 10);
+                    mes = mesConvertido;
+                    anio = parseInt(p3, 10);
+                    if (anio < 100) anio = anio < 50 ? 2000 + anio : 1900 + anio;
+                } else {
+                    const n1 = parseInt(p1, 10);
+                    const n2 = parseInt(p2, 10);
+                    const n3 = parseInt(p3, 10);
+                    if (n3 > 100) {
+                        if (n1 > 12) { dia = n1; mes = n2; anio = n3; }
+                        else if (n2 > 12) { mes = n1; dia = n2; anio = n3; }
+                        else { dia = n1; mes = n2; anio = n3; }
+                    } else if (n1 > 100) { anio = n1; mes = n2; dia = n3; }
+                    else if (n3 < 100) { dia = n1; mes = n2; anio = n3 < 50 ? 2000 + n3 : 1900 + n3; }
+                }
+            } else if (partes.length === 2) {
+                const mesConvertido = convertirMesANumero(partes[0]);
+                if (mesConvertido !== null) {
+                    mes = mesConvertido;
+                    anio = parseInt(partes[1], 10);
+                    if (anio < 100) anio = anio < 50 ? 2000 + anio : 1900 + anio;
+                }
+            }
+            if (dia === null && mes === null && anio === null) {
+                const mesConvertido = convertirMesANumero(str);
+                if (mesConvertido !== null) mes = mesConvertido;
+            }
+        } else if (!isNaN(valor) && Number(valor) > 1000) {
+            const numSerial = Number(valor);
+            const fechaExcel = new Date((numSerial - 25569) * 86400 * 1000);
+            if (!isNaN(fechaExcel.getTime())) {
+                dia = fechaExcel.getUTCDate();
+                mes = fechaExcel.getUTCMonth() + 1;
+                anio = fechaExcel.getUTCFullYear();
+            }
+        }
+
+        if (dia !== null && dia >= 1 && dia <= 31) buscarYSeleccionarOpcion(diaSel, dia);
+        if (mes !== null && mes >= 1 && mes <= 12) buscarYSeleccionarOpcion(mesSel, mes);
+        if (anio !== null && anio > 1900) buscarYSeleccionarOpcion(anioSel, anio);
+
+        if (dia !== null) diaSel.dispatchEvent(new Event('change', { bubbles: true }));
+        if (mes !== null) mesSel.dispatchEvent(new Event('change', { bubbles: true }));
+        if (anio !== null) anioSel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function buscarYSeleccionarOpcion(select, valorBuscado) {
+        if (!select || valorBuscado === null || valorBuscado === undefined) return false;
+        const valorStr = String(valorBuscado).trim();
+        for (const opt of select.options) {
+            if (String(opt.value).trim() === valorStr) { select.value = opt.value; return true; }
+            if (String(opt.text).trim() === valorStr) { select.value = opt.value; return true; }
+            const optNum = parseInt(opt.value, 10);
+            const valNum = parseInt(valorStr, 10);
+            if (!isNaN(optNum) && !isNaN(valNum) && optNum === valNum) { select.value = opt.value; return true; }
+        }
+        return false;
+    }
+
+    function asignarNacionalidad(valor, intentos = 0, maxIntentos = 15) {
+        if (!valor) return false;
+        const select = document.getElementById('nacionalidad');
+        if (!select) return false;
+        if (select.options.length <= 1) {
+            if (intentos < maxIntentos) {
+                setTimeout(() => asignarNacionalidad(valor, intentos + 1, maxIntentos), 300);
+                return false;
+            } else {
+                const nuevaOpt = document.createElement('option');
+                nuevaOpt.value = valor;
+                nuevaOpt.textContent = valor;
+                nuevaOpt.selected = true;
+                select.appendChild(nuevaOpt);
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                return true;
+            }
+        }
+        const valorNorm = normalizarTexto(valor);
+        if (asignarValorSelect('nacionalidad', valor)) return true;
+        for (const [nacionalidadCanonica, alias] of Object.entries(ALIAS_NACIONALIDADES)) {
+            for (const aliasItem of alias) {
+                const aliasNorm = normalizarTexto(aliasItem);
+                if (aliasNorm === valorNorm || valorNorm.includes(aliasNorm) || aliasNorm.includes(valorNorm)) {
+                    for (const aliasBuscar of alias) {
+                        if (asignarValorSelect('nacionalidad', aliasBuscar)) return true;
+                    }
+                    if (asignarValorSelect('nacionalidad', nacionalidadCanonica)) return true;
+                }
+            }
+        }
+        const valorPalabras = obtenerPalabras(valor);
+        for (const opt of select.options) {
+            if (!opt.value) continue;
+            const optPalabras = obtenerPalabras(opt.text);
+            for (const pVal of valorPalabras) {
+                for (const pOpt of optPalabras) {
+                    if (pVal === pOpt || (pVal.length > 3 && pOpt.length > 3 && (pVal.includes(pOpt) || pOpt.includes(pVal)))) {
+                        select.value = opt.value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        return true;
+                    }
+                }
+            }
+        }
+        const nuevaOpt = document.createElement('option');
+        nuevaOpt.value = valor;
+        nuevaOpt.textContent = valor;
+        nuevaOpt.selected = true;
+        select.appendChild(nuevaOpt);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+    }
+
+    function cargarEstudianteEnFormulario(indice) {
+        if (indice < 0 || indice >= ListadoEstudiantes.datos.length) return;
+
+        ListadoEstudiantes.indiceActual = indice;
+        const est = ListadoEstudiantes.datos[indice];
+
+        limpiarFormularioRapido();
+
+        const camposTexto = ['nombre', 'apellido', 'idEstudiante', 'libro', 'folio', 'direccionEstudiante', 'telefono', 'tutorTipo', 'tutorCedula', 'tutorDireccion', 'tutorTelefono', 'emergenciaNombre', 'emergenciaTelefono', 'enfermedades', 'medicamentos'];
+        camposTexto.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) { const valor = obtenerValorCampo(est, id); if (valor) input.value = valor; }
+        });
+
+        const camposSelect = ['parentescoEstudiante', 'provincia', 'municipio', 'barrio', 'neae', 'tutorEscolaridad', 'tutorOcupacion'];
+        camposSelect.forEach(id => {
+            const valor = obtenerValorCampo(est, id);
+            if (valor) asignarValorSelect(id, valor);
+        });
+
+        const nacionalidad = obtenerValorCampo(est, 'nacionalidad');
+        if (nacionalidad) asignarNacionalidad(nacionalidad);
+
+        const sexo = obtenerValorCampo(est, 'sexo');
+        if (sexo) {
+            const sexoNorm = normalizarTexto(sexo);
+            if (sexoNorm.includes('fem') || sexoNorm === 'f') {
+                const radio = document.getElementById('sexoFemenino');
+                if (radio) radio.checked = true;
+            } else if (sexoNorm.includes('mas') || sexoNorm === 'm') {
+                const radio = document.getElementById('sexoMasculino');
+                if (radio) radio.checked = true;
+            }
+        }
+
+        cargarFecha(est, 'fechaNacimiento', 'diaNacimiento', 'mesNacimiento', 'anoNacimiento');
+        cargarFecha(est, 'nuevoInscrito', 'nuevoDia', 'nuevoMes', 'nuevoAnio');
+        cargarFecha(est, 'retirado', 'retiradoDia', 'retiradoMes', 'retiradoAnio');
+
+        cargarCheckbox(est, 'condicion', 'condicion');
+        cargarCheckboxSimple(est, 'preprimario', 'preprimario');
+
+        setTimeout(() => {
+            if (typeof window.calcularEdadManual === 'function') window.calcularEdadManual();
+        }, 400);
+
+        actualizarPanelNavegacion();
+    }
+
+    function cargarCheckbox(estudiante, campoId, name) {
+        const valor = obtenerValorCampo(estudiante, campoId);
+        if (!valor) return;
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => cb.checked = false);
+        const valores = valor.split(/[,;\/]/).map(v => normalizarTexto(v));
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => {
+            const valNorm = normalizarTexto(cb.value);
+            if (valores.some(v => v === valNorm || v.includes(valNorm) || valNorm.includes(v))) cb.checked = true;
+        });
+    }
+
+    function cargarCheckboxSimple(estudiante, campoId, name) {
+        const valor = obtenerValorCampo(estudiante, campoId);
+        if (!valor) return;
+        const valNorm = normalizarTexto(valor);
+        document.querySelectorAll(`input[name="${name}"]`).forEach(cb => {
+            const optNorm = normalizarTexto(cb.value);
+            if (valNorm === optNorm || valNorm.includes(optNorm) || optNorm.includes(valNorm)) cb.checked = true;
+        });
+    }
+
+    function limpiarFormularioRapido() {
+        const inputsTexto = document.querySelectorAll('#registroForm input[type="text"]');
+        inputsTexto.forEach(inp => { if (inp.id !== 'orden' && inp.id !== 'edad') inp.value = ''; });
+        const selects = document.querySelectorAll('#registroForm select');
+        selects.forEach(sel => { sel.selectedIndex = 0; });
+        document.querySelectorAll('#registroForm input[type="radio"]').forEach(r => r.checked = false);
+        document.querySelectorAll('#registroForm input[type="checkbox"]').forEach(c => c.checked = false);
+        const otraEnf = document.getElementById('enfermedadesOtra');
+        const otraMed = document.getElementById('medicamentosOtra');
+        if (otraEnf) { otraEnf.value = ''; otraEnf.style.display = 'none'; }
+        if (otraMed) { otraMed.value = ''; otraMed.style.display = 'none'; }
+        const edad = document.getElementById('edad');
+        if (edad) edad.value = '';
+    }
+
+    if (btnPrimero) btnPrimero.addEventListener('click', function() { if (ListadoEstudiantes.indiceActual > 0) { cargarEstudianteEnFormulario(0); mostrarToast(`⏮ Estudiante 1 de ${ListadoEstudiantes.datos.length}`); } });
+    if (btnAnterior) btnAnterior.addEventListener('click', function() { if (ListadoEstudiantes.indiceActual > 0) { cargarEstudianteEnFormulario(ListadoEstudiantes.indiceActual - 1); mostrarToast(`◀ Estudiante ${ListadoEstudiantes.indiceActual + 1} de ${ListadoEstudiantes.datos.length}`); } });
+    if (btnSiguiente) btnSiguiente.addEventListener('click', function() { if (ListadoEstudiantes.indiceActual < ListadoEstudiantes.datos.length - 1) { cargarEstudianteEnFormulario(ListadoEstudiantes.indiceActual + 1); mostrarToast(`▶ Estudiante ${ListadoEstudiantes.indiceActual + 1} de ${ListadoEstudiantes.datos.length}`); } });
+    if (btnUltimo) btnUltimo.addEventListener('click', function() { if (ListadoEstudiantes.indiceActual < ListadoEstudiantes.datos.length - 1) { cargarEstudianteEnFormulario(ListadoEstudiantes.datos.length - 1); mostrarToast(`⏭ Último estudiante (${ListadoEstudiantes.datos.length})`); } });
+    if (btnCerrarListado) btnCerrarListado.addEventListener('click', function() {
+        if (confirm('¿Deseas cerrar el listado cargado?')) {
+            ListadoEstudiantes.activo = false;
+            ListadoEstudiantes.datos = [];
+            ListadoEstudiantes.mapeo = {};
+            ListadoEstudiantes.columnasArchivo = [];
+            ListadoEstudiantes.indiceActual = 0;
+            panelListado.classList.remove('activo');
+            mostrarToast('🗑️ Listado cerrado');
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (!ListadoEstudiantes.activo) return;
+        const tag = e.target.tagName.toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.key === 'ArrowLeft' && ListadoEstudiantes.indiceActual > 0) { e.preventDefault(); btnAnterior.click(); }
+        else if (e.key === 'ArrowRight' && ListadoEstudiantes.indiceActual < ListadoEstudiantes.datos.length - 1) { e.preventDefault(); btnSiguiente.click(); }
+    });
+
+    function mostrarToast(mensaje) {
+        if (typeof window.mostrarToastFormulario === 'function') { window.mostrarToastFormulario(mensaje); return; }
+        const toastAnterior = document.querySelector('.toast-mensaje-formulario');
+        if (toastAnterior) toastAnterior.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast-mensaje-formulario';
+        toast.textContent = mensaje;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    window.ListadoEstudiantes = ListadoEstudiantes;
+    window.cargarEstudianteDelListado = function(indice) { cargarEstudianteEnFormulario(indice); };
+    window.obtenerEstudianteActual = function() { return ListadoEstudiantes.datos[ListadoEstudiantes.indiceActual] || null; };
+
+})();
+</script>
+
+</body>
+</html>
