@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe de Aprendizaje</title>
+    <link rel="stylesheet" href="boletin.css">
+    
+    <!-- Librería para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- ============================================================
+    SISTEMA DE OBSERVACIONES AUTOMÁTICAS
+    ⚠️ ORDEN CRÍTICO - NO CAMBIAR:
+    1. observaciones.js          → Define OBSERVACIONES_BANCO
+    2. generadorObservaciones.js → Usa OBSERVACIONES_BANCO (obs generales)
+    3. observacionesPeriodo.js   → Usa OBSERVACIONES_BANCO (obs P1-P4)
+    ============================================================ -->
+    <script src="observaciones.js"></script>
+    <script src="generadorObservaciones.js"></script>
+    <script src="observacionesPeriodo.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ============================================================
+        BARRA DE HERRAMIENTAS
+        ============================================================ -->
+        <div class="toolbar">
+            <!-- 🔒 GRADO BLOQUEADO - Solo lectura -->
+            <div id="boletinBadgeContainer"></div>
+
+            <!-- SELECTOR DE ESTUDIANTES -->
+            <div class="selector-estudiante">
+                <label for="selectorEstudiante">👨‍🎓 Estudiante:</label>
+                <select id="selectorEstudiante">
+                    <option value="">-- Seleccionar estudiante --</option>
+                </select>
+                <button id="btnSeleccionar" class="btn btn-seleccionar">👤 Cargar</button>
+            </div>
+
+            <!-- BOTONES FIJOS DEBAJO DEL SELECTOR -->
+            <div class="botones-container">
+                <button id="btnImprimir" class="btn btn-primary">🖨️ Imprimir</button>
+                <button id="btnPDF" class="btn btn-success">📄 PDF Todos</button>
+                <button id="btnPDFSeleccionado" class="btn btn-pdf-seleccionado">📄 PDF Seleccionado</button>
+                <button id="btnLimpiar" class="btn btn-warning">🧹 Limpiar</button>
+                <!-- ✅ Botón para reiniciar observaciones -->
+                <button id="btnReiniciarObservaciones" class="btn btn-info" style="background:#17a2b8;">
+                    🔄 Reiniciar Observaciones
+                </button>
+            </div>
+        </div>
+
+        <!-- ============================================================
+        PANEL DE SITUACIÓN - FUERA DEL BOLETÍN
+        ============================================================ -->
+        <div id="panelSituacionExterno" class="panel-situacion-externo" style="display: none;">
+            <!-- Se llena dinámicamente desde JavaScript -->
+        </div>
+
+        <!-- ============================================================
+        CONTENEDOR DEL DOCUMENTO
+        ============================================================ -->
+        <div class="documento-con-flechas">
+            <!-- FLECHA IZQUIERDA -->
+            <button id="btnAnterior" class="btn-flecha btn-flecha-izquierda" title="Estudiante anterior (←)">
+                ◀
+            </button>
+
+            <!-- DOCUMENTO -->
+            <div id="documentoAExportar" class="document-wrapper">
+                <!-- PÁGINA 1 -->
+                <div class="page page1" id="page1">
+                    <div class="page1-left">
+                        <!-- FIRMA DEL PADRE, MADRE O TUTOR -->
+                        <div class="firma-box">
+                            <div class="firma-box-header">FIRMA DEL PADRE, MADRE O TUTOR</div>
+                            <div class="firma-box-content">
+                                <div class="firma-subtitulo">Periodos de Reporte de Calificaciones</div>
+                                <div id="firmaPeriodos"></div>
+                            </div>
+                        </div>
+
+                        <!-- SITUACIÓN DEL ESTUDIANTE - CON RADIO BUTTONS -->
+                        <div id="situacionBox" style="display: none;">
+                            <table class="situacion-tabla">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="situacion-header-unido">SITUACIÓN DEL/DE LA ESTUDIANTE</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="situacion-celda">
+                                            <label class="situacion-radio">
+                                                <input type="radio" name="situacion" value="promovido" id="radioPromovido">
+                                                <span>Promovido/a</span>
+                                            </label>
+                                        </td>
+                                        <td class="situacion-celda">
+                                            <label class="situacion-radio">
+                                                <input type="radio" name="situacion" value="aplazado" id="radioAplazado">
+                                                <span>Aplazado/a</span>
+                                            </label>
+                                        </td>
+                                        <td class="situacion-celda">
+                                            <label class="situacion-radio">
+                                                <input type="radio" name="situacion" value="repitente" id="radioRepitente">
+                                                <span>Repitente</span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <!-- ✅ CONDICIÓN FINAL - 3 LÍNEAS -->
+                            <div class="condicion-final-box">
+                                <label>Condición final del/de la estudiante:</label>
+                                <div class="lineas-condicion">
+                                    <div class="linea-condicion">
+                                        <input type="text" id="condicionFinalLinea1" placeholder="" readonly style="background:#f5f5f5; font-weight:bold; color:#1a3a6b;">
+                                    </div>
+                                    <div class="linea-condicion">
+                                        <input type="text" id="condicionFinalLinea2" placeholder="" readonly style="background:#f5f5f5;">
+                                    </div>
+                                    <div class="linea-condicion">
+                                        <input type="text" id="condicionFinalLinea3" placeholder="" readonly style="background:#f5f5f5;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAJA DE AVANCE (para 1ro y 2do) -->
+                        <div id="avanceBox" class="avance-box">
+                            <div class="avance-box-header">Información sobre el nivel de avance de los aprendizajes y los apoyos que necesita para la mejora de sus aprendizajes.</div>
+                            <div class="avance-box-content">
+                                <div id="avanceLineas"></div>
+                            </div>
+                        </div>
+
+                        <!-- CAJA DE OBSERVACIONES (para 3ro en adelante) -->
+                        <div id="observacionesBox" class="observaciones-box" style="display: none;">
+                            <div class="observaciones-box-header">Observaciones:</div>
+                            <div class="observaciones-box-content">
+                                <div id="observacionesLineas"></div>
+                            </div>
+                        </div>
+
+                        <!-- FIRMAS FOOTER -->
+                        <div class="firmas-footer">
+                            <div class="firma-linea">
+                                <div class="linea-firma"><input type="text" placeholder=""></div>
+                                Maestro(a) Encargado(a) del grado
+                            </div>
+                            <div class="firma-linea">
+                                <div class="linea-firma"><input type="text" placeholder=""></div>
+                                Director(a) del Centro Educativo
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA DERECHA DE LA PÁGINA 1 -->
+                    <div class="page1-right">
+                        <div id="portadaCompletaContainer" class="portada-completa-container"></div>
+                        <div class="anio-escolar">
+                            Año escolar: 20<input type="text" class="anio-linea" placeholder=""> - 20<input type="text" class="anio-linea" placeholder="">
+                        </div>
+                        <div id="camposInfo" class="campos-info"></div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 2 -->
+                <div class="page page2" id="page2">
+                    <div class="desempeno-header">DESEMPEÑO INDIVIDUAL DEL/LA ESTUDIANTE</div>
+                    <div id="tablaDesempenoContainer"></div>
+                    <div id="observacionesContainer"></div>
+                    <div class="bottom-section">
+                        <div id="asistenciaContainer"></div>
+                        <div id="leyendaContainer"></div>
+                        <div id="escalaContainer" class="escala-box"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLECHA DERECHA -->
+            <button id="btnSiguiente" class="btn-flecha btn-flecha-derecha" title="Estudiante siguiente (→)">
+                ▶
+            </button>
+        </div>
+
+        <!-- INDICADOR DE POSICIÓN -->
+        <div class="indicador-posicion" id="indicadorPosicion">
+            Estudiante <span id="posicionActual">0</span> de <span id="totalEstudiantes">0</span>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    SCRIPT PRINCIPAL DEL BOLETÍN
+    ⚠️ DEBE IR AL FINAL (después de todo el HTML)
+    ============================================================ -->
+    <script src="boletin.js"></script>
+</body>
+</html>
