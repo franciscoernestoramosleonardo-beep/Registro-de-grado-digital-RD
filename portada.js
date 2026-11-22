@@ -836,41 +836,41 @@ function actualizarHighlight(items) {
 }
 
 // ============================================
-// MAPEO DE GRADOS
+// MAPEO DE GRADOS (IMÁGENES EN MINÚSCULAS)
 // ============================================
 const mapaGrados = {
     'Primer Grado': {
-        imagen: '1ro-Imagen1.png',
+        imagen: '1ro-imagen1.png',
         colorRegistro: '#E7733E',
         colorGrado: '#E7733E',
         colorNivel: '#F5A07A'
     },
     'Segundo Grado': {
-        imagen: '2do-Imagen1.png',
+        imagen: '2do-imagen1.png',
         colorRegistro: '#001FA1',
         colorGrado: '#001FA1',
         colorNivel: '#6688CC'
     },
     'Tercer Grado': {
-        imagen: '3ro-Imagen1.png',
+        imagen: '3ro-imagen1.png',
         colorRegistro: '#115E3D',
         colorGrado: '#115E3D',
         colorNivel: '#6DA88A'
     },
     'Cuarto Grado': {
-        imagen: '4to-Imagen1.png',
+        imagen: '4to-imagen1.png',
         colorRegistro: '#F113FF',
         colorGrado: '#F113FF',
         colorNivel: '#F99EFF'
     },
     'Quinto Grado': {
-        imagen: '5to-Imagen1.png',
+        imagen: '5to-imagen1.png',
         colorRegistro: '#555900',
         colorGrado: '#555900',
         colorNivel: '#9A9E55'
     },
     'Sexto Grado': {
-        imagen: '6to-Imagen1.png',
+        imagen: '6to-imagen1.png',
         colorRegistro: '#451703',
         colorGrado: '#451703',
         colorNivel: '#A67555'
