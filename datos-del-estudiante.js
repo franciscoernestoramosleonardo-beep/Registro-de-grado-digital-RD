@@ -7,6 +7,7 @@ PÁGINAS 10, 11 Y 12
 ✅ BOTONES OCULTOS (SINCRONIZAR, VALIDAR, LIMPIAR)
 ✅ CAMPOS BLOQUEADOS CON APARIENCIA VIVA
 ✅ NACIONALIDAD - SE MUESTRA DIRECTAMENTE DEL FORMULARIO (INPUT TEXTO)
+✅ OPTIMIZADO PARA CARGA RÁPIDA EN GITHUB PAGES
 ============================================
 */
 
@@ -492,286 +493,230 @@ function restaurarDatosPagina(pagina) {
 }
 
 // ============================================
-// PRE-LLENAR DATOS DESDE EL FORMULARIO (COMPLETO)
+// PRE-LLENAR DATOS DESDE EL FORMULARIO (OPTIMIZADO)
 // ============================================
-function prellenarDesdeFormulario(pagina) {
-    const estudiantes = obtenerEstudiantesFiltrados();
-    
-    limpiarFilasPagina(pagina);
-    
-    if (estudiantes.length === 0) {
-        console.log(`ℹ️ No hay estudiantes para pre-llenar en ${pagina}`);
-        return;
-    }
+function prellenarTodasLasPaginas(estudiantes) {
+    if (!estudiantes || estudiantes.length === 0) return;
+    console.log(`📝 Pre-llenando páginas optimizadas con ${estudiantes.length} estudiantes...`);
+    prellenarPagina10Optimizada(estudiantes);
+    prellenarPagina11Optimizada(estudiantes);
+    prellenarPagina12Optimizada(estudiantes);
+    console.log(`✅ Estudiantes pre-llenados en todas las páginas`);
+}
 
-    console.log(`📝 Pre-llenando ${pagina} con ${estudiantes.length} estudiantes...`);
+function prellenarPagina10Optimizada(estudiantes) {
+    const container = document.getElementById('pagina10-container');
+    if (!container || estudiantes.length === 0) return;
 
     estudiantes.forEach(function(est, index) {
         const fila = parseInt(est.orden) || (index + 1);
-        
-        if (fila > TOTAL_FILAS) {
-            console.warn(`⚠️ Estudiante con orden ${fila} excede las ${TOTAL_FILAS} filas disponibles`);
-            return;
+        if (fila > TOTAL_FILAS) return;
+
+        const inputNombre = container.querySelector(`input[data-fila="${fila}"][data-columna="nombre"]`);
+        if (inputNombre) {
+            const val = `${est.nombre || ''} ${est.apellido || ''}`.trim().toUpperCase();
+            inputNombre.value = val;
+            guardarDatosEstudiante('pagina10', fila, 'nombre', val);
         }
 
-        if (pagina === 'pagina10') {
-            prellenarPagina10(est, fila);
-        } else if (pagina === 'pagina11') {
-            prellenarPagina11(est, fila);
-        } else if (pagina === 'pagina12') {
-            prellenarPagina12(est, fila);
+        const inputNac = container.querySelector(`input[data-fila="${fila}"][data-columna="nacionalidad"]`);
+        if (inputNac) {
+            const val = String(est.nacionalidad || '').toUpperCase().trim();
+            inputNac.value = val;
+            guardarDatosEstudiante('pagina10', fila, 'nacionalidad', val);
+        }
+
+        const cbFem = container.querySelector(`input[data-fila="${fila}"][data-columna="sexo_femenino"]`);
+        const cbMasc = container.querySelector(`input[data-fila="${fila}"][data-columna="sexo_masculino"]`);
+        if (est.sexo === 'FEMENINO') {
+            if (cbFem) { cbFem.checked = true; guardarDatosEstudiante('pagina10', fila, 'sexo_femenino', 'true'); }
+            if (cbMasc) { cbMasc.checked = false; guardarDatosEstudiante('pagina10', fila, 'sexo_masculino', 'false'); }
+        } else if (est.sexo === 'MASCULINO') {
+            if (cbMasc) { cbMasc.checked = true; guardarDatosEstudiante('pagina10', fila, 'sexo_masculino', 'true'); }
+            if (cbFem) { cbFem.checked = false; guardarDatosEstudiante('pagina10', fila, 'sexo_femenino', 'false'); }
+        }
+
+        if (est.fechaNac) {
+            const partes = est.fechaNac.split('/');
+            if (partes.length === 3) {
+                const inputDia = container.querySelector(`input[data-fila="${fila}"][data-columna="fecha_dia"]`);
+                const inputMes = container.querySelector(`input[data-fila="${fila}"][data-columna="fecha_mes"]`);
+                const inputAnio = container.querySelector(`input[data-fila="${fila}"][data-columna="fecha_anio"]`);
+
+                if (inputDia) {
+                    const dia = String(parseInt(partes[0], 10)).padStart(2, '0');
+                    inputDia.value = dia;
+                    guardarDatosEstudiante('pagina10', fila, 'fecha_dia', dia);
+                }
+                if (inputMes) {
+                    const mes = String(parseInt(partes[1], 10)).padStart(2, '0');
+                    inputMes.value = mes;
+                    guardarDatosEstudiante('pagina10', fila, 'fecha_mes', mes);
+                }
+                if (inputAnio) {
+                    const anioCompleto = parseInt(partes[2], 10);
+                    if (!isNaN(anioCompleto)) {
+                        const anio = String(anioCompleto % 100).padStart(2, '0');
+                        inputAnio.value = anio;
+                        guardarDatosEstudiante('pagina10', fila, 'fecha_anio', anio);
+                    }
+                }
+                recalcularEdadFila(fila);
+            }
+        }
+
+        const inputEdad = container.querySelector(`input[data-fila="${fila}"][data-columna="edad"]`);
+        if (inputEdad && !inputEdad.value && est.edad) {
+            const edadNum = parseInt(est.edad, 10);
+            if (!isNaN(edadNum)) {
+                inputEdad.value = String(edadNum);
+                guardarDatosEstudiante('pagina10', fila, 'edad', String(edadNum));
+            }
+        }
+
+        const inputLibro = container.querySelector(`input[data-fila="${fila}"][data-columna="libro"]`);
+        if (inputLibro && est.libro) {
+            const val = String(est.libro).toUpperCase();
+            inputLibro.value = val;
+            guardarDatosEstudiante('pagina10', fila, 'libro', val);
+        }
+
+        const inputFolio = container.querySelector(`input[data-fila="${fila}"][data-columna="folio"]`);
+        if (inputFolio && est.folio) {
+            const val = String(est.folio).toUpperCase();
+            inputFolio.value = val;
+            guardarDatosEstudiante('pagina10', fila, 'folio', val);
+        }
+
+        if (est.parentesco) {
+            const selectPar = container.querySelector(`select[data-fila="${fila}"][data-columna="parentesco"]`);
+            if (selectPar) {
+                selectPar.value = est.parentesco;
+                guardarDatosEstudiante('pagina10', fila, 'parentesco', est.parentesco);
+            }
         }
     });
-
-    console.log(`✅ ${estudiantes.length} estudiantes pre-llenados en ${pagina}`);
 }
 
-// ============================================
-// PRE-LLENAR PÁGINA 10 - NACIONALIDAD DIRECTA DEL FORMULARIO
-// ============================================
-function prellenarPagina10(est, fila) {
-    // 1. NOMBRE COMPLETO
-    const inputNombre = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="nombre"]`);
-    if (inputNombre) {
-        const nombreCompleto = `${est.nombre || ''} ${est.apellido || ''}`.trim().toUpperCase();
-        inputNombre.value = nombreCompleto;
-        guardarDatosEstudiante('pagina10', fila, 'nombre', nombreCompleto);
-    }
+function prellenarPagina11Optimizada(estudiantes) {
+    const container = document.getElementById('pagina11-container');
+    if (!container || estudiantes.length === 0) return;
 
-    // 2. NACIONALIDAD - DIRECTAMENTE DEL FORMULARIO (DOMINICANO/A, HAITIANO/A, etc.)
-    // ✅ AHORA SE USA INPUT TEXTO EN VEZ DE SELECT PARA NACIONALIDAD
-    const nacionalidad = String(est.nacionalidad || '').toUpperCase().trim();
-    console.log(`📍 Fila ${fila}: Nacionalidad desde formulario = "${nacionalidad}"`);
-    
-    // Buscar el input de nacionalidad (ahora es un input de texto)
-    const inputNac = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="nacionalidad"]`);
-    if (inputNac) {
-        inputNac.value = nacionalidad;
-        guardarDatosEstudiante('pagina10', fila, 'nacionalidad', nacionalidad);
-        console.log(`✅ Fila ${fila}: Nacionalidad asignada: "${nacionalidad}"`);
-    }
+    estudiantes.forEach(function(est, index) {
+        const fila = parseInt(est.orden) || (index + 1);
+        if (fila > TOTAL_FILAS) return;
 
-    // 3. SEXO
-    const cbFem = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="sexo_femenino"]`);
-    const cbMasc = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="sexo_masculino"]`);
-    if (est.sexo === 'FEMENINO') {
-        if (cbFem) { cbFem.checked = true; guardarDatosEstudiante('pagina10', fila, 'sexo_femenino', 'true'); }
-        if (cbMasc) { cbMasc.checked = false; guardarDatosEstudiante('pagina10', fila, 'sexo_masculino', 'false'); }
-    } else if (est.sexo === 'MASCULINO') {
-        if (cbMasc) { cbMasc.checked = true; guardarDatosEstudiante('pagina10', fila, 'sexo_masculino', 'true'); }
-        if (cbFem) { cbFem.checked = false; guardarDatosEstudiante('pagina10', fila, 'sexo_femenino', 'false'); }
-    }
-
-    // 4. FECHA DE NACIMIENTO
-    if (est.fechaNac) {
-        const partes = est.fechaNac.split('/');
-        if (partes.length === 3) {
-            const inputDia = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="fecha_dia"]`);
-            const inputMes = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="fecha_mes"]`);
-            const inputAnio = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="fecha_anio"]`);
-
-            if (inputDia) {
-                const dia = String(parseInt(partes[0], 10)).padStart(2, '0');
-                inputDia.value = dia;
-                guardarDatosEstudiante('pagina10', fila, 'fecha_dia', dia);
+        if (est.direccion) {
+            const inputDir = container.querySelector(`input[data-fila="${fila}"][data-columna="direccion"]`);
+            if (inputDir) {
+                const val = String(est.direccion).toUpperCase();
+                inputDir.value = val;
+                guardarDatosEstudiante('pagina11', fila, 'direccion', val);
             }
-            if (inputMes) {
-                const mes = String(parseInt(partes[1], 10)).padStart(2, '0');
-                inputMes.value = mes;
-                guardarDatosEstudiante('pagina10', fila, 'fecha_mes', mes);
-            }
-            if (inputAnio) {
-                const anioCompleto = parseInt(partes[2], 10);
-                if (!isNaN(anioCompleto)) {
-                    const anio = String(anioCompleto % 100).padStart(2, '0');
-                    inputAnio.value = anio;
-                    guardarDatosEstudiante('pagina10', fila, 'fecha_anio', anio);
+        }
+
+        const fechasP11 = [
+            { col: 'nuevo_dia', val: est.nuevoDia },
+            { col: 'nuevo_mes', val: est.nuevoMes },
+            { col: 'nuevo_anio', val: est.nuevoAnio },
+            { col: 'retirado_dia', val: est.retiradoDia },
+            { col: 'retirado_mes', val: est.retiradoMes },
+            { col: 'retirado_anio', val: est.retiradoAnio }
+        ];
+
+        fechasP11.forEach(f => {
+            if (f.val !== undefined && f.val !== null && f.val !== '') {
+                const input = container.querySelector(`input[data-fila="${fila}"][data-columna="${f.col}"]`);
+                if (input) {
+                    let valStr = String(f.val);
+                    if (f.col.includes('anio')) {
+                        valStr = String(parseInt(valStr, 10) % 100).padStart(2, '0');
+                    } else {
+                        valStr = valStr.padStart(2, '0');
+                    }
+                    input.value = valStr;
+                    guardarDatosEstudiante('pagina11', fila, f.col, valStr);
                 }
             }
-            recalcularEdadFila(fila);
-        }
-    }
+        });
 
-    // 5. EDAD
-    const inputEdad = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="edad"]`);
-    if (inputEdad && !inputEdad.value && est.edad) {
-        const edadNum = parseInt(est.edad, 10);
-        if (!isNaN(edadNum)) {
-            inputEdad.value = String(edadNum);
-            guardarDatosEstudiante('pagina10', fila, 'edad', String(edadNum));
-        }
-    }
-
-    // 6. LIBRO
-    const inputLibro = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="libro"]`);
-    if (inputLibro && est.libro) {
-        inputLibro.value = String(est.libro).toUpperCase();
-        guardarDatosEstudiante('pagina10', fila, 'libro', String(est.libro).toUpperCase());
-    }
-
-    // 7. FOLIO
-    const inputFolio = document.querySelector(`input[data-pagina="pagina10"][data-fila="${fila}"][data-columna="folio"]`);
-    if (inputFolio && est.folio) {
-        inputFolio.value = String(est.folio).toUpperCase();
-        guardarDatosEstudiante('pagina10', fila, 'folio', String(est.folio).toUpperCase());
-    }
-
-    // 8. PARENTESCO
-    if (est.parentesco) {
-        const selectPar = document.querySelector(`select[data-pagina="pagina10"][data-fila="${fila}"][data-columna="parentesco"]`);
-        if (selectPar) {
-            selectPar.value = est.parentesco;
-            guardarDatosEstudiante('pagina10', fila, 'parentesco', est.parentesco);
-        }
-    }
-}
-
-// ============================================
-// PRE-LLENAR PÁGINA 11
-// ============================================
-function prellenarPagina11(est, fila) {
-    const inputDir = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="direccion"]`);
-    if (inputDir && est.direccion) {
-        inputDir.value = String(est.direccion).toUpperCase();
-        guardarDatosEstudiante('pagina11', fila, 'direccion', String(est.direccion).toUpperCase());
-    }
-
-    if (est.nuevoDia) {
-        const inputNuevoDia = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="nuevo_dia"]`);
-        if (inputNuevoDia) {
-            inputNuevoDia.value = String(est.nuevoDia).padStart(2, '0');
-            guardarDatosEstudiante('pagina11', fila, 'nuevo_dia', String(est.nuevoDia).padStart(2, '0'));
-        }
-    }
-    if (est.nuevoMes) {
-        const inputNuevoMes = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="nuevo_mes"]`);
-        if (inputNuevoMes) {
-            inputNuevoMes.value = String(est.nuevoMes).padStart(2, '0');
-            guardarDatosEstudiante('pagina11', fila, 'nuevo_mes', String(est.nuevoMes).padStart(2, '0'));
-        }
-    }
-    if (est.nuevoAnio) {
-        const inputNuevoAnio = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="nuevo_anio"]`);
-        if (inputNuevoAnio) {
-            const anioCorto = String(parseInt(est.nuevoAnio, 10) % 100).padStart(2, '0');
-            inputNuevoAnio.value = anioCorto;
-            guardarDatosEstudiante('pagina11', fila, 'nuevo_anio', anioCorto);
-        }
-    }
-
-    if (est.retiradoDia) {
-        const inputRetiradoDia = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="retirado_dia"]`);
-        if (inputRetiradoDia) {
-            inputRetiradoDia.value = String(est.retiradoDia).padStart(2, '0');
-            guardarDatosEstudiante('pagina11', fila, 'retirado_dia', String(est.retiradoDia).padStart(2, '0'));
-        }
-    }
-    if (est.retiradoMes) {
-        const inputRetiradoMes = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="retirado_mes"]`);
-        if (inputRetiradoMes) {
-            inputRetiradoMes.value = String(est.retiradoMes).padStart(2, '0');
-            guardarDatosEstudiante('pagina11', fila, 'retirado_mes', String(est.retiradoMes).padStart(2, '0'));
-        }
-    }
-    if (est.retiradoAnio) {
-        const inputRetiradoAnio = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="retirado_anio"]`);
-        if (inputRetiradoAnio) {
-            const anioCorto = String(parseInt(est.retiradoAnio, 10) % 100).padStart(2, '0');
-            inputRetiradoAnio.value = anioCorto;
-            guardarDatosEstudiante('pagina11', fila, 'retirado_anio', anioCorto);
-        }
-    }
-
-    if (est.condicion) {
-        const condicionMap = {
-            'NUEVO INGRESO': 0,
-            'PROMOVIDO': 1,
-            'REENTRANTE': 2
-        };
-        const idx = condicionMap[est.condicion.toUpperCase()];
-        if (idx !== undefined) {
-            const cb = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="condicion_${idx}"]`);
-            if (cb) {
-                cb.checked = true;
-                guardarDatosEstudiante('pagina11', fila, 'condicion_' + idx, 'true');
-                guardarDatosEstudiante('pagina11', fila, 'condicion_seleccionada', idx.toString());
+        if (est.condicion) {
+            const condicionMap = { 'NUEVO INGRESO': 0, 'PROMOVIDO': 1, 'REENTRANTE': 2 };
+            const idx = condicionMap[est.condicion.toUpperCase()];
+            if (idx !== undefined) {
+                const cb = container.querySelector(`input[data-fila="${fila}"][data-columna="condicion_${idx}"]`);
+                if (cb) {
+                    cb.checked = true;
+                    guardarDatosEstudiante('pagina11', fila, 'condicion_' + idx, 'true');
+                    guardarDatosEstudiante('pagina11', fila, 'condicion_seleccionada', idx.toString());
+                }
             }
         }
-    }
 
-    if (est.preprimario) {
-        const preMap = {
-            'SI': 'preprimario_si',
-            'NO': 'preprimario_no'
-        };
-        const columna = preMap[est.preprimario.toUpperCase()];
-        if (columna) {
-            const cb = document.querySelector(`input[data-pagina="pagina11"][data-fila="${fila}"][data-columna="${columna}"]`);
-            if (cb) {
-                cb.checked = true;
-                guardarDatosEstudiante('pagina11', fila, columna, 'true');
-                guardarDatosEstudiante('pagina11', fila, 'preprimario_seleccionado', est.preprimario.toLowerCase());
+        if (est.preprimario) {
+            const preMap = { 'SI': 'preprimario_si', 'NO': 'preprimario_no' };
+            const columna = preMap[est.preprimario.toUpperCase()];
+            if (columna) {
+                const cb = container.querySelector(`input[data-fila="${fila}"][data-columna="${columna}"]`);
+                if (cb) {
+                    cb.checked = true;
+                    guardarDatosEstudiante('pagina11', fila, columna, 'true');
+                    guardarDatosEstudiante('pagina11', fila, 'preprimario_seleccionado', est.preprimario.toLowerCase());
+                }
             }
         }
-    }
+    });
 }
 
-// ============================================
-// PRE-LLENAR PÁGINA 12
-// ============================================
-function prellenarPagina12(est, fila) {
-    const inputNeae = document.querySelector(`input[data-pagina="pagina12"][data-fila="${fila}"][data-columna="neae"]`);
-    if (inputNeae && est.neae) {
-        inputNeae.value = String(est.neae).toUpperCase();
-        guardarDatosEstudiante('pagina12', fila, 'neae', String(est.neae).toUpperCase());
-    }
+function prellenarPagina12Optimizada(estudiantes) {
+    const container = document.getElementById('pagina12-container');
+    if (!container || estudiantes.length === 0) return;
 
-    const inputEnfermedades = document.querySelector(`input[data-pagina="pagina12"][data-fila="${fila}"][data-columna="enfermedades"]`);
-    if (inputEnfermedades && est.enfermedades) {
-        inputEnfermedades.value = String(est.enfermedades).toUpperCase();
-        guardarDatosEstudiante('pagina12', fila, 'enfermedades', String(est.enfermedades).toUpperCase());
-    }
+    estudiantes.forEach(function(est, index) {
+        const fila = parseInt(est.orden) || (index + 1);
+        if (fila > TOTAL_FILAS) return;
 
-    const inputMedicamentos = document.querySelector(`input[data-pagina="pagina12"][data-fila="${fila}"][data-columna="medicamentos"]`);
-    if (inputMedicamentos && est.medicamentos) {
-        inputMedicamentos.value = String(est.medicamentos).toUpperCase();
-        guardarDatosEstudiante('pagina12', fila, 'medicamentos', String(est.medicamentos).toUpperCase());
-    }
+        const camposTexto = [
+            { col: 'neae', val: est.neae },
+            { col: 'enfermedades', val: est.enfermedades },
+            { col: 'medicamentos', val: est.medicamentos },
+            { col: 'emergencia_nombre', val: est.emergenciaNombre || est.tutorTipo }
+        ];
 
-    const inputEmergenciaNombre = document.querySelector(`input[data-pagina="pagina12"][data-fila="${fila}"][data-columna="emergencia_nombre"]`);
-    if (inputEmergenciaNombre && est.emergenciaNombre) {
-        inputEmergenciaNombre.value = String(est.emergenciaNombre).toUpperCase();
-        guardarDatosEstudiante('pagina12', fila, 'emergencia_nombre', String(est.emergenciaNombre).toUpperCase());
-    } else if (inputEmergenciaNombre && est.tutorTipo) {
-        inputEmergenciaNombre.value = String(est.tutorTipo).toUpperCase();
-        guardarDatosEstudiante('pagina12', fila, 'emergencia_nombre', String(est.tutorTipo).toUpperCase());
-    }
+        camposTexto.forEach(c => {
+            if (c.val) {
+                const input = container.querySelector(`input[data-fila="${fila}"][data-columna="${c.col}"]`);
+                if (input) {
+                    const val = String(c.val).toUpperCase();
+                    input.value = val;
+                    guardarDatosEstudiante('pagina12', fila, c.col, val);
+                }
+            }
+        });
 
-    const inputEmergenciaTelefono = document.querySelector(`input[data-pagina="pagina12"][data-fila="${fila}"][data-columna="emergencia_telefono"]`);
-    if (inputEmergenciaTelefono) {
-        let telefono = '';
-        if (est.emergenciaTelefono) {
-            telefono = String(est.emergenciaTelefono);
-        } else if (est.tutorTelefono) {
-            telefono = String(est.tutorTelefono);
-        } else if (est.telefono) {
-            telefono = String(est.telefono);
+        let telefono = est.emergenciaTelefono || est.tutorTelefono || est.telefono || '';
+        if (telefono) {
+            const inputTel = container.querySelector(`input[data-fila="${fila}"][data-columna="emergencia_telefono"]`);
+            if (inputTel) {
+                let telLimpio = String(telefono).replace(/\D/g, '');
+                let telFormateado = '';
+                if (telLimpio.length === 10) {
+                    telFormateado = telLimpio.substring(0, 3) + '-' + telLimpio.substring(3, 6) + '-' + telLimpio.substring(6, 10);
+                    inputTel.style.borderBottomColor = '#28a745';
+                    inputTel.style.borderBottomWidth = '2px';
+                } else if (telLimpio.length > 0) {
+                    telFormateado = telLimpio;
+                    inputTel.style.borderBottomColor = '#dc3545';
+                    inputTel.style.borderBottomWidth = '2px';
+                }
+                
+                if (telFormateado) {
+                    inputTel.value = telFormateado;
+                    guardarDatosEstudiante('pagina12', fila, 'emergencia_telefono', telFormateado);
+                }
+            }
         }
-        
-        let telLimpio = telefono.replace(/\D/g, '');
-        if (telLimpio.length === 10) {
-            telLimpio = telLimpio.substring(0, 3) + '-' + telLimpio.substring(3, 6) + '-' + telLimpio.substring(6, 10);
-            inputEmergenciaTelefono.value = telLimpio;
-            inputEmergenciaTelefono.style.borderBottomColor = '#28a745';
-            inputEmergenciaTelefono.style.borderBottomWidth = '2px';
-            guardarDatosEstudiante('pagina12', fila, 'emergencia_telefono', telLimpio);
-        } else if (telLimpio.length > 0) {
-            inputEmergenciaTelefono.value = telLimpio;
-            inputEmergenciaTelefono.style.borderBottomColor = '#dc3545';
-            inputEmergenciaTelefono.style.borderBottomWidth = '2px';
-            guardarDatosEstudiante('pagina12', fila, 'emergencia_telefono', telLimpio);
-        }
-    }
+    });
 }
 
 // ============================================
@@ -779,7 +724,6 @@ function prellenarPagina12(est, fila) {
 // ============================================
 function limpiarFilasPagina(pagina) {
     console.log(`🧹 Limpiando filas de ${pagina}...`);
-    
     document.querySelectorAll(`[data-pagina="${pagina}"]`).forEach(function(el) {
         if (el.type === 'checkbox') {
             el.checked = false;
@@ -851,7 +795,7 @@ function recalcularEdadFila(fila) {
 }
 
 // ============================================
-// SINCRONIZAR TODAS LAS PÁGINAS
+// SINCRONIZAR TODAS LAS PÁGINAS (OPTIMIZADO)
 // ============================================
 function sincronizarConFormulario() {
     if (sincronizando) {
@@ -891,17 +835,22 @@ function sincronizarConFormulario() {
         
         console.log('🔄 Regenerando Página 10...');
         window.generarPagina10();
-        console.log('✅ Página 10 regenerada');
         
         console.log('🔄 Regenerando Página 11...');
         window.generarPagina11();
-        console.log('✅ Página 11 regenerada');
         
         console.log('🔄 Regenerando Página 12...');
         window.generarPagina12();
-        console.log('✅ Página 12 regenerada');
         
         estudiantesCargados = estudiantes;
+        
+        // PRE-LLENAR OPTIMIZADO UNA SOLA VEZ
+        console.log('🔄 Pre-llenando datos optimizados...');
+        prellenarTodasLasPaginas(estudiantes);
+        
+        // DESHABILITAR CAMPOS UNA SOLA VEZ AL FINAL
+        console.log('🔒 Aplicando modo solo lectura...');
+        deshabilitarTodosLosCampos();
         
         const mensaje = `✅ Sincronizado: ${estudiantes.length} estudiantes en ${grupo.grado} · Sección ${grupo.seccion} · ${grupo.tanda}`;
         mostrarMensajeEstudiante(mensaje, 'success');
@@ -969,7 +918,7 @@ function mostrarMensajeEstudiante(mensaje, tipo) {
 }
 
 // ============================================
-// 1. GENERAR PÁGINA 10 - CON INPUT PARA NACIONALIDAD
+// 1. GENERAR PÁGINA 10
 // ============================================
 window.generarPagina10 = function() {
     console.log('📄 Generando Página 10...');
@@ -981,7 +930,6 @@ window.generarPagina10 = function() {
     }
 
     container.innerHTML = '';
-
     container.appendChild(crearBadgeAsignacion());
 
     const titulo = document.createElement('div');
@@ -1091,7 +1039,6 @@ window.generarPagina10 = function() {
         tdNombre.appendChild(inputNombre);
         tr.appendChild(tdNombre);
 
-        // ✅ NACIONALIDAD - INPUT TEXTO (no select)
         const tdNacionalidad = document.createElement('td');
         tdNacionalidad.className = 'col-nacionalidad';
         tdNacionalidad.style.cssText = 'padding: 0px; vertical-align: middle;';
@@ -1134,16 +1081,9 @@ window.generarPagina10 = function() {
             input.dataset.fila = i;
             input.dataset.columna = 'fecha_' + col;
             input.style.cssText = `
-                width: 100%;
-                border: none;
-                border-bottom: 1.5px solid transparent;
-                background: transparent;
-                font-family: 'Times New Roman', Times, serif;
-                font-size: 12px;
-                text-align: center;
-                outline: none;
-                color: #1a2a4a;
-                padding: 0 2px;
+                width: 100%; border: none; border-bottom: 1.5px solid transparent; background: transparent;
+                font-family: 'Times New Roman', Times, serif; font-size: 12px; text-align: center;
+                outline: none; color: #1a2a4a; padding: 0 2px;
             `;
 
             input.addEventListener('input', function() {
@@ -1161,15 +1101,13 @@ window.generarPagina10 = function() {
         const tdLibro = document.createElement('td');
         tdLibro.className = 'col-fecha-sub';
         tdLibro.style.cssText = 'padding: 0px; vertical-align: middle;';
-        const inputLibro = crearInputTexto('', 'input-editable', true, 'pagina10', i, 'libro');
-        tdLibro.appendChild(inputLibro);
+        tdLibro.appendChild(crearInputTexto('', 'input-editable', true, 'pagina10', i, 'libro'));
         tr.appendChild(tdLibro);
 
         const tdFolio = document.createElement('td');
         tdFolio.className = 'col-fecha-sub';
         tdFolio.style.cssText = 'padding: 0px; vertical-align: middle;';
-        const inputFolio = crearInputTexto('', 'input-editable', true, 'pagina10', i, 'folio');
-        tdFolio.appendChild(inputFolio);
+        tdFolio.appendChild(crearInputTexto('', 'input-editable', true, 'pagina10', i, 'folio'));
         tr.appendChild(tdFolio);
 
         const tdEdad = document.createElement('td');
@@ -1183,16 +1121,8 @@ window.generarPagina10 = function() {
         inputEdad.dataset.fila = i;
         inputEdad.dataset.columna = 'edad';
         inputEdad.style.cssText = `
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12px;
-            text-align: center;
-            color: #1a2a4a;
-            font-weight: bold;
-            outline: none;
-            padding: 0 2px;
+            width: 100%; border: none; background: transparent; font-family: 'Times New Roman', Times, serif;
+            font-size: 12px; text-align: center; color: #1a2a4a; font-weight: bold; outline: none; padding: 0 2px;
         `;
         tdEdad.appendChild(inputEdad);
         tr.appendChild(tdEdad);
@@ -1200,8 +1130,7 @@ window.generarPagina10 = function() {
         const tdParentesco = document.createElement('td');
         tdParentesco.className = 'col-parentesco';
         tdParentesco.style.cssText = 'padding: 0px; vertical-align: middle;';
-        const selectPar = crearSelect(PARENTESCOS, 'select-parentesco', 'pagina10', i, 'parentesco');
-        tdParentesco.appendChild(selectPar);
+        tdParentesco.appendChild(crearSelect(PARENTESCOS, 'select-parentesco', 'pagina10', i, 'parentesco'));
         tr.appendChild(tdParentesco);
 
         tbody.appendChild(tr);
@@ -1213,12 +1142,7 @@ window.generarPagina10 = function() {
     container.appendChild(watermark);
 
     agregarBotonesPagina10(container);
-
-    prellenarDesdeFormulario('pagina10');
-    restaurarDatosPagina('pagina10');
-
-    deshabilitarTodosLosCampos();
-
+    // NOTA: prellenarDesdeFormulario y deshabilitarTodosLosCampos se mueven a sincronizarConFormulario
     console.log('✅ Página 10 generada correctamente');
 };
 
@@ -1235,7 +1159,6 @@ window.generarPagina11 = function() {
     }
 
     container.innerHTML = '';
-
     container.appendChild(crearBadgeAsignacion());
 
     const titulo = document.createElement('div');
@@ -1332,8 +1255,7 @@ window.generarPagina11 = function() {
         const tdDireccion = document.createElement('td');
         tdDireccion.className = 'col-direccion';
         tdDireccion.style.cssText = 'padding: 0px; vertical-align: middle;';
-        const inputDir = crearInputTexto('', 'input-editable input-direccion', true, 'pagina11', i, 'direccion');
-        tdDireccion.appendChild(inputDir);
+        tdDireccion.appendChild(crearInputTexto('', 'input-editable input-direccion', true, 'pagina11', i, 'direccion'));
         tr.appendChild(tdDireccion);
 
         const fechaColumnasP11 = ['nuevo_dia', 'nuevo_mes', 'nuevo_anio', 'retirado_dia', 'retirado_mes', 'retirado_anio'];
@@ -1350,16 +1272,9 @@ window.generarPagina11 = function() {
             input.dataset.fila = i;
             input.dataset.columna = fechaColumnasP11[j];
             input.style.cssText = `
-                width: 100%;
-                border: none;
-                border-bottom: 1.5px solid transparent;
-                background: transparent;
-                font-family: 'Times New Roman', Times, serif;
-                font-size: 12px;
-                text-align: center;
-                outline: none;
-                color: #1a2a4a;
-                padding: 0 2px;
+                width: 100%; border: none; border-bottom: 1.5px solid transparent; background: transparent;
+                font-family: 'Times New Roman', Times, serif; font-size: 12px; text-align: center;
+                outline: none; color: #1a2a4a; padding: 0 2px;
             `;
 
             input.addEventListener('input', function() {
@@ -1428,12 +1343,6 @@ window.generarPagina11 = function() {
     container.appendChild(watermark);
 
     agregarBotonesPagina11(container);
-
-    prellenarDesdeFormulario('pagina11');
-    restaurarDatosPagina('pagina11');
-
-    deshabilitarTodosLosCampos();
-
     console.log('✅ Página 11 generada correctamente');
 };
 
@@ -1450,7 +1359,6 @@ window.generarPagina12 = function() {
     }
 
     container.innerHTML = '';
-
     container.appendChild(crearBadgeAsignacion());
 
     const titulo = document.createElement('div');
@@ -1526,29 +1434,25 @@ window.generarPagina12 = function() {
         const tdNeae = document.createElement('td');
         tdNeae.className = 'col-neae';
         tdNeae.style.cssText = 'padding: 0px; vertical-align: middle; text-align: center;';
-        const inputNeae = crearInputTexto('', 'input-p12', true, 'pagina12', i, 'neae');
-        tdNeae.appendChild(inputNeae);
+        tdNeae.appendChild(crearInputTexto('', 'input-p12', true, 'pagina12', i, 'neae'));
         tr.appendChild(tdNeae);
 
         const tdEnfermedades = document.createElement('td');
         tdEnfermedades.className = 'col-enfermedades';
         tdEnfermedades.style.cssText = 'padding: 0px; vertical-align: middle; text-align: center;';
-        const inputEnfermedades = crearInputTexto('', 'input-p12', true, 'pagina12', i, 'enfermedades');
-        tdEnfermedades.appendChild(inputEnfermedades);
+        tdEnfermedades.appendChild(crearInputTexto('', 'input-p12', true, 'pagina12', i, 'enfermedades'));
         tr.appendChild(tdEnfermedades);
 
         const tdMedicamentos = document.createElement('td');
         tdMedicamentos.className = 'col-medicamentos';
         tdMedicamentos.style.cssText = 'padding: 0px; vertical-align: middle; text-align: center;';
-        const inputMedicamentos = crearInputTexto('', 'input-p12', true, 'pagina12', i, 'medicamentos');
-        tdMedicamentos.appendChild(inputMedicamentos);
+        tdMedicamentos.appendChild(crearInputTexto('', 'input-p12', true, 'pagina12', i, 'medicamentos'));
         tr.appendChild(tdMedicamentos);
 
         const tdEmergenciaNombre = document.createElement('td');
         tdEmergenciaNombre.className = 'col-emergencia-sub';
         tdEmergenciaNombre.style.cssText = 'padding: 0px; vertical-align: middle; text-align: center;';
-        const inputEmergenciaNombre = crearInputTexto('', 'input-p12', true, 'pagina12', i, 'emergencia_nombre');
-        tdEmergenciaNombre.appendChild(inputEmergenciaNombre);
+        tdEmergenciaNombre.appendChild(crearInputTexto('', 'input-p12', true, 'pagina12', i, 'emergencia_nombre'));
         tr.appendChild(tdEmergenciaNombre);
 
         const tdEmergenciaTelefono = document.createElement('td');
@@ -1562,16 +1466,9 @@ window.generarPagina12 = function() {
         inputEmergenciaTelefono.dataset.fila = i;
         inputEmergenciaTelefono.dataset.columna = 'emergencia_telefono';
         inputEmergenciaTelefono.style.cssText = `
-            width: 100%;
-            border: none;
-            border-bottom: 1.5px solid transparent;
-            background: transparent;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12px;
-            text-align: center;
-            outline: none;
-            color: #1a2a4a;
-            padding: 0 2px;
+            width: 100%; border: none; border-bottom: 1.5px solid transparent; background: transparent;
+            font-family: 'Times New Roman', Times, serif; font-size: 12px; text-align: center;
+            outline: none; color: #1a2a4a; padding: 0 2px;
         `;
 
         inputEmergenciaTelefono.addEventListener('input', function() {
@@ -1620,12 +1517,6 @@ window.generarPagina12 = function() {
     container.appendChild(watermark);
 
     agregarBotonesPagina12(container);
-
-    prellenarDesdeFormulario('pagina12');
-    restaurarDatosPagina('pagina12');
-
-    deshabilitarTodosLosCampos();
-
     console.log('✅ Página 12 generada correctamente');
 };
 
@@ -1908,14 +1799,9 @@ window.limpiarPagina12 = function() {
 // ============================================
 // ESCUCHAR CAMBIOS EN EL FORMULARIO
 // ============================================
-
 document.addEventListener('formulariosActualizado', function(e) {
     console.log('🔄 Evento "formulariosActualizado" recibido');
-    
-    if (window._timeoutSync) {
-        clearTimeout(window._timeoutSync);
-    }
-    
+    if (window._timeoutSync) clearTimeout(window._timeoutSync);
     window._timeoutSync = setTimeout(function() {
         console.log('🔄 Ejecutando sincronización por evento...');
         sincronizarConFormulario();
@@ -1926,15 +1812,9 @@ document.addEventListener('formulariosActualizado', function(e) {
 window.addEventListener('storage', function(e) {
     if (e.key === 'registrosSigerd' || e.key === 'datosSincronizados' || e.key === 'registroGradoData') {
         console.log('🔄 Cambios detectados en otra pestaña en:', e.key);
-        
-        if (window._timeoutSync) {
-            clearTimeout(window._timeoutSync);
-        }
-        
+        if (window._timeoutSync) clearTimeout(window._timeoutSync);
         window._timeoutSync = setTimeout(function() {
-            if (document.getElementById('pagina10-container') || 
-                document.getElementById('pagina11-container') || 
-                document.getElementById('pagina12-container')) {
+            if (document.getElementById('pagina10-container') || document.getElementById('pagina11-container') || document.getElementById('pagina12-container')) {
                 console.log('🔄 Actualizando páginas por cambio en otra pestaña...');
                 sincronizarConFormulario();
             }
@@ -1946,12 +1826,10 @@ window.addEventListener('storage', function(e) {
 function detectarCambioGrupo() {
     const grupoActual = obtenerGrupoActual();
     const key = `${grupoActual.grado}|${grupoActual.seccion}|${grupoActual.tanda}`;
-    
     if (_grupoAnterior && _grupoAnterior !== key) {
         console.log(`🔄 Cambio de grupo detectado: ${_grupoAnterior} -> ${key}`);
         sincronizarConFormulario();
     }
-    
     _grupoAnterior = key;
 }
 
@@ -1968,9 +1846,7 @@ function verificarCambiosHash() {
                 sincronizarConFormulario();
             }
         }
-    } catch (e) {
-        // Ignorar errores
-    }
+    } catch (e) { /* Ignorar errores */ }
 }
 
 setInterval(verificarCambiosHash, 3000);
@@ -2000,257 +1876,64 @@ styleAnimEstudiante.textContent = `
     .botones-pagina10, .botones-pagina11, .botones-pagina12 { display: none !important; }
     #panel-configuracion-grupo { display: none !important; }
     .badge-asignacion-completa {
-        display: block !important;
-        background: #002D62 !important;
-        color: white !important;
-        border: 2px solid #C8102E !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
+        display: block !important; background: #002D62 !important; color: white !important;
+        border: 2px solid #C8102E !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
     }
     .badge-asignacion-completa button { display: none !important; }
 }
 
-/* ESTILOS PARA CAMPOS BLOQUEADOS CON APARIENCIA VIVA */
 input[readonly], input[disabled], select[disabled] {
-    color: #1a2a4a !important;
-    opacity: 1 !important;
-    background: transparent !important;
-    border-bottom-color: #a0b8d0 !important;
-    border-bottom-width: 1.5px !important;
-    cursor: default !important;
-    pointer-events: none !important;
+    color: #1a2a4a !important; opacity: 1 !important; background: transparent !important;
+    border-bottom-color: #a0b8d0 !important; border-bottom-width: 1.5px !important;
+    cursor: default !important; pointer-events: none !important;
 }
 
-input[type="checkbox"][disabled] {
-    opacity: 1 !important;
-    pointer-events: none !important;
-    cursor: default !important;
-}
+input[type="checkbox"][disabled] { opacity: 1 !important; pointer-events: none !important; cursor: default !important; }
+select[disabled] { color: #1a2a4a !important; opacity: 1 !important; pointer-events: none !important; cursor: default !important; }
+input[readonly]:focus, input[disabled]:focus, select[disabled]:focus { border-bottom-color: #a0b8d0 !important; box-shadow: none !important; outline: none !important; }
 
-select[disabled] {
-    color: #1a2a4a !important;
-    opacity: 1 !important;
-    pointer-events: none !important;
-    cursor: default !important;
-}
-
-input[readonly]:focus, input[disabled]:focus, select[disabled]:focus {
-    border-bottom-color: #a0b8d0 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-/* ✅ CHECKBOXES - COLOR NEGRO */
 input[type="checkbox"] {
-    width: 16px !important;
-    height: 16px !important;
-    accent-color: #000000 !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    border: 2px solid #000000 !important;
-    border-radius: 2px !important;
-    background: #ffffff !important;
-    cursor: default !important;
-    pointer-events: none !important;
-    display: inline-block !important;
-    position: relative !important;
-    flex-shrink: 0 !important;
-    margin: 0 auto !important;
+    width: 16px !important; height: 16px !important; accent-color: #000000 !important;
+    -webkit-appearance: none !important; appearance: none !important; border: 2px solid #000000 !important;
+    border-radius: 2px !important; background: #ffffff !important; cursor: default !important;
+    pointer-events: none !important; display: inline-block !important; position: relative !important;
+    flex-shrink: 0 !important; margin: 0 auto !important;
 }
-
-input[type="checkbox"]:checked {
-    background: #000000 !important;
-    border-color: #000000 !important;
-}
-
+input[type="checkbox"]:checked { background: #000000 !important; border-color: #000000 !important; }
 input[type="checkbox"]:checked::after {
-    content: "✓" !important;
-    display: block !important;
-    color: #ffffff !important;
-    font-size: 12px !important;
-    font-weight: bold !important;
-    text-align: center !important;
-    line-height: 12px !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
+    content: "✓" !important; display: block !important; color: #ffffff !important; font-size: 12px !important;
+    font-weight: bold !important; text-align: center !important; line-height: 12px !important;
+    position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
+}
+input[type="checkbox"][disabled] { opacity: 1 !important; pointer-events: none !important; cursor: default !important; border-color: #000000 !important; }
+input[type="checkbox"][disabled]:checked { background: #000000 !important; border-color: #000000 !important; }
+input[type="checkbox"][disabled]:checked::after { color: #ffffff !important; }
+
+.checkbox-sexo, .checkbox-condicion, .checkbox-preprimario {
+    width: 16px !important; height: 16px !important; accent-color: #000000 !important;
+    -webkit-appearance: none !important; appearance: none !important; border: 2px solid #000000 !important;
+    border-radius: 2px !important; background: #ffffff !important; cursor: default !important;
+    pointer-events: none !important; display: inline-block !important; position: relative !important;
+    flex-shrink: 0 !important; margin: 0 auto !important;
+}
+.checkbox-sexo:checked, .checkbox-condicion:checked, .checkbox-preprimario:checked { background: #000000 !important; border-color: #000000 !important; }
+.checkbox-sexo:checked::after, .checkbox-condicion:checked::after, .checkbox-preprimario:checked::after {
+    content: "✓" !important; display: block !important; color: #ffffff !important; font-size: 12px !important;
+    font-weight: bold !important; text-align: center !important; line-height: 12px !important;
+    position: absolute !important; top: 0 !important; left: 0 !important; width: 100% !important; height: 100% !important;
 }
 
-input[type="checkbox"][disabled] {
-    opacity: 1 !important;
-    pointer-events: none !important;
-    cursor: default !important;
-    border-color: #000000 !important;
-}
-
-input[type="checkbox"][disabled]:checked {
-    background: #000000 !important;
-    border-color: #000000 !important;
-}
-
-input[type="checkbox"][disabled]:checked::after {
-    color: #ffffff !important;
-}
-
-/* CHECKBOXES ESPECÍFICOS */
-.checkbox-sexo,
-.checkbox-condicion,
-.checkbox-preprimario {
-    width: 16px !important;
-    height: 16px !important;
-    accent-color: #000000 !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    border: 2px solid #000000 !important;
-    border-radius: 2px !important;
-    background: #ffffff !important;
-    cursor: default !important;
-    pointer-events: none !important;
-    display: inline-block !important;
-    position: relative !important;
-    flex-shrink: 0 !important;
-    margin: 0 auto !important;
-}
-
-.checkbox-sexo:checked,
-.checkbox-condicion:checked,
-.checkbox-preprimario:checked {
-    background: #000000 !important;
-    border-color: #000000 !important;
-}
-
-.checkbox-sexo:checked::after,
-.checkbox-condicion:checked::after,
-.checkbox-preprimario:checked::after {
-    content: "✓" !important;
-    display: block !important;
-    color: #ffffff !important;
-    font-size: 12px !important;
-    font-weight: bold !important;
-    text-align: center !important;
-    line-height: 12px !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* IMPRESIÓN - CHECKBOXES NEGROS */
 @media print {
-    input[type="checkbox"] {
-        border: 2px solid #000000 !important;
-        background: #ffffff !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-    }
-    input[type="checkbox"]:checked {
-        background: #000000 !important;
-        border-color: #000000 !important;
-    }
-    input[type="checkbox"]:checked::after {
-        color: #ffffff !important;
-    }
-    .checkbox-sexo:checked,
-    .checkbox-condicion:checked,
-    .checkbox-preprimario:checked {
-        background: #000000 !important;
-        border-color: #000000 !important;
-    }
-    .checkbox-sexo:checked::after,
-    .checkbox-condicion:checked::after,
-    .checkbox-preprimario:checked::after {
-        color: #ffffff !important;
-    }
+    input[type="checkbox"] { border: 2px solid #000000 !important; background: #ffffff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    input[type="checkbox"]:checked { background: #000000 !important; border-color: #000000 !important; }
+    input[type="checkbox"]:checked::after { color: #ffffff !important; }
+    .checkbox-sexo:checked, .checkbox-condicion:checked, .checkbox-preprimario:checked { background: #000000 !important; border-color: #000000 !important; }
+    .checkbox-sexo:checked::after, .checkbox-condicion:checked::after, .checkbox-preprimario:checked::after { color: #ffffff !important; }
 }
 `;
 document.head.appendChild(styleAnimEstudiante);
 
 // ============================================
-// INICIALIZACIÓN CON REINTENTOS
+// INICIALIZACIÓN CON REINTENTOS (OPTIMIZADO)
 // ============================================
-function inicializarConReintentos(intentos = 15) {
-    if (intentos <= 0) {
-        console.error('❌ No se pudieron cargar los datos del formulario después de múltiples intentos');
-        mostrarMensajeEstudiante('⚠️ No se pudo sincronizar con el formulario. Verifica que haya datos guardados.', 'warning');
-        return;
-    }
-    
-    const registros = localStorage.getItem('registrosSigerd');
-    if (!registros) {
-        console.log(`⏳ Esperando registrosSigerd... (${intentos} intentos restantes)`);
-        setTimeout(() => inicializarConReintentos(intentos - 1), 500);
-        return;
-    }
-    
-    try {
-        const parsed = JSON.parse(registros);
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-            console.log(`⏳ registrosSigerd existe pero está vacío (${intentos} intentos restantes)`);
-            setTimeout(() => inicializarConReintentos(intentos - 1), 500);
-            return;
-        }
-    } catch (e) {
-        console.log(`⏳ registrosSigerd no es válido (${intentos} intentos restantes)`);
-        setTimeout(() => inicializarConReintentos(intentos - 1), 500);
-        return;
-    }
-    
-    console.log('✅ registrosSigerd encontrado, generando páginas...');
-    
-    if (document.getElementById('pagina10-container') &&
-        document.getElementById('pagina11-container') &&
-        document.getElementById('pagina12-container')) {
-        
-        console.log('📄 Inicializando generación dinámica de páginas...');
-        console.log('🎯 Grupo actual:', obtenerGrupoActual());
-        console.log('🔑 Clave de storage:', obtenerClaveStorageEstudiante());
-        
-        try {
-            window.generarPagina10();
-            window.generarPagina11();
-            window.generarPagina12();
-            
-            estudiantesCargados = obtenerEstudiantesFiltrados();
-            
-            console.log('✅ Todas las páginas generadas correctamente');
-            console.log(`📊 ${estudiantesCargados.length} estudiantes sincronizados`);
-            
-            mostrarMensajeEstudiante(
-                `✅ Sincronizado: ${estudiantesCargados.length} estudiantes cargados`,
-                'success'
-            );
-        } catch (error) {
-            console.error('❌ Error al generar páginas:', error);
-            mostrarMensajeEstudiante('❌ Error al generar las páginas. Revisa la consola.', 'error');
-        }
-    } else {
-        console.log('⏳ Esperando contenedores de páginas...');
-        setTimeout(() => inicializarConReintentos(intentos - 1), 300);
-    }
-}
-
-// ============================================
-// INICIALIZACIÓN
-// ============================================
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(inicializarConReintentos, 500);
-    });
-} else {
-    setTimeout(inicializarConReintentos, 500);
-}
-
-window.obtenerEstudiantesFiltrados = obtenerEstudiantesFiltrados;
-window.sincronizarConFormulario = sincronizarConFormulario;
-window.prellenarDesdeFormulario = prellenarDesdeFormulario;
-window.obtenerGrupoActual = obtenerGrupoActual;
-
-console.log('📚 DATOS-DEL-ESTUDIANTE.js cargado - NACIONALIDAD NORMAL (INPUT TEXTO)');
-console.log('   ✅ La nacionalidad se muestra TAL CUAL del formulario (DOMINICANO/A, HAITIANO/A, etc.)');
-console.log('   ✅ Se usa INPUT TEXTO en lugar de SELECT para nacionalidad');
-console.log('   ✅ Checkboxes en color NEGRO');
-console.log('   ✅ Botones ocultos');
-console.log('   ✅ Campos con apariencia viva');
+function inicializarConReintentos(intentos = 4) { // REDUCIDO DE 15 A 4 (MÁ-container')) {
