@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos del Centro Educativo</title>
+    <link rel="stylesheet" href="datos-del-centro.css">
+</head>
+<body>
+    <div class="container-datos-centro">
+        <!-- Controles -->
+        <div class="controls-dc">
+            <span class="badge-dc" id="gradeDisplayDC">3er Grado</span>
+            <span class="badge-dc badge-section-dc" id="sectionDisplayDC">Sección A</span>
+            <span class="badge-dc" id="schoolYearDisplayDC">2025-2026</span>
+            <button class="btn btn-success" onclick="validarDatosCentro()" aria-label="Validar datos">✅ Validar</button>
+            <button class="btn btn-danger" onclick="limpiarDatosCentro()" aria-label="Limpiar formulario">🗑️ Limpiar</button>
+            <button class="btn btn-primary" onclick="printPage()" aria-label="Imprimir documento">🖨️ Imprimir</button>
+        </div>
+
+        <!-- Página tipo carta -->
+        <div class="carta-page-dc">
+            <h1 class="page-title-dc">Datos del Centro Educativo</h1>
+            
+            <div class="form-content-dc">
+                <!-- Correo y Teléfono -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc form-group-large">
+                        <label for="correo" class="label-dc">Correo electrónico:</label>
+                        <input type="email" id="correo" class="value-input-full-dc" 
+                               placeholder="ejemplo@correo.com" autocomplete="email"
+                               aria-describedby="correoHelp">
+                        <span id="correoHelp" class="sr-only">Ingrese un correo electrónico válido</span>
+                    </div>
+                    <div class="form-group-dc form-group-small">
+                        <label for="telefono" class="label-dc">Teléfono:</label>
+                        <input type="tel" id="telefono" class="value-input-full-dc" 
+                               placeholder="809-000-0000" autocomplete="tel"
+                               aria-describedby="telefonoHelp">
+                        <span id="telefonoHelp" class="sr-only">Formato: 809-000-0000, 829-000-0000 o 849-000-0000</span>
+                    </div>
+                </div>
+
+                <!-- Dirección completa -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row">
+                        <label for="direccion" class="label-dc">Dirección:</label>
+                        <input type="text" id="direccion" class="value-input-full-dc" 
+                               placeholder="Calle, número, sector" autocomplete="street-address">
+                    </div>
+                </div>
+
+                <!-- Paraje/Barrio -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row" style="position: relative;">
+                        <label for="paraje" class="label-dc">Paraje/Barrio:</label>
+                        <input type="text" id="paraje" class="value-input-full-dc" 
+                               placeholder="Escriba el nombre del paraje o barrio" 
+                               autocomplete="off" role="combobox" 
+                               aria-expanded="false" aria-controls="sugerenciasParaje"
+                               aria-describedby="parajeHelp">
+                        <span id="parajeHelp" class="sr-only">Escriba el nombre de su paraje o barrio</span>
+                        <!-- CONTENEDOR DE SUGERENCIAS PARA PARAJE -->
+                        <div id="sugerenciasParaje" class="sugerencias-container" role="listbox" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <!-- Municipio -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row" style="position: relative;">
+                        <label for="municipio" class="label-dc">Municipio:</label>
+                        <input type="text" id="municipio" class="value-input-full-dc" 
+                               placeholder="Haga clic para ver opciones o escriba manualmente" 
+                               autocomplete="off" role="combobox" 
+                               aria-expanded="false" aria-controls="sugerenciasMunicipio">
+                        <!-- CONTENEDOR DE SUGERENCIAS PARA MUNICIPIO -->
+                        <div id="sugerenciasMunicipio" class="sugerencias-container" role="listbox" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <!-- Provincia -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row" style="position: relative;">
+                        <label for="provincia" class="label-dc">Provincia:</label>
+                        <input type="text" id="provincia" class="value-input-full-dc" 
+                               placeholder="Se sugiere automáticamente al escribir municipio" 
+                               autocomplete="off" role="combobox" 
+                               aria-expanded="false" aria-controls="sugerenciasProvincia">
+                        <!-- CONTENEDOR DE SUGERENCIAS PARA PROVINCIA -->
+                        <div id="sugerenciasProvincia" class="sugerencias-container" role="listbox" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <!-- Zona -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row">
+                        <fieldset id="zonaGroupDC" class="radio-group-dc" style="border: none; padding: 0; margin: 0;">
+                            <legend class="label-dc">Zona:</legend>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona1" name="zona" value="Urbana">
+                                <label for="zona1">Urbana</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona2" name="zona" value="Urbana marginal">
+                                <label for="zona2">Urbana marginal</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona3" name="zona" value="Urbana turística">
+                                <label for="zona3">Urbana turística</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona4" name="zona" value="Rural">
+                                <label for="zona4">Rural</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona5" name="zona" value="Rural aislada">
+                                <label for="zona5">Rural aislada</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="zona6" name="zona" value="Rural turística">
+                                <label for="zona6">Rural turística</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!-- Sector -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row">
+                        <fieldset id="sectorGroupDC" class="radio-group-dc" style="border: none; padding: 0; margin: 0;">
+                            <legend class="label-dc">Sector:</legend>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="sector1" name="sector" value="Público">
+                                <label for="sector1">Público</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="sector2" name="sector" value="Privado">
+                                <label for="sector2">Privado</label>
+                            </div>
+                            <div class="radio-option-dc">
+                                <input type="radio" id="sector3" name="sector" value="Semioficial">
+                                <label for="sector3">Semioficial</label>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+
+                <!-- Regional y Distrito -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc">
+                        <label for="regional" class="label-dc">Regional:</label>
+                        <select id="regional" class="value-select-dc" aria-label="Seleccionar regional">
+                            <option value="">--</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                        </select>
+                    </div>
+                    <div class="form-group-dc">
+                        <label for="distrito" class="label-dc">Distrito:</label>
+                        <select id="distrito" class="value-select-dc" aria-label="Seleccionar distrito">
+                            <option value="">--</option>
+                            <option value="01">01</option>
+                            <option value="02">02</option>
+                            <option value="03">03</option>
+                            <option value="04">04</option>
+                            <option value="05">05</option>
+                            <option value="06">06</option>
+                            <option value="07">07</option>
+                            <option value="08">08</option>
+                            <option value="09">09</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Apoyo -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row">
+                        <label for="apoyo" class="label-dc">Sector, organismo, institución que brinda apoyo y/o apadrina:</label>
+                        <input type="text" id="apoyo" class="value-input-full-dc" placeholder="Nombre de la institución">
+                    </div>
+                </div>
+
+                <!-- Director -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc full-width-row">
+                        <label for="director" class="label-dc">Director(a) del centro educativo:</label>
+                        <input type="text" id="director" class="value-input-full-dc" placeholder="Nombre completo">
+                    </div>
+                </div>
+
+                <!-- Correo y Teléfono del Director -->
+                <div class="form-row-dc">
+                    <div class="form-group-dc form-group-large">
+                        <label for="correoDirector" class="label-dc">Correo electrónico:</label>
+                        <input type="email" id="correoDirector" class="value-input-full-dc" 
+                               placeholder="director@correo.com" autocomplete="email">
+                    </div>
+                    <div class="form-group-dc form-group-small">
+                        <label for="telefonoDirector" class="label-dc">Teléfono:</label>
+                        <input type="tel" id="telefonoDirector" class="value-input-full-dc" 
+                               placeholder="809-000-0000" autocomplete="tel">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-dc">
+                <div class="watermark-dc">Ministerio de Educación • República Dominicana</div>
+                <div class="page-number-dc">Página 1 de 1</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Región para mensajes accesibles -->
+    <div id="mensajeRegion" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+
+    <!-- Cargar datos de parajes/barrio PRIMERO -->
+    <script src="paraje-barrio.js"></script>
+    <!-- Luego el script principal -->
+    <script src="datos-del-centro.js"></script>
+</body>
+</html>
