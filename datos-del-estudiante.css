@@ -1,0 +1,1219 @@
+/* ============================================
+   RESET Y ESTILOS BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    background: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    gap: 30px;
+    overflow-x: hidden;
+    word-wrap: break-word;
+}
+
+/* ============================================
+   SEPARADOR ENTRE PÁGINAS
+   ============================================ */
+.separador-paginas {
+    width: 100%;
+    max-width: 8.5in;
+    height: 2px;
+    background: #1a3a6b;
+    margin: 10px 0;
+    border-radius: 2px;
+    opacity: 0.3;
+}
+
+/* ============================================
+   HOJA TAMAÑO CARTA (8.5" x 11")
+   ============================================ */
+.hoja-carta {
+    width: 8.5in;
+    min-height: 11in;
+    height: auto;
+    background: #ffffff;
+    padding: 0.2in 0.15in 0.15in 0.15in;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    border: 1px solid #d0d0d0;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   TÍTULOS
+   ============================================ */
+.titulo-pagina {
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a2a4a;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+    border-bottom: 2px solid #1a3a6b;
+    padding-bottom: 2px;
+}
+
+.subtitulo {
+    font-size: 9px;
+    color: #444;
+    font-style: italic;
+    text-align: center;
+    margin-bottom: 3px;
+}
+
+/* ============================================
+   TABLA DE ESTUDIANTES - BASE
+   ============================================ */
+.tabla-container {
+    flex: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabla-estudiantes {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+    font-family: 'Times New Roman', Times, serif;
+    table-layout: fixed;
+    min-width: 700px; /* Ancho mínimo para mantener estructura */
+}
+
+/* ============================================
+   ENCABEZADOS PRINCIPALES
+   ============================================ */
+.tabla-estudiantes thead th {
+    background: #f0f4f8;
+    border: 1px solid #333 !important;
+    padding: 0px 1px !important;
+    text-align: center !important;
+    font-weight: bold !important;
+    color: #1a2a4a;
+    font-size: 10px !important;
+    letter-spacing: 0px;
+    vertical-align: middle;
+    height: 55px;
+    min-height: 55px;
+    max-height: 55px;
+    overflow: hidden;
+    white-space: normal;
+    box-sizing: border-box;
+}
+
+.tabla-estudiantes thead th[rowspan="2"] {
+    height: 55px;
+    min-height: 55px;
+    max-height: 55px;
+    vertical-align: middle;
+}
+
+/* ============================================
+   TEXTO VERTICAL
+   ============================================ */
+.texto-vertical-orden,
+.texto-vertical {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    color: #1a2a4a;
+    letter-spacing: 0px;
+    padding: 0px !important;
+    margin: 0px !important;
+    line-height: 1.1;
+    text-align: center !important;
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================
+   SUB-ENCABEZADOS - PÁGINAS 10 Y 11
+   ============================================ */
+.col-sexo-sub,
+.col-fecha-sub,
+.col-condicion-sub,
+.col-preprimario-sub {
+    padding: 0px 1px !important;
+    text-align: center !important;
+    vertical-align: middle;
+    background: #f0f4f8;
+    border: 1px solid #333 !important;
+    height: 55px;
+    min-height: 55px;
+    max-height: 55px;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    overflow: hidden;
+}
+
+/* ============================================
+   SUB-ENCABEZADOS - PÁGINA 12
+   ============================================ */
+.col-emergencia-sub,
+.col-emergencia-telefono {
+    padding: 0px 1px !important;
+    text-align: center !important;
+    vertical-align: middle;
+    background: #f0f4f8;
+    border: 1px solid #333 !important;
+    height: 55px;
+    min-height: 55px;
+    max-height: 55px;
+    font-size: 10px !important;
+    font-weight: bold !important;
+    overflow: hidden;
+}
+
+/* ============================================
+   ANCHOS DE COLUMNAS - PÁGINA 10
+   ============================================ */
+.col-orden {
+    width: 3.5%;
+    min-width: 14px;
+    max-width: 25px;
+    text-align: center !important;
+}
+
+.col-nombre {
+    width: 25%;
+    min-width: 80px;
+}
+
+.col-nacionalidad {
+    width: 8.5%;
+    min-width: 45px;
+}
+
+.col-sexo {
+    width: 7.5%;
+    min-width: 25px;
+}
+
+.col-sexo-sub {
+    width: 3.75%;
+    min-width: 12px;
+}
+
+.col-fecha {
+    width: 34%;
+    min-width: 70px;
+}
+
+.col-fecha-sub {
+    width: 5.66%;
+    min-width: 8px;
+}
+
+.col-parentesco {
+    width: 21.5%;
+    min-width: 70px;
+}
+
+/* ============================================
+   ANCHOS DE COLUMNAS - PÁGINA 11
+   ============================================ */
+.col-orden-p11 {
+    width: 3.5%;
+    min-width: 14px;
+    max-width: 25px;
+    text-align: center !important;
+}
+
+.col-direccion {
+    width: 18%;
+    min-width: 80px;
+}
+
+.col-nuevo {
+    width: 9%;
+    min-width: 40px;
+}
+
+.col-retirado {
+    width: 9%;
+    min-width: 40px;
+}
+
+.col-condicion {
+    width: 12%;
+    min-width: 50px;
+}
+
+.col-condicion-sub {
+    width: 4%;
+    min-width: 16px;
+}
+
+.col-preprimario {
+    width: 8%;
+    min-width: 35px;
+}
+
+.col-preprimario-sub {
+    width: 4%;
+    min-width: 16px;
+}
+
+/* ============================================
+   ANCHOS DE COLUMNAS - PÁGINA 12
+   ============================================ */
+.col-orden-p12 {
+    width: 3%;
+    min-width: 18px;
+    max-width: 25px;
+    text-align: center !important;
+}
+
+.col-neae {
+    width: 20%;
+    min-width: 80px;
+}
+
+.col-enfermedades {
+    width: 20%;
+    min-width: 80px;
+}
+
+.col-medicamentos {
+    width: 20%;
+    min-width: 80px;
+}
+
+.col-emergencia {
+    width: 37%;
+    min-width: 160px;
+}
+
+.col-emergencia-sub {
+    width: 27%;
+    min-width: 100px;
+}
+
+.col-emergencia-telefono {
+    width: 10%;
+    min-width: 60px;
+}
+
+/* ============================================
+   CUERPO DE LA TABLA - TODAS LAS PÁGINAS
+   ============================================ */
+.tabla-estudiantes tbody td {
+    border: 1px solid #a0a0a0 !important;
+    padding: 2px 1px;
+    text-align: center !important;
+    height: 18px;
+    font-size: 8px;
+    color: #1a2a4a;
+    vertical-align: middle;
+    min-height: 18px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.tabla-estudiantes tbody td:empty {
+    border: 1px solid #a0a0a0 !important;
+    min-height: 18px;
+}
+
+.tabla-estudiantes tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+
+/* ============================================
+   NÚMEROS DE ORDEN - TODAS LAS PÁGINAS
+   ============================================ */
+.tabla-estudiantes tbody td.col-orden,
+.tabla-estudiantes tbody td.col-orden-p11,
+.tabla-estudiantes tbody td.col-orden-p12 {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    color: #1a2a4a;
+    text-align: center !important;
+}
+
+/* ============================================
+   COLUMNA NOMBRE - PÁGINA 10
+   ============================================ */
+.col-nombre td {
+    text-align: left !important;
+    padding-left: 3px !important;
+}
+
+.col-nombre {
+    text-align: left !important;
+}
+
+/* ============================================
+   MARCA DE AGUA
+   ============================================ */
+.watermark {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 8px;
+    color: #8a9aaa;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-top: 1px solid #d0d8e0;
+    padding-top: 4px;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   BOTONES - OCULTOS (pero funcionales)
+   ============================================ */
+.botones-pagina10,
+.botones-pagina11,
+.botones-pagina12 {
+    display: none !important;
+}
+
+/* ============================================
+   CAMPOS BLOQUEADOS CON APARIENCIA VIVA
+   ============================================ */
+input[readonly],
+input[disabled],
+select[disabled] {
+    color: #1a2a4a !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border-bottom-color: #a0b8d0 !important;
+    border-bottom-width: 1.5px !important;
+    cursor: default !important;
+    pointer-events: none !important;
+}
+
+select[disabled] {
+    color: #1a2a4a !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+    cursor: default !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+}
+
+input[readonly]:focus,
+input[disabled]:focus,
+select[disabled]:focus {
+    border-bottom-color: #a0b8d0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* ============================================
+   ✅ CHECKBOXES - COLOR NEGRO (TODOS)
+   ============================================ */
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #000000 !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    border: 2px solid #000000 !important;
+    border-radius: 2px !important;
+    background: #ffffff !important;
+    cursor: default !important;
+    pointer-events: none !important;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 auto;
+}
+
+input[type="checkbox"]:checked {
+    background: #000000 !important;
+    border-color: #000000 !important;
+}
+
+input[type="checkbox"]:checked::after {
+    content: "✓";
+    display: block;
+    color: #ffffff !important;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+input[type="checkbox"][disabled] {
+    opacity: 1 !important;
+    pointer-events: none !important;
+    cursor: default !important;
+    border-color: #000000 !important;
+}
+
+input[type="checkbox"][disabled]:checked {
+    background: #000000 !important;
+    border-color: #000000 !important;
+}
+
+input[type="checkbox"][disabled]:checked::after {
+    color: #ffffff !important;
+}
+
+/* ============================================
+   CHECKBOXES ESPECÍFICOS - COLOR NEGRO
+   ============================================ */
+.checkbox-sexo,
+.checkbox-condicion,
+.checkbox-preprimario {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: #000000 !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    border: 2px solid #000000 !important;
+    border-radius: 2px !important;
+    background: #ffffff !important;
+    cursor: default !important;
+    pointer-events: none !important;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 auto;
+}
+
+.checkbox-sexo:checked,
+.checkbox-condicion:checked,
+.checkbox-preprimario:checked {
+    background: #000000 !important;
+    border-color: #000000 !important;
+}
+
+.checkbox-sexo:checked::after,
+.checkbox-condicion:checked::after,
+.checkbox-preprimario:checked::after {
+    content: "✓";
+    display: block;
+    color: #ffffff !important;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================
+   CHECKBOXES PARA IMPRESIÓN
+   ============================================ */
+@media print {
+    input[type="checkbox"] {
+        border: 2px solid #000000 !important;
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    input[type="checkbox"]:checked {
+        background: #000000 !important;
+        border-color: #000000 !important;
+    }
+
+    input[type="checkbox"]:checked::after {
+        color: #ffffff !important;
+    }
+
+    .checkbox-sexo:checked,
+    .checkbox-condicion:checked,
+    .checkbox-preprimario:checked {
+        background: #000000 !important;
+        border-color: #000000 !important;
+    }
+
+    .checkbox-sexo:checked::after,
+    .checkbox-condicion:checked::after,
+    .checkbox-preprimario:checked::after {
+        color: #ffffff !important;
+    }
+}
+
+/* ============================================
+   CAMPOS DE FECHA - APARIENCIA VIVA
+   ============================================ */
+.input-fecha-dia,
+.input-fecha-mes,
+.input-fecha-anio,
+.input-fecha-p11 {
+    color: #1a2a4a !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border-bottom-color: #a0b8d0 !important;
+    border-bottom-width: 1.5px !important;
+}
+
+.input-fecha-dia:focus,
+.input-fecha-mes:focus,
+.input-fecha-anio:focus,
+.input-fecha-p11:focus {
+    border-bottom-color: #a0b8d0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* ============================================
+   INPUTS EDITABLES - APARIENCIA VIVA
+   ============================================ */
+.input-editable,
+.input-direccion,
+.input-p12,
+.input-telefono-emergencia-p12 {
+    color: #1a2a4a !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border-bottom-color: #a0b8d0 !important;
+    border-bottom-width: 1.5px !important;
+}
+
+.input-editable:focus,
+.input-direccion:focus,
+.input-p12:focus,
+.input-telefono-emergencia-p12:focus {
+    border-bottom-color: #a0b8d0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* ============================================
+   SELECTS - APARIENCIA VIVA
+   ============================================ */
+.select-nacionalidad,
+.select-parentesco,
+.select-generico {
+    color: #1a2a4a !important;
+    opacity: 1 !important;
+    background: transparent !important;
+    border-bottom-color: #a0b8d0 !important;
+    border-bottom-width: 1.5px !important;
+    pointer-events: none !important;
+    cursor: default !important;
+}
+
+/* ============================================
+   BADGE DE ASIGNACIÓN
+   ============================================ */
+.badge-asignacion-completa {
+    background: #002D62;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 2px solid #C8102E;
+    font-family: 'Times New Roman', Times, serif;
+    box-shadow: 0 4px 15px rgba(0, 45, 98, 0.2);
+    width: 100%;
+    max-width: 8.5in;
+}
+
+.badge-asignacion-completa button {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 4px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-left: 12px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.badge-asignacion-completa button:hover {
+    background: #5a6268;
+    transform: scale(1.02);
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL (≤ 700px)
+   ============================================ */
+@media screen and (max-width: 700px) {
+    body {
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .hoja-carta {
+        width: 100%;
+        min-height: auto;
+        padding: 12px 8px;
+    }
+
+    .badge-asignacion-completa {
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+
+    .badge-asignacion-completa button {
+        font-size: 10px;
+        padding: 3px 10px;
+    }
+
+    .tabla-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .tabla-estudiantes {
+        font-size: 7px;
+        min-width: 650px;
+    }
+
+    .tabla-estudiantes thead th {
+        font-size: 9px !important;
+        padding: 0px 1px !important;
+        height: 45px;
+        min-height: 45px;
+        max-height: 45px;
+    }
+
+    .tabla-estudiantes thead th[rowspan="2"] {
+        height: 45px;
+        min-height: 45px;
+        max-height: 45px;
+    }
+
+    .col-sexo-sub,
+    .col-fecha-sub,
+    .col-condicion-sub,
+    .col-preprimario-sub,
+    .col-emergencia-sub,
+    .col-emergencia-telefono {
+        height: 38px;
+        min-height: 38px;
+        max-height: 38px;
+        font-size: 9px !important;
+    }
+
+    .tabla-estudiantes tbody td {
+        font-size: 6px;
+        padding: 2px 1px;
+        height: 15px;
+        min-height: 15px;
+        text-align: center !important;
+    }
+
+    .tabla-estudiantes tbody td.col-orden,
+    .tabla-estudiantes tbody td.col-orden-p11,
+    .tabla-estudiantes tbody td.col-orden-p12 {
+        font-size: 10px !important;
+    }
+
+    .col-orden { min-width: 12px; width: 3.5%; }
+    .col-orden-p11 { min-width: 12px; width: 3.5%; }
+    .col-orden-p12 { min-width: 14px; width: 3%; }
+    .col-nombre { min-width: 50px; width: 25%; }
+    .col-nacionalidad { min-width: 30px; width: 8.5%; }
+    .col-sexo { min-width: 20px; width: 7.5%; }
+    .col-sexo-sub { min-width: 9px; width: 3.75%; }
+    .col-fecha { min-width: 22px; width: 34%; }
+    .col-fecha-sub { min-width: 5px; width: 5.66%; }
+    .col-parentesco { min-width: 38px; width: 21.5%; }
+    .col-direccion { min-width: 50px; width: 18%; }
+    .col-nuevo { min-width: 30px; width: 9%; }
+    .col-retirado { min-width: 30px; width: 9%; }
+    .col-condicion { min-width: 35px; width: 12%; }
+    .col-condicion-sub { min-width: 12px; width: 4%; }
+    .col-preprimario { min-width: 25px; width: 8%; }
+    .col-preprimario-sub { min-width: 12px; width: 4%; }
+    .col-neae { min-width: 45px; width: 20%; }
+    .col-enfermedades { min-width: 40px; width: 20%; }
+    .col-medicamentos { min-width: 40px; width: 20%; }
+    .col-emergencia { min-width: 40px; width: 37%; }
+    .col-emergencia-sub { min-width: 20px; width: 27%; }
+    .col-emergencia-telefono { min-width: 20px; width: 10%; }
+
+    .texto-vertical { font-size: 9px !important; }
+    .texto-vertical-orden { font-size: 10px !important; }
+
+    .titulo-pagina { font-size: 10px; }
+    .subtitulo { font-size: 8px; }
+    .watermark { font-size: 7px; }
+
+    input[type="checkbox"],
+    .checkbox-sexo,
+    .checkbox-condicion,
+    .checkbox-preprimario {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    input[type="checkbox"]:checked::after,
+    .checkbox-sexo:checked::after,
+    .checkbox-condicion:checked::after,
+    .checkbox-preprimario:checked::after {
+        font-size: 10px !important;
+        line-height: 10px !important;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL PEQUEÑO (≤ 480px)
+   ============================================ */
+@media screen and (max-width: 480px) {
+    body {
+        gap: 15px;
+        padding: 5px;
+    }
+
+    .hoja-carta {
+        padding: 8px 4px;
+    }
+
+    .badge-asignacion-completa {
+        font-size: 11px;
+        padding: 7px 12px;
+    }
+
+    .badge-asignacion-completa button {
+        font-size: 9px;
+        padding: 3px 8px;
+        margin-left: 8px;
+    }
+
+    .tabla-estudiantes {
+        font-size: 5px;
+        min-width: 600px;
+    }
+
+    .tabla-estudiantes thead th {
+        font-size: 7px !important;
+        padding: 0px 0px !important;
+        height: 35px;
+        min-height: 35px;
+        max-height: 35px;
+    }
+
+    .tabla-estudiantes thead th[rowspan="2"] {
+        height: 35px;
+        min-height: 35px;
+        max-height: 35px;
+    }
+
+    .col-sexo-sub,
+    .col-fecha-sub,
+    .col-condicion-sub,
+    .col-preprimario-sub,
+    .col-emergencia-sub,
+    .col-emergencia-telefono {
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+        font-size: 7px !important;
+    }
+
+    .tabla-estudiantes tbody td {
+        font-size: 5px;
+        padding: 2px 0px;
+        height: 13px;
+        min-height: 13px;
+        text-align: center !important;
+    }
+
+    .tabla-estudiantes tbody td.col-orden,
+    .tabla-estudiantes tbody td.col-orden-p11,
+    .tabla-estudiantes tbody td.col-orden-p12 {
+        font-size: 9px !important;
+    }
+
+    .col-orden { min-width: 9px; width: 3.5%; }
+    .col-orden-p11 { min-width: 9px; width: 3.5%; }
+    .col-orden-p12 { min-width: 10px; width: 3%; }
+    .col-nombre { min-width: 30px; width: 25%; }
+    .col-nacionalidad { min-width: 20px; width: 8.5%; }
+    .col-sexo { min-width: 14px; width: 7.5%; }
+    .col-sexo-sub { min-width: 7px; width: 3.75%; }
+    .col-fecha { min-width: 15px; width: 34%; }
+    .col-fecha-sub { min-width: 4px; width: 5.66%; }
+    .col-parentesco { min-width: 20px; width: 21.5%; }
+    .col-direccion { min-width: 30px; width: 18%; }
+    .col-nuevo { min-width: 20px; width: 9%; }
+    .col-retirado { min-width: 20px; width: 9%; }
+    .col-condicion { min-width: 25px; width: 12%; }
+    .col-condicion-sub { min-width: 9px; width: 4%; }
+    .col-preprimario { min-width: 18px; width: 8%; }
+    .col-preprimario-sub { min-width: 9px; width: 4%; }
+    .col-neae { min-width: 28px; width: 20%; }
+    .col-enfermedades { min-width: 25px; width: 20%; }
+    .col-medicamentos { min-width: 25px; width: 20%; }
+    .col-emergencia { min-width: 25px; width: 37%; }
+    .col-emergencia-sub { min-width: 12px; width: 27%; }
+    .col-emergencia-telefono { min-width: 12px; width: 10%; }
+
+    .texto-vertical { font-size: 7px !important; letter-spacing: 0px !important; }
+    .texto-vertical-orden { font-size: 8px !important; }
+
+    .titulo-pagina { font-size: 9px; }
+    .subtitulo { font-size: 7px; }
+    .watermark { font-size: 6px; }
+
+    input[type="checkbox"],
+    .checkbox-sexo,
+    .checkbox-condicion,
+    .checkbox-preprimario {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    input[type="checkbox"]:checked::after,
+    .checkbox-sexo:checked::after,
+    .checkbox-condicion:checked::after,
+    .checkbox-preprimario:checked::after {
+        font-size: 9px !important;
+        line-height: 9px !important;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL MUY PEQUEÑO (≤ 360px)
+   ============================================ */
+@media screen and (max-width: 360px) {
+    body {
+        gap: 10px;
+        padding: 3px;
+    }
+
+    .hoja-carta {
+        padding: 6px 3px;
+    }
+
+    .badge-asignacion-completa {
+        font-size: 10px;
+        padding: 6px 10px;
+    }
+
+    .badge-asignacion-completa button {
+        font-size: 8px;
+        padding: 2px 6px;
+        margin-left: 6px;
+    }
+
+    .tabla-estudiantes {
+        font-size: 4.5px;
+        min-width: 550px;
+    }
+
+    .tabla-estudiantes thead th {
+        font-size: 6px !important;
+        padding: 0px !important;
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+    }
+
+    .tabla-estudiantes thead th[rowspan="2"] {
+        height: 30px;
+        min-height: 30px;
+        max-height: 30px;
+    }
+
+    .col-sexo-sub,
+    .col-fecha-sub,
+    .col-condicion-sub,
+    .col-preprimario-sub,
+    .col-emergencia-sub,
+    .col-emergencia-telefono {
+        height: 26px;
+        min-height: 26px;
+        max-height: 26px;
+        font-size: 6px !important;
+    }
+
+    .tabla-estudiantes tbody td {
+        font-size: 4.5px;
+        padding: 1px 0px;
+        height: 11px;
+        min-height: 11px;
+    }
+
+    .tabla-estudiantes tbody td.col-orden,
+    .tabla-estudiantes tbody td.col-orden-p11,
+    .tabla-estudiantes tbody td.col-orden-p12 {
+        font-size: 8px !important;
+    }
+
+    .col-orden { min-width: 8px; }
+    .col-orden-p11 { min-width: 8px; }
+    .col-orden-p12 { min-width: 9px; }
+    .col-nombre { min-width: 25px; }
+    .col-nacionalidad { min-width: 18px; }
+    .col-sexo { min-width: 12px; }
+    .col-sexo-sub { min-width: 6px; }
+    .col-fecha { min-width: 12px; }
+    .col-fecha-sub { min-width: 3px; }
+    .col-parentesco { min-width: 18px; }
+    .col-direccion { min-width: 25px; }
+    .col-nuevo { min-width: 18px; }
+    .col-retirado { min-width: 18px; }
+    .col-condicion { min-width: 22px; }
+    .col-condicion-sub { min-width: 8px; }
+    .col-preprimario { min-width: 16px; }
+    .col-preprimario-sub { min-width: 8px; }
+    .col-neae { min-width: 22px; }
+    .col-enfermedades { min-width: 20px; }
+    .col-medicamentos { min-width: 20px; }
+    .col-emergencia { min-width: 20px; }
+    .col-emergencia-sub { min-width: 10px; }
+    .col-emergencia-telefono { min-width: 10px; }
+
+    .texto-vertical { font-size: 6px !important; }
+    .texto-vertical-orden { font-size: 7px !important; }
+
+    .titulo-pagina { font-size: 8px; }
+    .subtitulo { font-size: 6px; }
+    .watermark { font-size: 5px; }
+
+    input[type="checkbox"],
+    .checkbox-sexo,
+    .checkbox-condicion,
+    .checkbox-preprimario {
+        width: 10px !important;
+        height: 10px !important;
+    }
+
+    input[type="checkbox"]:checked::after,
+    .checkbox-sexo:checked::after,
+    .checkbox-condicion:checked::after,
+    .checkbox-preprimario:checked::after {
+        font-size: 8px !important;
+        line-height: 8px !important;
+    }
+}
+
+/* ============================================
+   IMPRESIÓN - TAMAÑO CARTA
+   ============================================ */
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
+        min-height: auto !important;
+        gap: 0 !important;
+    }
+
+    .separador-paginas {
+        display: none !important;
+    }
+
+    .hoja-carta {
+        width: 100% !important;
+        min-height: 100vh !important;
+        padding: 0.5in !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: white !important;
+        margin: 0 !important;
+        display: block !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        position: relative !important;
+        overflow: visible !important;
+    }
+
+    .hoja-carta:last-child {
+        page-break-after: avoid !important;
+    }
+
+    .tabla-estudiantes {
+        font-size: 8px !important;
+        width: 100% !important;
+        min-width: auto !important;
+    }
+
+    .tabla-estudiantes thead th {
+        border-color: #333 !important;
+        background: #e8ecf1 !important;
+        height: 45px !important;
+        min-height: 45px !important;
+        max-height: 45px !important;
+        font-size: 9px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        padding: 0px 1px !important;
+    }
+
+    .tabla-estudiantes tbody td {
+        border: 1px solid #333 !important;
+        height: 16px !important;
+        min-height: 16px !important;
+        font-size: 7px !important;
+        padding: 1px 1px !important;
+        text-align: center !important;
+    }
+
+    .tabla-estudiantes tbody td:empty {
+        border: 1px solid #333 !important;
+        min-height: 16px !important;
+    }
+
+    .tabla-estudiantes tbody tr:nth-child(even) {
+        background: #fafbfc !important;
+    }
+
+    .texto-vertical-orden {
+        color: #000 !important;
+        font-size: 9px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        writing-mode: vertical-lr !important;
+        text-orientation: mixed !important;
+    }
+
+    .texto-vertical {
+        color: #000 !important;
+        font-size: 8px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        writing-mode: vertical-lr !important;
+        text-orientation: mixed !important;
+    }
+
+    .col-sexo-sub,
+    .col-fecha-sub,
+    .col-condicion-sub,
+    .col-preprimario-sub,
+    .col-emergencia-sub,
+    .col-emergencia-telefono {
+        border-color: #333 !important;
+        background: #e8ecf1 !important;
+        height: 45px !important;
+        min-height: 45px !important;
+        max-height: 45px !important;
+        font-size: 9px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        padding: 0px 1px !important;
+    }
+
+    .tabla-estudiantes tbody td.col-orden,
+    .tabla-estudiantes tbody td.col-orden-p11,
+    .tabla-estudiantes tbody td.col-orden-p12 {
+        font-size: 10px !important;
+        font-weight: bold !important;
+        color: #000 !important;
+        text-align: center !important;
+    }
+
+    .col-nombre td {
+        text-align: left !important;
+        padding-left: 3px !important;
+    }
+
+    .titulo-pagina {
+        font-size: 11px !important;
+        margin-bottom: 3px !important;
+        padding-bottom: 3px !important;
+        border-bottom: 2px solid #1a3a6b !important;
+    }
+
+    .subtitulo {
+        font-size: 8px !important;
+        margin-bottom: 4px !important;
+    }
+
+    .watermark {
+        font-size: 7px !important;
+        margin-top: 5px !important;
+        padding-top: 4px !important;
+        border-top: 1px solid #d0d8e0 !important;
+        color: #8a9aaa !important;
+    }
+
+    .botones-pagina10,
+    .botones-pagina11,
+    .botones-pagina12,
+    .mensaje-flotante-estudiante {
+        display: none !important;
+    }
+
+    @page {
+        size: letter !important;
+        margin: 0.4in !important;
+    }
+
+    input {
+        border: none !important;
+        background: transparent !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: inherit !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
+
+    select {
+        border: none !important;
+        background: transparent !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: inherit !important;
+        color: #000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        outline: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
+
+    input[type="checkbox"] {
+        width: 12px !important;
+        height: 12px !important;
+        border: 2px solid #000000 !important;
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    input[type="checkbox"]:checked {
+        background: #000000 !important;
+        border-color: #000000 !important;
+    }
+
+    input[type="checkbox"]:checked::after {
+        color: #ffffff !important;
+        font-size: 10px !important;
+        line-height: 10px !important;
+    }
+
+    .tabla-container {
+        overflow: visible !important;
+        flex: 1 !important;
+    }
+}
