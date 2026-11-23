@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Inscristos e Inscritas de la Sección</title>
+    <link rel="stylesheet" href="resumen-incristos.css">
+</head>
+<body>
+    <!-- ✅ BARRA DE INFORMACIÓN SINCRONIZADA (CON TANDA) -->
+    <div class="barra-info-inscritos">
+        <div class="info-grado-inscritos">
+            <span id="gradeDisplayRI">3er Grado</span> • 
+            <span id="sectionDisplayRI">Sección A</span> • 
+            <span id="tandaDisplayRI">Matutina</span> • 
+            <span id="schoolYearDisplayRI">2025-2026</span>
+        </div>
+    </div>
+
+    <div class="carta-page">
+        <h1 class="titulo-principal">RESUMEN DE INSCRITOS E INSCRITAS DE LA SECCIÓN</h1>
+
+        <div class="descripcion">
+            <p>Este cuadro resume el movimiento de los y las estudiantes durante el año escolar.</p>
+            <p>Para cada mes indicar la cantidad de inscritos e inscritas al primer día, los nuevos inscritos y retirados si hubiere, y los inscritos al último día.</p>
+            <p>Los inscritos al primer día de un mes deben coincidir con los inscritos al último día del mes anterior.</p>
+            <p>Verifique que los inscritos al primer día del primer mes, más el total de nuevos estudiantes inscritos del año, menos el total de retirados del año, sea igual a los inscritos al último día del último mes.</p>
+        </div>
+
+        <!-- MATRÍCULA INICIAL Y FINAL -->
+        <div class="matriculas-container">
+            <div class="matricula-box" id="matricula-inicial">
+                <div class="matricula-label">MATRÍCULA INICIAL</div>
+                <table class="matricula-tabla">
+                    <tr>
+                        <th>Masc.</th>
+                        <th>Fem.</th>
+                        <th>TOTAL</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" min="0" max="9999" data-campo="inicial_masc" placeholder="0"></td>
+                        <td><input type="number" min="0" max="9999" data-campo="inicial_fem" placeholder="0"></td>
+                        <td class="total-cell"><input type="number" min="0" max="9999" data-campo="inicial_total" placeholder="0" readonly></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="matricula-box" id="matricula-final">
+                <div class="matricula-label">MATRÍCULA FINAL</div>
+                <table class="matricula-tabla">
+                    <tr>
+                        <th>Masc.</th>
+                        <th>Fem.</th>
+                        <th>TOTAL</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" min="0" max="9999" data-campo="final_masc" placeholder="0" readonly></td>
+                        <td><input type="number" min="0" max="9999" data-campo="final_fem" placeholder="0" readonly></td>
+                        <td class="total-cell"><input type="number" min="0" max="9999" data-campo="final_total" placeholder="0" readonly></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- TABLA PRINCIPAL -->
+        <div class="tabla-contenedor">
+            <div id="tabla-resumen-container"></div>
+        </div>
+
+        <div class="footer">
+            <div class="watermark">Ministerio de Educación • República Dominicana</div>
+            <div class="page-number">Página 34</div>
+        </div>
+    </div>
+
+    <script src="resumen-incristos.js"></script>
+</body>
+</html>
