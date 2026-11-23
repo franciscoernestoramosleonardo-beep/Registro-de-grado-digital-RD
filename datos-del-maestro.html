@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos del Maestro</title>
+    <link rel="stylesheet" href="datos-del-maestro.css">
+</head>
+<body>
+    <div class="container-datos-maestro">
+        <div class="controls-dm">
+            <div class="header-info-dm">
+                <span class="badge-dm badge-grade-dm" id="gradeDisplayDM">3er Grado</span>
+                <span class="badge-dm badge-section-dm" id="sectionDisplayDM">Sección A</span>
+                <span class="badge-dm" id="schoolYearDisplayDM">2025-2026</span>
+            </div>
+            <button class="btn btn-primary" onclick="validarDatosMaestro()">✅ Validar</button>
+            <button class="btn btn-danger" onclick="limpiarDatosMaestro()">🗑️ Limpiar</button>
+            <button class="btn btn-success" onclick="printPage()">🖨️ Imprimir</button>
+        </div>
+
+        <div class="carta-page-dm">
+            <h1 class="page-title-dm">Datos del maestro o la maestra</h1>
+            
+            <p class="texto-descriptivo-dm">
+                Completar los datos solicitados del maestro o la maestra responsable de la sección. 
+                Este registro cuenta con espacio para posibles reemplazantes como responsables del grado.
+            </p>
+
+            <div class="maestro-grid-dm">
+                <!-- Nombre y apellidos - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Nombre(s) y apellido(s):</label>
+                    <input type="text" class="value-input-full-dm" id="maestroNombre" placeholder="">
+                </div>
+
+                <!-- Fecha de ingreso y Teléfono -->
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Fecha de ingreso a este curso:</label>
+                    <div class="fecha-group-dm">
+                        <input type="text" id="maestroIngresoDia" placeholder="DD" maxlength="2"> /
+                        <input type="text" id="maestroIngresoMes" placeholder="MM" maxlength="2"> /
+                        <input type="text" id="maestroIngresoAnio" placeholder="AAAA" maxlength="4">
+                    </div>
+                </div>
+
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Teléfono:</label>
+                    <input type="tel" class="value-input-dm" id="maestroTelefono" placeholder="" maxlength="12">
+                </div>
+
+                <!-- Dirección - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Dirección / Residencia:</label>
+                    <input type="text" class="value-input-full-dm" id="maestroDireccion" placeholder="">
+                </div>
+
+                <!-- Correo y Sexo -->
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Correo electrónico:</label>
+                    <input type="email" class="value-input-dm" id="maestroCorreo" placeholder="">
+                </div>
+
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Sexo:</label>
+                    <div class="sexo-group-dm">
+                        <label><input type="radio" name="sexo" value="M"> Masculino</label>
+                        <label><input type="radio" name="sexo" value="F"> Femenino</label>
+                    </div>
+                </div>
+
+                <!-- Fecha de nacimiento y Estado civil -->
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Fecha de nacimiento:</label>
+                    <div class="fecha-group-dm">
+                        <input type="text" id="maestroNacDia" placeholder="DD" maxlength="2"> /
+                        <input type="text" id="maestroNacMes" placeholder="MM" maxlength="2"> /
+                        <input type="text" id="maestroNacAnio" placeholder="AAAA" maxlength="4">
+                    </div>
+                </div>
+
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Estado civil:</label>
+                    <select class="value-input-dm" id="maestroEstadoCivil">
+                        <option value="">Seleccione...</option>
+                        <option value="Soltero/a">Soltero/a</option>
+                        <option value="Casado/a">Casado/a</option>
+                        <option value="Divorciado/a">Divorciado/a</option>
+                        <option value="Viudo/a">Viudo/a</option>
+                        <option value="Unión Libre">Unión Libre</option>
+                        <option value="Separado/a">Separado/a</option>
+                        <option value="Concubino/a">Concubino/a</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <!-- Nacionalidad y Cédula -->
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Nacionalidad:</label>
+                    <select class="value-input-dm" id="maestroNacionalidad">
+                        <option value="">Seleccione...</option>
+                        <!-- AMÉRICA -->
+                        <option value="Dominicano/a">Dominicano/a</option>
+                        <option value="Antiguano/a">Antiguano/a</option>
+                        <option value="Argentino/a">Argentino/a</option>
+                        <option value="Bahameño/a">Bahameño/a</option>
+                        <option value="Barbadense">Barbadense</option>
+                        <option value="Beliceño/a">Beliceño/a</option>
+                        <option value="Boliviano/a">Boliviano/a</option>
+                        <option value="Brasileño/a">Brasileño/a</option>
+                        <option value="Canadiense">Canadiense</option>
+                        <option value="Chileno/a">Chileno/a</option>
+                        <option value="Colombiano/a">Colombiano/a</option>
+                        <option value="Costarricense">Costarricense</option>
+                        <option value="Cubano/a">Cubano/a</option>
+                        <option value="Ecuatoriano/a">Ecuatoriano/a</option>
+                        <option value="Salvadoreño/a">Salvadoreño/a</option>
+                        <option value="Estadounidense">Estadounidense</option>
+                        <option value="Granadino/a">Granadino/a</option>
+                        <option value="Guatemalteco/a">Guatemalteco/a</option>
+                        <option value="Guyanés/a">Guyanés/a</option>
+                        <option value="Haitiano/a">Haitiano/a</option>
+                        <option value="Hondureño/a">Hondureño/a</option>
+                        <option value="Jamaicano/a">Jamaicano/a</option>
+                        <option value="Mexicano/a">Mexicano/a</option>
+                        <option value="Nicaragüense">Nicaragüense</option>
+                        <option value="Panameño/a">Panameño/a</option>
+                        <option value="Paraguayo/a">Paraguayo/a</option>
+                        <option value="Peruano/a">Peruano/a</option>
+                        <option value="Puertorriqueño/a">Puertorriqueño/a</option>
+                        <option value="Sanvicentino/a">Sanvicentino/a</option>
+                        <option value="Surinamés/a">Surinamés/a</option>
+                        <option value="Trinitense">Trinitense</option>
+                        <option value="Uruguayo/a">Uruguayo/a</option>
+                        <option value="Venezolano/a">Venezolano/a</option>
+                        <!-- OTROS CONTINENTES -->
+                        <option value="Europeo/a">Europeo/a</option>
+                        <option value="Asiático/a">Asiático/a</option>
+                        <option value="Africano/a"> Africano/a</option>
+                        <option value="Oceánico/a">Oceánico/a</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="maestro-item-dm">
+                    <label class="label-dm">Cédula de identidad y electoral:</label>
+                    <input type="text" class="value-input-dm" id="maestroCedula" placeholder="" maxlength="13">
+                </div>
+
+                <!-- Años en servicio - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Años en servicio en el sistema educativo:</label>
+                    <input type="number" class="value-input-full-dm" id="maestroAnosServicio" placeholder="" min="0" max="50">
+                </div>
+
+                <!-- Labora en otra actividad -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Labora en actividad distinta a docencia:</label>
+                    <div class="si-no-group-dm">
+                        <label><input type="radio" name="labora" value="S"> Sí</label>
+                        <label><input type="radio" name="labora" value="N"> No</label>
+                        <input type="text" class="value-input-dm" id="maestroEspecifique" placeholder="Especifique:" style="margin-left: 20px; flex: 1;">
+                    </div>
+                </div>
+
+                <!-- Espacio adicional -->
+                <div class="maestro-item-dm full-width" style="min-height: 30px; border: none;"></div>
+
+                <!-- Título alcanzado - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Título alcanzado:</label>
+                    <input type="text" class="value-input-full-dm" id="maestroTitulo" placeholder="">
+                </div>
+
+                <!-- Área de Especialización - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Área de Especialización:</label>
+                    <input type="text" class="value-input-full-dm" id="maestroArea" placeholder="">
+                </div>
+
+                <!-- Estudios que cursa - ancho completo -->
+                <div class="maestro-item-dm full-width">
+                    <label class="label-long-dm">Estudios que cursa actualmente:</label>
+                    <input type="text" class="value-input-full-dm" id="maestroEstudios" placeholder="">
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-dm">
+                <span class="watermark-dm">Ministerio de Educación • República Dominicana</span>
+                <span class="page-number-dm">Página 1 de 1</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="datos-del-maestro.js"></script>
+</body>
+</html>
