@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMI-15OCT - Resumen de Matrícula Inicial</title>
+    <link rel="stylesheet" href="rmi-150ct.css">
+</head>
+<body>
+    <!-- BARRA DE CONTROLES -->
+    <div class="barra-controles">
+        <button class="btn-print" onclick="imprimirPagina()">🖨️ Imprimir</button>
+        <button class="btn-sync" onclick="procesarDatos()">🔄 Sincronizar desde Formulario</button>
+        <button class="btn-clear" onclick="limpiarDatos()">🗑️ Limpiar</button>
+        <div class="info-grado">
+            <span class="info-item">
+                🎓 <span id="gradeDisplayRMI">3er Grado</span>
+            </span>
+            <span class="info-sep">•</span>
+            <span class="info-item">
+                📚 <span id="sectionDisplayRMI">Sección A</span>
+            </span>
+            <span class="info-sep">•</span>
+            <span class="info-item">
+                🕐 <span id="tandaDisplayRMI">Matutina</span>
+            </span>
+            <span class="info-sep">•</span>
+            <span class="info-item">
+                📅 <span id="schoolYearDisplayRMI">2025-2026</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="contenedor-carta">
+        <h1 class="titulo-principal">RESUMEN DE MATRÍCULA INICIAL AL 15 DE OCTUBRE</h1>
+
+        <div class="grid">
+            <div class="cuadro" id="cuadro1">
+                <div class="cuadro-header">1. Cantidad de estudiantes, sexo y edad</div>
+                <div class="cuadro-body"></div>
+            </div>
+            <div class="cuadro" id="cuadro2">
+                <div class="cuadro-header">2. Cantidad de estudiantes en sobreedad en este grado</div>
+                <div class="cuadro-body"></div>
+            </div>
+            <div class="cuadro" id="cuadro3">
+                <div class="cuadro-header">3. Estudiantes con necesidades específicas de apoyo educativo (NEAE)</div>
+                <div class="cuadro-body"></div>
+            </div>
+            <div class="cuadro" id="cuadro4">
+                <div class="cuadro-header">4. Nivel de educación de la madre, padre o tutor/a</div>
+                <div class="cuadro-body"></div>
+            </div>
+        </div>
+
+        <div class="pie-pagina">
+            <div class="marca-agua">Ministerio de Educación • República Dominicana</div>
+            <div class="numero-pagina">Página 1 de 1</div>
+        </div>
+    </div>
+
+    <script src="rmi-150ct.js"></script>
+</body>
+</html>

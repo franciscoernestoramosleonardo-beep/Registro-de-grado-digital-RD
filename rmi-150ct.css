@@ -1,0 +1,393 @@
+@page {
+    size: letter;
+    margin: 10mm;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ============================================ */
+/* BODY OCUPA EL 100% DEL CONTENEDOR            */
+/* ============================================ */
+body {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 9pt;
+    color: #000;
+    background: #f0f2f5;
+    width: 100%;
+    min-height: 100vh;
+    padding: 10px;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* ============================================ */
+/* BARRA DE CONTROLES                           */
+/* ============================================ */
+.barra-controles {
+    width: 100%;
+    max-width: 215.9mm;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #1a2a4a;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.barra-controles .btn-print,
+.barra-controles .btn-clear {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.barra-controles .btn-print {
+    background: #28a745;
+    color: white;
+}
+
+.barra-controles .btn-print:hover {
+    background: #218838;
+    transform: scale(1.02);
+}
+
+.barra-controles .btn-clear {
+    background: #dc3545;
+    color: white;
+}
+
+.barra-controles .btn-clear:hover {
+    background: #c82333;
+    transform: scale(1.02);
+}
+
+.barra-controles .info-grado {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: bold;
+    margin-left: auto;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+/* ============================================ */
+/* CONTENEDOR CARTA - TAMAÑO CARTA              */
+/* ============================================ */
+.contenedor-carta {
+    width: 100%;
+    max-width: 215.9mm;
+    background: #ffffff;
+    padding: 8mm 10mm 6mm 10mm;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    border: 1px solid #d0d0d0;
+    display: flex;
+    flex-direction: column;
+    min-height: 279.4mm;
+}
+
+/* ============================================ */
+/* TÍTULO PRINCIPAL                             */
+/* ============================================ */
+.titulo-principal {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    margin-bottom: 5mm;
+    text-transform: uppercase;
+    width: 100%;
+    color: #1a2a4a;
+    border-bottom: 2px solid #1a3a6b;
+    padding-bottom: 3mm;
+}
+
+/* ============================================ */
+/* GRID OCUPA EL 100% DEL ESPACIO               */
+/* ============================================ */
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 4mm;
+    width: 100%;
+    flex: 1;
+}
+
+/* ============================================ */
+/* CUADROS CON ALTURA AUTOMÁTICA                */
+/* ============================================ */
+.cuadro {
+    border: 1.5px solid #1a2a4a;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 160px;
+    border-radius: 2px;
+}
+
+.cuadro-header {
+    background: #e8ecf1;
+    border-bottom: 1.5px solid #1a2a4a;
+    padding: 2mm 3mm;
+    font-weight: bold;
+    font-size: 9pt;
+    text-align: center;
+    flex-shrink: 0;
+    color: #1a2a4a;
+}
+
+.cuadro-body {
+    flex: 1;
+    padding: 2mm;
+    overflow: visible;
+    min-height: 80px;
+}
+
+/* ============================================ */
+/* TABLAS RESPONSIVAS                           */
+/* ============================================ */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    min-width: 150px;
+}
+
+th,
+td {
+   border: 1px solid #1a2a4a;
+    padding: 1.2mm 1.5mm;
+    text-align: center;
+}
+
+th {
+    background: #f0f0f0;
+    font-weight: bold;
+    color: #1a2a4a;
+}
+
+.fila-total {
+    font-weight: bold;
+    background: #fafafa;
+}
+
+.sub-header {
+    background: #dcdcdc;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 3mm;
+}
+
+.td-left {
+    text-align: left;
+    padding-left: 3mm;
+}
+
+.num-row {
+    width: 15%;
+}
+
+/* ============================================ */
+/* INPUTS - SIN PLACEHOLDER                     */
+/* ============================================ */
+input[type="number"] {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 9pt;
+    padding: 2px;
+    outline: none;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+input[type="number"]:focus {
+    background: #e8f0fe;
+}
+
+input[type="number"][readonly] {
+    font-weight: bold;
+    background: #f5f5f5;
+}
+
+/* ============================================ */
+/* ANCHOS ESPECÍFICOS POR TABLA                 */
+/* ============================================ */
+#cuadro1 table .num-row { width: 20%; }
+#cuadro1 table .col-cantidad { width: 80%; }
+#cuadro1 table .sub-col { width: 40%; }
+
+#cuadro2 table .num-row { width: 20%; }
+#cuadro2 table .col-cantidad { width: 80%; }
+#cuadro2 table .sub-col { width: 40%; }
+
+#cuadro3 table th:first-child,
+#cuadro3 table td:first-child { width: 40%; }
+#cuadro3 table .col-cantidad { width: 60%; }
+#cuadro3 table .sub-col { width: 30%; }
+
+#cuadro4 table th:first-child,
+#cuadro4 table td:first-child { width: 70%; }
+#cuadro4 table th:last-child,
+#cuadro4 table td:last-child { width: 30%; }
+
+/* ============================================ */
+/* PIE DE PÁGINA                                */
+/* ============================================ */
+.pie-pagina {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5mm;
+    padding-top: 3mm;
+    border-top: 2px solid #1a3a6b;
+    font-size: 8pt;
+    color: #6c7a8a;
+    flex-shrink: 0;
+}
+
+.pie-pagina .marca-agua {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.pie-pagina .numero-pagina {
+    font-weight: bold;
+    color: #1a2a4a;
+}
+
+/* ============================================ */
+/* RESPONSIVE                                   */
+/* ============================================ */
+@media screen and (max-width: 800px) {
+    body { padding: 5px; }
+    .contenedor-carta { padding: 5mm; }
+    .grid { grid-template-columns: 1fr; gap: 3mm; }
+    .cuadro-header { font-size: 8pt; padding: 1.5mm 2mm; }
+    table { font-size: 8pt; min-width: 120px; }
+    th, td { padding: 1mm 1.2mm; }
+    .barra-controles { padding: 8px 12px; }
+    .barra-controles .btn-print,
+    .barra-controles .btn-clear { font-size: 10px; padding: 6px 14px; }
+}
+
+@media screen and (max-width: 480px) {
+    body { padding: 3px; }
+    .contenedor-carta { padding: 3mm; }
+    .titulo-principal { font-size: 9pt; }
+    .cuadro-header { font-size: 7pt; padding: 1mm 1.5mm; }
+    table { font-size: 7pt; min-width: 100px; }
+    th, td { padding: 0.8mm 1mm; }
+    .grid { gap: 2mm; }
+    .barra-controles { padding: 6px 10px; gap: 6px; }
+    .barra-controles .btn-print,
+    .barra-controles .btn-clear { font-size: 9px; padding: 4px 10px; }
+    .barra-controles .info-grado { font-size: 10px; }
+    .pie-pagina { font-size: 6pt; }
+}
+
+/* ============================================ */
+/* IMPRESIÓN - TAMAÑO CARTA                     */
+/* ============================================ */
+@media print {
+    body {
+        padding: 0;
+        margin: 0;
+        background: #fff;
+        min-height: auto;
+    }
+
+    .barra-controles {
+        display: none !important;
+    }
+
+    .contenedor-carta {
+        max-width: 100%;
+        padding: 8mm 10mm 6mm 10mm;
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        min-height: auto;
+        background: #fff;
+    }
+
+    .grid {
+        max-width: 100%;
+        gap: 3mm;
+    }
+
+    .cuadro-body {
+        overflow: visible;
+    }
+
+    .cuadro {
+        border: 1.5px solid #000 !important;
+    }
+
+    .cuadro-header {
+        border-bottom: 1.5px solid #000 !important;
+    }
+
+    input[type="number"] {
+        border: none !important;
+        background: transparent !important;
+    }
+
+    input[type="number"][readonly] {
+        background: #f5f5f5 !important;
+    }
+
+    .pie-pagina {
+        border-top: 2px solid #000 !important;
+    }
+
+    @page {
+        size: letter;
+        margin: 10mm;
+    }
+}
+/* ============================================ */
+/* BOTÓN SINCRONIZAR DESDE FORMULARIO           */
+/* ============================================ */
+.barra-controles .btn-sync {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #007bff;
+    color: white;
+}
+
+.barra-controles .btn-sync:hover {
+    background: #0069d9;
+    transform: scale(1.02);
+}
+
+/* Indicador de datos auto-cargados */
+.cuadro.auto-cargado .cuadro-header::after {
+    content: ' ✓ AUTO';
+    font-size: 7pt;
+    color: #28a745;
+    font-weight: bold;
+    margin-left: 6px;
+}
