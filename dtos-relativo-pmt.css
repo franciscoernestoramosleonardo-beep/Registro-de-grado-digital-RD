@@ -1,0 +1,476 @@
+/* ============ RESET Y CONFIGURACIÓN GENERAL ============ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #e0e0e0;
+    padding: 20px;
+    overflow-x: hidden;
+    word-wrap: break-word;
+}
+
+/* ============================================
+✅ BARRA DE INFORMACIÓN SINCRONIZADA
+============================================ */
+.barra-info-pmt {
+    width: 8.5in;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    background: #1a2a4a;
+    border-radius: 8px;
+    margin: 0 auto 15px auto;
+    flex-shrink: 0;
+}
+
+.barra-info-pmt .info-grado-pmt {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 16px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+#tandaDisplayPMT {
+    color: #FFD700;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+/* ============ CONTENEDOR TAMAÑO CARTA ============ */
+.carta {
+    width: 8.5in;
+    max-width: 100%; /* ← AGREGADO: permite encojerse en móvil */
+    min-height: 11in;
+    background: #fff;
+    margin: 0 auto;
+    padding: 0.4in 0.35in;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ============ ENCABEZADO ============ */
+.titulo {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+/* ============ TABLA ============ */
+.tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* ← AGREGADO: scroll suave en iOS */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+    table-layout: fixed;
+    min-width: 600px; /* ← AGREGADO: mantiene estructura en móvil */
+}
+
+th,
+td {
+    border: 1px solid #000;
+    text-align: center;
+    vertical-align: middle;
+    padding: 2px;
+    height: 18px;
+}
+
+th {
+    background: #f5f5f5;
+    font-weight: bold;
+}
+
+/* ============ ANCHOS DE COLUMNAS ============ */
+.col-orden { width: 2%; }
+.col-nombre { width: 25%; }
+.col-parent { width: 7%; }
+.col-cedula { width: 10%; }
+.col-tel { width: 13%; }
+.col-prof { width: 13%; }
+.col-nivel { width: 30%; }
+
+/* ============ TEXTO VERTICAL ============ */
+.vertical {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: bold;
+    padding: 4px 2px;
+    height: 70px;
+    vertical-align: middle;
+}
+
+.vertical-small {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-size: 8px;
+    padding: 2px;
+    height: 102px;
+    vertical-align: middle;
+}
+
+.vertical-orden {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    font-size: 8px;
+    font-weight: bold;
+    padding: 2px;
+    height: 70px;
+    vertical-align: middle;
+}
+
+/* ============ CELDAS DE INPUT ============ */
+td input[type="text"],
+td input[type="number"],
+td select {
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-size: 9px;
+    background: transparent;
+    padding: 2px;
+    font-family: Arial, sans-serif;
+}
+
+td input[type="text"]:focus,
+td select:focus {
+    background: #f0f7ff;
+}
+
+td input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #1a3a6b;
+}
+
+/* ============ QUITAR FLECHAS DE SELECT ============ */
+td select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+}
+
+td select::-ms-expand {
+    display: none;
+}
+
+/* ============ BOTONES ============ */
+.controles {
+    margin: 15px auto;
+    text-align: center;
+    width: 8.5in;
+    max-width: 100%; /* ← AGREGADO: permite encojerse en móvil */
+}
+
+.btn {
+    background: #2c3e50;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    margin: 0 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background: #34495e;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #c0392b;
+}
+
+.btn-danger:hover {
+    background: #e74c3c;
+}
+
+.btn-success {
+    background: #27ae60;
+}
+
+.btn-success:hover {
+    background: #2ecc71;
+}
+
+/* ============================================
+RESPONSIVE - MÓVIL (≤ 700px)
+============================================ */
+@media screen and (max-width: 700px) {
+    body {
+        padding: 10px;
+    }
+    
+    .barra-info-pmt {
+        padding: 8px 12px;
+    }
+    
+    .barra-info-pmt .info-grado-pmt {
+        font-size: 12px;
+        padding: 3px 12px;
+    }
+    
+    .carta {
+        padding: 0.3in 0.25in;
+    }
+    
+    .titulo {
+        font-size: 12px;
+    }
+    
+    table {
+        font-size: 8px;
+    }
+    
+    th, td {
+        padding: 1px;
+        height: 16px;
+    }
+    
+    .vertical {
+        height: 60px;
+        font-size: 8px;
+    }
+    
+    .vertical-small {
+        height: 90px;
+        font-size: 7px;
+    }
+    
+    .vertical-orden {
+        height: 60px;
+        font-size: 7px;
+    }
+    
+    td input[type="text"],
+    td input[type="number"],
+    td select {
+        font-size: 8px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+}
+
+/* ============================================
+RESPONSIVE - MÓVIL PEQUEÑO (≤ 480px)
+============================================ */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 5px;
+    }
+    
+    .barra-info-pmt {
+        padding: 6px 10px;
+    }
+    
+    .barra-info-pmt .info-grado-pmt {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+    
+    .carta {
+        padding: 0.25in 0.2in;
+    }
+    
+    .titulo {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    
+    table {
+        font-size: 7px;
+        min-width: 550px;
+    }
+    
+    th, td {
+        padding: 1px;
+        height: 14px;
+    }
+    
+    .vertical {
+        height: 50px;
+        font-size: 7px;
+    }
+    
+    .vertical-small {
+        height: 80px;
+        font-size: 6px;
+    }
+    
+    .vertical-orden {
+        height: 50px;
+        font-size: 6px;
+    }
+    
+    td input[type="text"],
+    td input[type="number"],
+    td select {
+        font-size: 7px;
+    }
+    
+    td input[type="checkbox"] {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .btn {
+        padding: 5px 10px;
+        font-size: 10px;
+        margin: 0 3px;
+    }
+}
+
+/* ============================================
+RESPONSIVE - MÓVIL MUY PEQUEÑO (≤ 360px)
+============================================ */
+@media screen and (max-width: 360px) {
+    body {
+        padding: 3px;
+    }
+    
+    .barra-info-pmt {
+        padding: 5px 8px;
+        margin-bottom: 10px;
+    }
+    
+    .barra-info-pmt .info-grado-pmt {
+        font-size: 9px;
+        padding: 2px 6px;
+    }
+    
+    .carta {
+        padding: 0.2in 0.15in;
+    }
+    
+    .titulo {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+    
+    table {
+        font-size: 6px;
+        min-width: 500px;
+    }
+    
+    th, td {
+        padding: 0.5px;
+        height: 12px;
+    }
+    
+    .vertical {
+        height: 45px;
+        font-size: 6px;
+    }
+    
+    .vertical-small {
+        height: 70px;
+        font-size: 5px;
+    }
+    
+    .vertical-orden {
+        height: 45px;
+        font-size: 5px;
+    }
+    
+    td input[type="text"],
+    td input[type="number"],
+    td select {
+        font-size: 6px;
+    }
+    
+    td input[type="checkbox"] {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .btn {
+        padding: 4px 8px;
+        font-size: 9px;
+        margin: 0 2px;
+    }
+}
+
+/* ============ IMPRESIÓN ============ */
+@media print {
+    body {
+        background: #fff;
+        padding: 0;
+    }
+
+    .carta {
+        box-shadow: none;
+        margin: 0;
+    }
+
+    .barra-info-pmt {
+        display: none !important;
+    }
+
+    .controles {
+        display: none;
+    }
+
+    td input[type="checkbox"] {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        accent-color: #1a3a6b;
+    }
+
+    td input[type="checkbox"]:checked {
+        accent-color: #1a3a6b;
+    }
+
+    td select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    td select::-ms-expand {
+        display: none !important;
+    }
+
+    td input[type="text"],
+    td select {
+        border: none !important;
+        background: transparent !important;
+    }
+
+    td select option {
+        display: none;
+    }
+
+    td select option:checked {
+        display: block;
+    }
+}

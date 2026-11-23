@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datos relativos al padre, madre, tutor, tutora</title>
+    <link rel="stylesheet" href="dtos-relativo-pmt.css">
+</head>
+<body>
+
+    <!-- ✅ BARRA DE INFORMACIÓN SINCRONIZADA (CON TANDA) -->
+    <div class="barra-info-pmt">
+        <div class="info-grado-pmt">
+            <span id="gradeDisplayPMT">3er Grado</span> • 
+            <span id="sectionDisplayPMT">Sección A</span> • 
+            <span id="tandaDisplayPMT">Matutina</span> • 
+            <span id="schoolYearDisplayPMT">2025-2026</span>
+        </div>
+    </div>
+
+    <!-- ============ CONTROLES ============ -->
+    <div class="controles">
+        <button class="btn btn-success" onclick="guardarDatos()">💾 Guardar</button>
+        <button class="btn" onclick="cargarDatos()">📂 Cargar</button>
+        <button class="btn btn-danger" onclick="limpiarTodo()">🗑️ Limpiar</button>
+        <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn" onclick="recargarTablaDesdeSincronizacion()">🔄 Recargar</button>
+    </div>
+
+    <!-- ============ CONTENEDOR CARTA ============ -->
+    <div class="carta">
+        <div class="titulo">Datos relativos al padre, madre, tutor, tutora</div>
+
+        <div class="tabla-contenedor">
+            <table id="tablaDatos">
+                <thead>
+                    <tr>
+                        <th class="col-orden vertical-orden" rowspan="2">Nº de orden</th>
+                        <th class="col-nombre" rowspan="2">Nombre y apellido</th>
+                        <th class="col-parent" colspan="3">Parentesco</th>
+                        <th class="col-cedula" rowspan="2">No. de Cédula de Identidad y Electoral</th>
+                        <th class="col-tel" rowspan="2">Teléfono</th>
+                        <th class="col-prof" rowspan="2">Profesión u oficio</th>
+                        <th class="col-nivel" colspan="8">Nivel educativo alcanzado</th>
+                    </tr>
+                    <tr>
+                        <th class="vertical-small">Madre</th>
+                        <th class="vertical-small">Padre</th>
+                        <th class="vertical-small">Tutor(a)</th>
+                        <th class="vertical">Sin escolaridad</th>
+                        <th class="vertical">Primaria incompleta</th>
+                        <th class="vertical">Primaria completa</th>
+                        <th class="vertical">Secundaria incompleta</th>
+                        <th class="vertical">Secundaria completa</th>
+                        <th class="vertical">Superior incompleto</th>
+                        <th class="vertical">Superior completo</th>
+                        <th class="vertical">Desconocido</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <!-- Las 45 filas se generan con JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============ SCRIPT ============ -->
+    <script src="dtos-relativo-pmt.js"></script>
+
+</body>
+</html>
