@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📱 Vista Responsiva</title>
+    <style>
+        /* ============================================
+           ESTILOS BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body.modo-oscuro {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        body.modo-oscuro .card {
+            background: #2a2a4a;
+            border-color: #3a3a5a;
+        }
+
+        body.modo-oscuro .card h2,
+        body.modo-oscuro .card h3,
+        body.modo-oscuro .card label {
+            color: #e0e0e0;
+        }
+
+        body.modo-oscuro .card p,
+        body.modo-oscuro .card .descripcion {
+            color: #b0b0c0;
+        }
+
+        body.modo-oscuro .preview {
+            background: #2a2a4a;
+            border-color: #3a3a5a;
+        }
+
+        body.modo-oscuro .preview .demo-card {
+            background: #3a3a5a;
+            border-color: #4a4a6a;
+        }
+
+        body.modo-oscuro .preview .demo-card .demo-titulo {
+            color: #e0e0e0;
+        }
+
+        body.modo-oscuro .preview .demo-card .demo-texto {
+            color: #b0b0c0;
+        }
+
+        body.modo-oscuro .opcion-activa {
+            background: #1a3a6b !important;
+            border-color: #4a8ab5 !important;
+        }
+
+        body.modo-oscuro .selector-opcion {
+            background: #3a3a5a;
+            border-color: #4a4a6a;
+            color: #e0e0e0;
+        }
+
+        body.modo-oscuro .selector-opcion:hover {
+            background: #4a4a6a;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: #1a2a4a;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body.modo-oscuro .header {
+            background: #2a2a4a;
+            border-bottom: 2px solid #3a3a5a;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-info {
+            color: #FFD700;
+            font-size: 13px;
+            background: rgba(255, 215, 0, 0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #FFD700;
+        }
+
+        /* ============================================
+           TARJETA PRINCIPAL
+           ============================================ */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8ecf1;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card h2 {
+            font-size: 18px;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .card .subtitulo {
+            font-size: 14px;
+            color: #4a5a7a;
+            margin-bottom: 16px;
+        }
+
+        /* ============================================
+           SELECTORES DE VISTA
+           ============================================ */
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .selector-opcion {
+            padding: 12px 16px;
+            background: #f8fafc;
+            border: 2px solid #e8ecf1;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a2a4a;
+        }
+
+        .selector-opcion:hover {
+            border-color: #1a3a6b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .selector-opcion .icono {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .selector-opcion .label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .selector-opcion .desc {
+            font-size: 10px;
+            color: #8a9aaa;
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .selector-opcion.activa {
+            border-color: #1a3a6b;
+            background: #e8f0fe;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.15);
+        }
+
+        body.modo-oscuro .selector-opcion.activa {
+            background: #1a3a6b;
+            border-color: #4a8ab5;
+            color: #ffffff;
+        }
+
+        .selector-opcion.activa .desc {
+            color: #4a5a7a;
+        }
+
+        body.modo-oscuro .selector-opcion.activa .desc {
+            color: #b0b0c0;
+        }
+
+        /* ============================================
+           VISTA PREVIA
+           ============================================ */
+        .preview {
+            background: #f8fafc;
+            border: 2px dashed #d0d8e0;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 180px;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .preview .badge-preview {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8a9aaa;
+            background: #ffffff;
+            padding: 2px 12px;
+            border-radius: 12px;
+            border: 1px solid #e8ecf1;
+        }
+
+        body.modo-oscuro .preview .badge-preview {
+            background: #2a2a4a;
+            border-color: #3a3a5a;
+            color: #8a9aaa;
+        }
+
+        /* Demo de vista móvil */
+        .preview.movil {
+            max-width: 375px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-color: #1a3a6b;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body.modo-oscuro .preview.movil {
+            background: #2a2a4a;
+            border-color: #4a8ab5;
+        }
+
+        .preview.tablet {
+            max-width: 768px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-color: #1a3a6b;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        body.modo-oscuro .preview.tablet {
+            background: #2a2a4a;
+            border-color: #4a8ab5;
+        }
+
+        .preview.escritorio {
+            max-width: 100%;
+            background: #ffffff;
+            border-color: #28a745;
+        }
+
+        body.modo-oscuro .preview.escritorio {
+            background: #2a2a4a;
+            border-color: #28a745;
+        }
+
+        /* Demo card dentro de la preview */
+        .preview .demo-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            border: 1px solid #e8ecf1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        body.modo-oscuro .preview .demo-card {
+            background: #3a3a5a;
+            border-color: #4a4a6a;
+        }
+
+        .preview .demo-card .demo-titulo {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .preview .demo-card .demo-texto {
+            font-size: 13px;
+            color: #4a5a7a;
+            line-height: 1.5;
+        }
+
+        .preview .demo-card .demo-grid {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .preview .demo-card .demo-grid.grid-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .preview .demo-card .demo-grid.grid-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .preview .demo-card .demo-grid .demo-item {
+            background: #f0f4f8;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            color: #1a2a4a;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        body.modo-oscuro .preview .demo-card .demo-grid .demo-item {
+            background: #4a4a6a;
+            color: #e0e0e0;
+        }
+
+        .preview .demo-card .demo-grid .demo-item .demo-icono {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* ============================================
+           CONTROLES DE ACCESIBILIDAD
+           ============================================ */
+        .controles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e8ecf1;
+            transition: all 0.3s ease;
+        }
+
+        body.modo-oscuro .control-item {
+            background: #3a3a5a;
+            border-color: #4a4a6a;
+        }
+
+        .control-item .icono {
+            font-size: 20px;
+        }
+
+        .control-item .info {
+            flex: 1;
+        }
+
+        .control-item .info .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a2a4a;
+        }
+
+        body.modo-oscuro .control-item .info .label {
+            color: #e0e0e0;
+        }
+
+        .control-item .info .valor {
+            font-size: 11px;
+            color: #4a5a7a;
+        }
+
+        body.modo-oscuro .control-item .info .valor {
+            color: #b0b0c0;
+        }
+
+        .control-item .btn-control {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            background: #1a2a4a;
+            color: white;
+        }
+
+        .control-item .btn-control:hover {
+            transform: scale(1.05);
+        }
+
+        .control-item .btn-control.activo {
+            background: #28a745;
+        }
+
+        body.modo-oscuro .control-item .btn-control {
+            background: #4a4a6a;
+            color: #e0e0e0;
+        }
+
+        body.modo-oscuro .control-item .btn-control.activo {
+            background: #28a745;
+            color: white;
+        }
+
+        /* ============================================
+           ESTADO ACTUAL
+           ============================================ */
+        .estado-actual {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e8ecf1;
+            margin-top: 12px;
+        }
+
+        body.modo-oscuro .estado-actual {
+            background: #3a3a5a;
+            border-color: #4a4a6a;
+        }
+
+        .estado-actual .tag {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        body.modo-oscuro .estado-actual .tag {
+            background: #4a4a6a;
+            color: #e0e0e0;
+        }
+
+        .estado-actual .tag.activa {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        body.modo-oscuro .estado-actual .tag.activa {
+            background: #1a4a2a;
+            color: #8fdf9f;
+        }
+
+        .estado-actual .tag.inactiva {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        body.modo-oscuro .estado-actual .tag.inactiva {
+            background: #4a1a1a;
+            color: #df8f8f;
+        }
+
+        /* ============================================
+           TOAST MENSAJE
+           ============================================ */
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            opacity: 0;
+            transform: translateX(-50%) translateY(16px);
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .toast-mensaje.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        body.modo-oscuro .toast-mensaje {
+            background: #2a2a4a;
+            border-color: #3a3a5a;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .card {
+                padding: 16px 18px;
+            }
+            .selector-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .preview .demo-card .demo-grid.grid-2,
+            .preview .demo-card .demo-grid.grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .controles-grid {
+                grid-template-columns: 1fr;
+            }
+            .toast-mensaje {
+                font-size: 13px;
+                padding: 10px 20px;
+                white-space: normal;
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .selector-grid {
+                grid-template-columns: 1fr;
+            }
+            .estado-actual {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ============================================
+        HEADER
+        ============================================ -->
+        <div class="header">
+            <h1>📱 Vista Responsiva</h1>
+            <span class="header-info" id="vistaActual">💻 Escritorio</span>
+        </div>
+
+        <!-- ============================================
+        TARJETA PRINCIPAL
+        ============================================ -->
+        <div class="card">
+            <h2>🎨 Personaliza tu experiencia</h2>
+            <p class="subtitulo">Selecciona cómo quieres ver el sistema. Los cambios se guardan automáticamente.</p>
+
+            <!-- SELECTORES DE VISTA -->
+            <div class="selector-grid">
+                <button class="selector-opcion activa" data-vista="escritorio" onclick="cambiarVista('escritorio')">
+                    <span class="icono">🖥️</span>
+                    <span class="label">Escritorio</span>
+                    <span class="desc">Pantalla completa</span>
+                </button>
+                <button class="selector-opcion" data-vista="tablet" onclick="cambiarVista('tablet')">
+                    <span class="icono">📱</span>
+                    <span class="label">Tablet</span>
+                    <span class="desc">768px de ancho</span>
+                </button>
+                <button class="selector-opcion" data-vista="movil" onclick="cambiarVista('movil')">
+                    <span class="icono">📱</span>
+                    <span class="label">Móvil</span>
+                    <span class="desc">375px de ancho</span>
+                </button>
+                <button class="selector-opcion" data-vista="oscuro" onclick="alternarModoOscuro()">
+                    <span class="icono">🌙</span>
+                    <span class="label">Modo Oscuro</span>
+                    <span class="desc" id="modoOscuroDesc">Desactivado</span>
+                </button>
+            </div>
+
+            <!-- VISTA PREVIA -->
+            <div class="preview escritorio" id="previewContainer">
+                <span class="badge-preview" id="previewBadge">💻 Escritorio</span>
+                <div class="demo-card">
+                    <div class="demo-titulo">📚 Registro de Grado</div>
+                    <div class="demo-texto">Visualización de cómo se vería el sistema con la configuración actual.</div>
+                    <div class="demo-grid grid-3" id="demoGrid">
+                        <div class="demo-item">
+                            <span class="demo-icono">📋</span>
+                            Formulario
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-icono">👥</span>
+                            Estudiantes
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-icono">📊</span>
+                            Estadísticas
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-icono">📅</span>
+                            Asistencia
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-icono">📚</span>
+                            Evaluación
+                        </div>
+                        <div class="demo-item">
+                            <span class="demo-icono">📄</span>
+                            Reportes
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO ACTUAL -->
+            <div class="estado-actual" id="estadoActual">
+                <span class="tag activa" id="tagVista">💻 Escritorio</span>
+                <span class="tag inactiva" id="tagOscuro">☀️ Modo Claro</span>
+                <span class="tag inactiva" id="tagFuente">🔤 Tamaño normal</span>
+                <span class="tag inactiva" id="tagContraste">🎨 Contraste normal</span>
+            </div>
+        </div>
+
+        <!-- ============================================
+        CONTROLES DE ACCESIBILIDAD
+        ============================================ -->
+        <div class="card">
+            <h2>⚙️ Controles de Accesibilidad</h2>
+            <p class="subtitulo">Ajusta el sistema a tus necesidades visuales.</p>
+
+            <div class="controles-grid">
+                <div class="control-item">
+                    <span class="icono">🔤</span>
+                    <div class="info">
+                        <div class="label">Tamaño de fuente</div>
+                        <div class="valor" id="fuenteValor">Normal</div>
+                    </div>
+                    <button class="btn-control" onclick="cambiarFuente()">Cambiar</button>
+                </div>
+
+                <div class="control-item">
+                    <span class="icono">🎨</span>
+                    <div class="info">
+                        <div class="label">Alto contraste</div>
+                        <div class="valor" id="contrasteValor">Desactivado</div>
+                    </div>
+                    <button class="btn-control" onclick="alternarContraste()">Activar</button>
+                </div>
+
+                <div class="control-item">
+                    <span class="icono">📐</span>
+                    <div class="info">
+                        <div class="label">Espaciado</div>
+                        <div class="valor" id="espaciadoValor">Normal</div>
+                    </div>
+                    <button class="btn-control" onclick="cambiarEspaciado()">Cambiar</button>
+                </div>
+
+                <div class="control-item">
+                    <span class="icono">🔄</span>
+                    <div class="info">
+                        <div class="label">Restablecer todo</div>
+                        <div class="valor">Volver a valores predeterminados</div>
+                    </div>
+                    <button class="btn-control" onclick="restablecerTodo()" style="background:#dc3545;">Restablecer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+        INFORMACIÓN ADICIONAL
+        ============================================ -->
+        <div class="card" style="background:#f8fafc;border:2px dashed #d0d8e0;">
+            <p style="font-size:13px;color:#4a5a7a;text-align:center;">
+                💡 Las preferencias se guardan automáticamente en tu navegador y se aplican a todo el sistema.
+                <br>
+                <span style="font-size:11px;color:#8a9aaa;">Puedes cambiar la vista en cualquier momento desde este panel.</span>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+    TOAST MENSAJE
+    ============================================ -->
+    <div id="toastMensaje" class="toast-mensaje">📌 Mensaje</div>
+
+    <!-- ============================================
+    SCRIPT PRINCIPAL
+    ============================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================
+            // 1. REFERENCIAS A DOM
+            // ============================================
+            const previewContainer = document.getElementById('previewContainer');
+            const previewBadge = document.getElementById('previewBadge');
+            const vistaActual = document.getElementById('vistaActual');
+            const demoGrid = document.getElementById('demoGrid');
+
+            const tagVista = document.getElementById('tagVista');
+            const tagOscuro = document.getElementById('tagOscuro');
+            const tagFuente = document.getElementById('tagFuente');
+            const tagContraste = document.getElementById('tagContraste');
+
+            const fuenteValor = document.getElementById('fuenteValor');
+            const contrasteValor = document.getElementById('contrasteValor');
+            const espaciadoValor = document.getElementById('espaciadoValor');
+            const modoOscuroDesc = document.getElementById('modoOscuroDesc');
+
+            const toast = document.getElementById('toastMensaje');
+
+            // ============================================
+            // 2. ESTADO
+            // ============================================
+            let estado = {
+                vista: 'escritorio',
+                oscuro: false,
+                contraste: false,
+                fuente: 'normal', // normal, grande, muy_grande
+                espaciado: 'normal' // normal, amplio, muy_amplio
+            };
+
+            // ============================================
+            // 3. CARGAR PREFERENCIAS GUARDADAS
+            // ============================================
+            function cargarPreferencias() {
+                try {
+                    const guardado = localStorage.getItem('preferenciasVista');
+                    if (guardado) {
+                        const data = JSON.parse(guardado);
+                        Object.assign(estado, data);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ No se pudieron cargar las preferencias:', e);
+                }
+                aplicarPreferencias();
+                actualizarUI();
+            }
+
+            // ============================================
+            // 4. GUARDAR PREFERENCIAS
+            // ============================================
+            function guardarPreferencias() {
+                try {
+                    localStorage.setItem('preferenciasVista', JSON.stringify(estado));
+                    console.log('✅ Preferencias guardadas:', estado);
+                } catch (e) {
+                    console.warn('⚠️ No se pudieron guardar las preferencias:', e);
+                }
+            }
+
+            // ============================================
+            // 5. APLICAR PREFERENCIAS
+            // ============================================
+            function aplicarPreferencias() {
+                // Aplicar vista
+                cambiarVista(estado.vista, true);
+
+                // Aplicar modo oscuro
+                if (estado.oscuro) {
+                    document.body.classList.add('modo-oscuro');
+                } else {
+                    document.body.classList.remove('modo-oscuro');
+                }
+
+                // Aplicar contraste
+                if (estado.contraste) {
+                    document.body.style.filter = 'contrast(1.5)';
+                    document.body.style.background = '#000000';
+                } else {
+                    document.body.style.filter = '';
+                    document.body.style.background = '';
+                }
+
+                // Aplicar tamaño de fuente
+                const fuentes = {
+                    normal: '16px',
+                    grande: '20px',
+                    muy_grande: '24px'
+                };
+                document.body.style.fontSize = fuentes[estado.fuente] || '16px';
+
+                // Aplicar espaciado
+                const espaciados = {
+                    normal: '1.5',
+                    amplio: '2',
+                    muy_amplio: '2.8'
+                };
+                document.body.style.lineHeight = espaciados[estado.espaciado] || '1.5';
+
+                // Notificar al padre (si existe)
+                notificarPadre();
+            }
+
+            // ============================================
+            // 6. CAMBIAR VISTA
+            // ============================================
+            function cambiarVista(vista, silencioso) {
+                estado.vista = vista;
+
+                // Actualizar clases de preview
+                previewContainer.className = 'preview';
+                if (vista === 'movil') {
+                    previewContainer.classList.add('movil');
+                    previewBadge.textContent = '📱 Móvil (375px)';
+                    vistaActual.textContent = '📱 Móvil';
+                } else if (vista === 'tablet') {
+                    previewContainer.classList.add('tablet');
+                    previewBadge.textContent = '📱 Tablet (768px)';
+                    vistaActual.textContent = '📱 Tablet';
+                } else {
+                    previewContainer.classList.add('escritorio');
+                    previewBadge.textContent = '💻 Escritorio';
+                    vistaActual.textContent = '💻 Escritorio';
+                }
+
+                // Actualizar grid de demo según la vista
+                if (vista === 'movil') {
+                    demoGrid.className = 'demo-grid grid-2';
+                } else {
+                    demoGrid.className = 'demo-grid grid-3';
+                }
+
+                // Actualizar selectores
+                document.querySelectorAll('.selector-opcion[data-vista]').forEach(el => {
+                    el.classList.toggle('activa', el.dataset.vista === vista);
+                });
+
+                // Actualizar tag
+                const nombresVista = {
+                    'escritorio': '💻 Escritorio',
+                    'tablet': '📱 Tablet',
+                    'movil': '📱 Móvil'
+                };
+                tagVista.textContent = nombresVista[vista] || '💻 Escritorio';
+                tagVista.className = 'tag activa';
+
+                guardarPreferencias();
+
+                if (!silencioso) {
+                    mostrarToast(`✅ Vista cambiada a ${nombresVista[vista] || vista}`);
+                }
+
+                // Notificar al padre
+                notificarPadre();
+            }
+
+            // ============================================
+            // 7. ALTERNAR MODO OSCURO
+            // ============================================
+            function alternarModoOscuro() {
+                estado.oscuro = !estado.oscuro;
+
+                if (estado.oscuro) {
+                    document.body.classList.add('modo-oscuro');
+                    modoOscuroDesc.textContent = '✅ Activado';
+                    tagOscuro.textContent = '🌙 Modo Oscuro';
+                    tagOscuro.className = 'tag activa';
+                    mostrarToast('🌙 Modo oscuro activado');
+                } else {
+                    document.body.classList.remove('modo-oscuro');
+                    modoOscuroDesc.textContent = 'Desactivado';
+                    tagOscuro.textContent = '☀️ Modo Claro';
+                    tagOscuro.className = 'tag inactiva';
+                    mostrarToast('☀️ Modo claro activado');
+                }
+
+                // Actualizar el selector de oscuro
+                document.querySelectorAll('.selector-opcion[data-vista="oscuro"]').forEach(el => {
+                    el.classList.toggle('activa', estado.oscuro);
+                });
+
+                guardarPreferencias();
+                notificarPadre();
+            }
+
+            // ============================================
+            // 8. CAMBIAR FUENTE
+            // ============================================
+            function cambiarFuente() {
+                const fuentes = ['normal', 'grande', 'muy_grande'];
+                const nombres = ['Normal', 'Grande', 'Muy Grande'];
+                const idx = fuentes.indexOf(estado.fuente);
+                const nuevoIdx = (idx + 1) % fuentes.length;
+                estado.fuente = fuentes[nuevoIdx];
+
+                const tamanos = {
+                    normal: '16px',
+                    grande: '20px',
+                    muy_grande: '24px'
+                };
+                document.body.style.fontSize = tamanos[estado.fuente];
+
+                fuenteValor.textContent = nombres[nuevoIdx];
+                tagFuente.textContent = `🔤 ${nombres[nuevoIdx]}`;
+                tagFuente.className = estado.fuente === 'normal' ? 'tag inactiva' : 'tag activa';
+
+                mostrarToast(`🔤 Fuente: ${nombres[nuevoIdx]}`);
+                guardarPreferencias();
+                notificarPadre();
+            }
+
+            // ============================================
+            // 9. ALTERNAR CONTRASTE
+            // ============================================
+            function alternarContraste() {
+                estado.contraste = !estado.contraste;
+
+                if (estado.contraste) {
+                    document.body.style.filter = 'contrast(1.5)';
+                    document.body.style.background = '#000000';
+                    contrasteValor.textContent = '✅ Activado';
+                    tagContraste.textContent = '🎨 Alto contraste';
+                    tagContraste.className = 'tag activa';
+                    mostrarToast('🎨 Alto contraste activado');
+                } else {
+                    document.body.style.filter = '';
+                    document.body.style.background = '';
+                    contrasteValor.textContent = 'Desactivado';
+                    tagContraste.textContent = '🎨 Contraste normal';
+                    tagContraste.className = 'tag inactiva';
+                    mostrarToast('🎨 Contraste normal');
+                }
+
+                guardarPreferencias();
+                notificarPadre();
+            }
+
+            // ============================================
+            // 10. CAMBIAR ESPACIADO
+            // ============================================
+            function cambiarEspaciado() {
+                const espaciados = ['normal', 'amplio', 'muy_amplio'];
+                const nombres = ['Normal', 'Amplio', 'Muy Amplio'];
+                const idx = espaciados.indexOf(estado.espaciado);
+                const nuevoIdx = (idx + 1) % espaciados.length;
+                estado.espaciado = espaciados[nuevoIdx];
+
+                const valores = {
+                    normal: '1.5',
+                    amplio: '2',
+                    muy_amplio: '2.8'
+                };
+                document.body.style.lineHeight = valores[estado.espaciado];
+
+                espaciadoValor.textContent = nombres[nuevoIdx];
+
+                mostrarToast(`📐 Espaciado: ${nombres[nuevoIdx]}`);
+                guardarPreferencias();
+                notificarPadre();
+            }
+
+            // ============================================
+            // 11. RESTABLECER TODO
+            // ============================================
+            function restablecerTodo() {
+                if (!confirm('¿Restablecer todas las preferencias a los valores predeterminados?')) return;
+
+                estado = {
+                    vista: 'escritorio',
+                    oscuro: false,
+                    contraste: false,
+                    fuente: 'normal',
+                    espaciado: 'normal'
+                };
+
+                aplicarPreferencias();
+                actualizarUI();
+                guardarPreferencias();
+                mostrarToast('🔄 Todas las preferencias restablecidas');
+                notificarPadre();
+            }
+
+            // ============================================
+            // 12. ACTUALIZAR UI
+            // ============================================
+            function actualizarUI() {
+                // Vista
+                cambiarVista(estado.vista, true);
+
+                // Modo oscuro
+                if (estado.oscuro) {
+                    document.body.classList.add('modo-oscuro');
+                    modoOscuroDesc.textContent = '✅ Activado';
+                    tagOscuro.textContent = '🌙 Modo Oscuro';
+                    tagOscuro.className = 'tag activa';
+                    document.querySelectorAll('.selector-opcion[data-vista="oscuro"]').forEach(el => {
+                        el.classList.add('activa');
+                    });
+                } else {
+                    document.body.classList.remove('modo-oscuro');
+                    modoOscuroDesc.textContent = 'Desactivado';
+                    tagOscuro.textContent = '☀️ Modo Claro';
+                    tagOscuro.className = 'tag inactiva';
+                    document.querySelectorAll('.selector-opcion[data-vista="oscuro"]').forEach(el => {
+                        el.classList.remove('activa');
+                    });
+                }
+
+                // Fuente
+                const nombresFuente = {
+                    'normal': 'Normal',
+                    'grande': 'Grande',
+                    'muy_grande': 'Muy Grande'
+                };
+                fuenteValor.textContent = nombresFuente[estado.fuente] || 'Normal';
+                tagFuente.textContent = `🔤 ${nombresFuente[estado.fuente] || 'Normal'}`;
+                tagFuente.className = estado.fuente === 'normal' ? 'tag inactiva' : 'tag activa';
+
+                // Contraste
+                if (estado.contraste) {
+                    contrasteValor.textContent = '✅ Activado';
+                    tagContraste.textContent = '🎨 Alto contraste';
+                    tagContraste.className = 'tag activa';
+                } else {
+                    contrasteValor.textContent = 'Desactivado';
+                    tagContraste.textContent = '🎨 Contraste normal';
+                    tagContraste.className = 'tag inactiva';
+                }
+
+                // Espaciado
+                const nombresEspaciado = {
+                    'normal': 'Normal',
+                    'amplio': 'Amplio',
+                    'muy_amplio': 'Muy Amplio'
+                };
+                espaciadoValor.textContent = nombresEspaciado[estado.espaciado] || 'Normal';
+            }
+
+            // ============================================
+            // 13. NOTIFICAR AL PADRE (REGISTRO-DE-GRADO)
+            // ============================================
+            function notificarPadre() {
+                try {
+                    const evento = new CustomEvent('vistaResponsivaActualizada', {
+                        detail: {
+                            vista: estado.vista,
+                            oscuro: estado.oscuro,
+                            fuente: estado.fuente,
+                            contraste: estado.contraste,
+                            espaciado: estado.espaciado
+                        }
+                    });
+                    document.dispatchEvent(evento);
+                    window.parent?.postMessage({
+                        type: 'vistaResponsiva',
+                        data: estado
+                    }, '*');
+                } catch (e) {
+                    // Silencioso
+                }
+            }
+
+            // ============================================
+            // 14. MOSTRAR TOAST
+            // ============================================
+            function mostrarToast(mensaje) {
+                toast.textContent = mensaje || '📌 Mensaje';
+                toast.style.background = estado.oscuro ? '#2a2a4a' : '#1a2a4a';
+                toast.classList.add('visible');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 2500);
+            }
+
+            // ============================================
+            // 15. EXPONER FUNCIONES GLOBALES
+            // ============================================
+            window.cambiarVista = cambiarVista;
+            window.alternarModoOscuro = alternarModoOscuro;
+            window.cambiarFuente = cambiarFuente;
+            window.alternarContraste = alternarContraste;
+            window.cambiarEspaciado = cambiarEspaciado;
+            window.restablecerTodo = restablecerTodo;
+            window.actualizarUI = actualizarUI;
+
+            // ============================================
+            // 16. INICIALIZAR
+            // ============================================
+            function inicializar() {
+                cargarPreferencias();
+                console.log('✅ VISTA-RESPONSIVA.html cargado correctamente');
+                console.log('📱 Preferencias de vista cargadas:', estado);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', inicializar);
+            } else {
+                inicializar();
+            }
+
+        })();
+    </script>
+
+</body>
+</html>
