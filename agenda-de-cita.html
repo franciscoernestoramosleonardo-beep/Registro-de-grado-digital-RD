@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Citas - Registro de Grado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: #f5f6f8;
+            color: #1a2a4a;
+            line-height: 1.6;
+        }
+
+        .agenda-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ============================================
+           ENCABEZADO
+        ============================================ */
+        .agenda-header {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a5a8b 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(26, 42, 74, 0.3);
+        }
+
+        .agenda-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .agenda-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .agenda-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* ============================================
+           CONTROLES Y BOTONES
+        ============================================ */
+        .agenda-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #1a2a4a;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #d0d8e0;
+            border-radius: 8px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-group select:focus {
+            border-color: #1a73e8;
+        }
+
+        /* ============================================
+           VISTA DE CALENDARIO
+        ============================================ */
+        .calendar-view {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-header h2 {
+            font-size: 24px;
+            color: #1a2a4a;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: #1a2a4a;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav button:hover {
+            background: #2a5a8b;
+            transform: scale(1.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #1a2a4a;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 2px solid #e8ecf1;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            border-color: #1a73e8;
+            transform: scale(1.05);
+        }
+
+        .calendar-day.other-month {
+            background: #f5f6f8;
+            opacity: 0.5;
+        }
+
+        .calendar-day.today {
+            background: #e8f0fe;
+            border-color: #1a73e8;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-appointments {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .calendar-day .day-number {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .calendar-day .appointment-dots {
+            display: flex;
+            gap: 3px;
+            flex-wrap: wrap;
+        }
+
+        .appointment-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #1a73e8;
+        }
+
+        .appointment-dot.reunion { background: #28a745; }
+        .appointment-dot.evaluacion { background: #dc3545; }
+        .appointment-dot.boletin { background: #ffc107; }
+        .appointment-dot.tutoria { background: #17a2b8; }
+        .appointment-dot.otro { background: #6c757d; }
+
+        /* ============================================
+           LISTA DE CITAS
+        ============================================ */
+        .appointments-list {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .appointments-list h2 {
+            font-size: 24px;
+            color: #1a2a4a;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1a2a4a;
+        }
+
+        .appointment-card {
+            background: #f8f9fa;
+            border-left: 5px solid #1a73e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .appointment-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .appointment-card.reunion { border-left-color: #28a745; }
+        .appointment-card.evaluacion { border-left-color: #dc3545; }
+        .appointment-card.boletin { border-left-color: #ffc107; }
+        .appointment-card.tutoria { border-left-color: #17a2b8; }
+        .appointment-card.otro { border-left-color: #6c757d; }
+
+        .appointment-card.upcoming {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+        }
+
+        .appointment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .appointment-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a2a4a;
+            margin-bottom: 5px;
+        }
+
+        .appointment-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .appointment-type.reunion { background: #28a745; }
+        .appointment-type.evaluacion { background: #dc3545; }
+        .appointment-type.boletin { background: #ffc107; color: #1a2a4a; }
+        .appointment-type.tutoria { background: #17a2b8; }
+        .appointment-type.otro { background: #6c757d; }
+
+        .appointment-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .appointment-details div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .appointment-description {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .appointment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .appointment-actions button {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .no-appointments {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c7a8a;
+        }
+
+        .no-appointments .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* ============================================
+           MODAL
+        ============================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a5a8b 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .modal-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #1a2a4a;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d0d8e0;
+            border-radius: 8px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #1a73e8;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e8ecf1;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ============================================
+           ALERTA DE RECORDATORIO
+        ============================================ */
+        .reminder-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            z-index: 3000;
+            animation: slideInRight 0.5s ease;
+            border-left: 5px solid #ffc107;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .reminder-alert-header {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #1a2a4a;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-alert-header h3 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-alert-body {
+            padding: 20px;
+        }
+
+        .reminder-alert-body .appointment-info {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .reminder-alert-body .appointment-info h4 {
+            color: #1a2a4a;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .reminder-alert-body .appointment-info p {
+            font-size: 13px;
+            color: #555;
+            margin: 4px 0;
+        }
+
+        .reminder-alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reminder-alert-actions button {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+        }
+
+        /* ============================================
+           CONFIGURACIÓN DE RECORDATORIOS
+        ============================================ */
+        .reminder-settings {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .reminder-settings h4 {
+            margin-bottom: 15px;
+            color: #1a2a4a;
+        }
+
+        .reminder-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reminder-option:hover {
+            background: #e8f0fe;
+        }
+
+        .reminder-option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .reminder-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* ============================================
+           RESPONSIVE
+        ============================================ */
+        @media (max-width: 768px) {
+            .agenda-container {
+                padding: 10px;
+            }
+
+            .agenda-header {
+                padding: 20px;
+            }
+
+            .agenda-header h1 {
+                font-size: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-grid {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                padding: 4px;
+            }
+
+            .calendar-day .day-number {
+                font-size: 12px;
+            }
+
+            .appointment-details {
+                grid-template-columns: 1fr;
+            }
+
+            .reminder-alert {
+                max-width: 90%;
+                right: 5%;
+            }
+        }
+
+        @media print {
+            .agenda-controls, .modal-overlay, .reminder-alert {
+                display: none !important;
+            }
+
+            .appointment-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="agenda-container">
+        <!-- ENCABEZADO -->
+        <div class="agenda-header">
+            <h1> Agenda de Citas</h1>
+            <p>Gestiona tus citas con padres, evaluaciones y reuniones</p>
+            
+            <div class="agenda-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-total">0</span>
+                    <span class="stat-label">Total de Citas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-upcoming">0</span>
+                    <span class="stat-label">Próximas Citas</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-today">0</span>
+                    <span class="stat-label">Citas Hoy</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-week">0</span>
+                    <span class="stat-label">Esta Semana</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLES -->
+        <div class="agenda-controls">
+            <button class="btn btn-primary" onclick="openModal()">
+                ➕ Nueva Cita
+            </button>
+            
+            <div class="filter-group">
+                <select id="filter-type" onchange="filterAppointments()">
+                    <option value="all">Todos los tipos</option>
+                    <option value="reunion">Reunión con Padres</option>
+                    <option value="evaluacion">Evaluación</option>
+                    <option value="boletin">Entrega de Boletín</option>
+                    <option value="tutoria">Tutoría</option>
+                    <option value="otro">Otro</option>
+                </select>
+                
+                <select id="filter-period" onchange="filterAppointments()">
+                    <option value="all">Todo el período</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Esta semana</option>
+                    <option value="month">Este mes</option>
+                    <option value="upcoming">Próximas</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <button class="btn btn-secondary" onclick="exportAppointments()">
+                    📤 Exportar
+                </button>
+                <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()">
+                    📥 Importar
+                </button>
+                <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importAppointments(event)">
+            </div>
+        </div>
+
+        <!-- VISTA DE CALENDARIO -->
+        <div class="calendar-view">
+            <div class="calendar-header">
+                <h2 id="calendar-month-year">Mes Año</h2>
+                <div class="calendar-nav">
+                    <button onclick="changeMonth(-1)">◀</button>
+                    <button onclick="changeMonth(1)">▶</button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- LISTA DE CITAS -->
+        <div class="appointments-list">
+            <h2>📋 Lista de Citas</h2>
+            <div id="appointments-container">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA AGREGAR/EDITAR CITA -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title"> Nueva Cita</h2>
+                <p>Complete los datos de la cita</p>
+            </div>
+            <div class="modal-body">
+                <form id="appointment-form">
+                    <input type="hidden" id="appointment-id">
+                    
+                    <div class="form-group">
+                        <label for="appointment-title">Título de la Cita *</label>
+                        <input type="text" id="appointment-title" required placeholder="Ej: Reunión con padres de Juan Pérez">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="appointment-date">Fecha *</label>
+                            <input type="date" id="appointment-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="appointment-time">Hora *</label>
+                            <input type="time" id="appointment-time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointment-type">Tipo de Cita *</label>
+                        <select id="appointment-type" required>
+                            <option value="">Seleccione un tipo</option>
+                            <option value="reunion">👥 Reunión con Padres</option>
+                            <option value="evaluacion"> Evaluación</option>
+                            <option value="boletin">📄 Entrega de Boletín</option>
+                            <option value="tutoria">🎓 Tutoría</option>
+                            <option value="otro"> Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointment-location">Lugar</label>
+                        <input type="text" id="appointment-location" placeholder="Ej: Aula 3A, Oficina del docente">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointment-description">Descripción</label>
+                        <textarea id="appointment-description" placeholder="Detalles adicionales sobre la cita..."></textarea>
+                    </div>
+
+                    <div class="reminder-settings">
+                        <h4>🔔 Configuración de Recordatorios</h4>
+                        <div class="reminder-option">
+                            <input type="checkbox" id="reminder-1day" checked>
+                            <label for="reminder-1day">1 día antes</label>
+                        </div>
+                        <div class="reminder-option">
+                            <input type="checkbox" id="reminder-sameday" checked>
+                            <label for="reminder-sameday">El mismo día (mañana)</label>
+                        </div>
+                        <div class="reminder-option">
+                            <input type="checkbox" id="reminder-1hour">
+                            <label for="reminder-1hour">1 hora antes</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveAppointment()">💾 Guardar Cita</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let appointments = [];
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let editingId = null;
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAppointments();
+            renderCalendar();
+            renderAppointments();
+            updateStats();
+            checkReminders();
+            
+            // Verificar recordatorios cada minuto
+            setInterval(checkReminders, 60000);
+        });
+
+        // ============================================
+        // GESTIÓN DE CITAS
+        // ============================================
+        function loadAppointments() {
+            const stored = localStorage.getItem('agenda_citas_docente');
+            if (stored) {
+                appointments = JSON.parse(stored);
+            }
+        }
+
+        function saveAppointments() {
+            localStorage.setItem('agenda_citas_docente', JSON.stringify(appointments));
+        }
+
+        function openModal(id = null) {
+            editingId = id;
+            const modal = document.getElementById('modal-overlay');
+            const form = document.getElementById('appointment-form');
+            
+            if (id) {
+                const appointment = appointments.find(a => a.id === id);
+                if (appointment) {
+                    document.getElementById('modal-title').textContent = '✏️ Editar Cita';
+                    document.getElementById('appointment-id').value = appointment.id;
+                    document.getElementById('appointment-title').value = appointment.title;
+                    document.getElementById('appointment-date').value = appointment.date;
+                    document.getElementById('appointment-time').value = appointment.time;
+                    document.getElementById('appointment-type').value = appointment.type;
+                    document.getElementById('appointment-location').value = appointment.location || '';
+                    document.getElementById('appointment-description').value = appointment.description || '';
+                    document.getElementById('reminder-1day').checked = appointment.reminders?.includes('1day') || false;
+                    document.getElementById('reminder-sameday').checked = appointment.reminders?.includes('sameday') || false;
+                    document.getElementById('reminder-1hour').checked = appointment.reminders?.includes('1hour') || false;
+                }
+            } else {
+                document.getElementById('modal-title').textContent = '➕ Nueva Cita';
+                form.reset();
+                document.getElementById('appointment-id').value = '';
+                // Establecer fecha mínima como hoy
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('appointment-date').min = today;
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+            editingId = null;
+        }
+
+        function saveAppointment() {
+            const title = document.getElementById('appointment-title').value.trim();
+            const date = document.getElementById('appointment-date').value;
+            const time = document.getElementById('appointment-time').value;
+            const type = document.getElementById('appointment-type').value;
+            const location = document.getElementById('appointment-location').value.trim();
+            const description = document.getElementById('appointment-description').value.trim();
+
+            if (!title || !date || !time || !type) {
+                alert('⚠️ Por favor complete todos los campos obligatorios');
+                return;
+            }
+
+            const reminders = [];
+            if (document.getElementById('reminder-1day').checked) reminders.push('1day');
+            if (document.getElementById('reminder-sameday').checked) reminders.push('sameday');
+            if (document.getElementById('reminder-1hour').checked) reminders.push('1hour');
+
+            const appointment = {
+                id: editingId || Date.now().toString(),
+                title,
+                date,
+                time,
+                type,
+                location,
+                description,
+                reminders,
+                createdAt: editingId ? appointments.find(a => a.id === editingId).createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                reminderSent: editingId ? appointments.find(a => a.id === editingId).reminderSent || [] : []
+            };
+
+            if (editingId) {
+                const index = appointments.findIndex(a => a.id === editingId);
+                if (index !== -1) {
+                    appointments[index] = appointment;
+                }
+            } else {
+                appointments.push(appointment);
+            }
+
+            saveAppointments();
+            renderCalendar();
+            renderAppointments();
+            updateStats();
+            closeModal();
+            
+            showNotification('✅ Cita guardada exitosamente', 'success');
+        }
+
+        function deleteAppointment(id) {
+            if (confirm('¿Está seguro que desea eliminar esta cita?')) {
+                appointments = appointments.filter(a => a.id !== id);
+                saveAppointments();
+                renderCalendar();
+                renderAppointments();
+                updateStats();
+                showNotification('🗑️ Cita eliminada', 'info');
+            }
+        }
+
+        // ============================================
+        // RENDERIZADO
+        // ============================================
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthYear = document.getElementById('calendar-month-year');
+            
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                              'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            monthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            grid.innerHTML = '';
+
+            // Encabezados de días
+            const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            // Primer día del mes
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+            const today = new Date();
+            const todayDate = today.getDate();
+            const todayMonth = today.getMonth();
+            const todayYear = today.getFullYear();
+
+            // Días del mes anterior
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.innerHTML = `<div class="day-number">${daysInPrevMonth - i}</div>`;
+                grid.appendChild(day);
+            }
+
+            // Días del mes actual
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                if (day === todayDate && currentMonth === todayMonth && currentYear === todayYear) {
+                    dayElement.classList.add('today');
+                }
+
+                // Verificar si hay citas este día
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayAppointments = appointments.filter(a => a.date === dateStr);
+                
+                if (dayAppointments.length > 0) {
+                    dayElement.classList.add('has-appointments');
+                    const dots = document.createElement('div');
+                    dots.className = 'appointment-dots';
+                    dayAppointments.forEach(apt => {
+                        const dot = document.createElement('div');
+                        dot.className = `appointment-dot ${apt.type}`;
+                        dots.appendChild(dot);
+                    });
+                    dayElement.appendChild(dots);
+                }
+
+                dayElement.innerHTML = `<div class="day-number">${day}</div>` + (dayElement.querySelector('.appointment-dots')?.outerHTML || '');
+                dayElement.onclick = () => showDayAppointments(dateStr);
+                
+                grid.appendChild(dayElement);
+            }
+
+            // Días del mes siguiente
+            const totalCells = firstDay + daysInMonth;
+            const remainingCells = 42 - totalCells;
+            for (let i = 1; i <= remainingCells; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.innerHTML = `<div class="day-number">${i}</div>`;
+                grid.appendChild(day);
+            }
+        }
+
+        function renderAppointments() {
+            const container = document.getElementById('appointments-container');
+            const filterType = document.getElementById('filter-type').value;
+            const filterPeriod = document.getElementById('filter-period').value;
+
+            let filtered = [...appointments];
+
+            // Filtrar por tipo
+            if (filterType !== 'all') {
+                filtered = filtered.filter(a => a.type === filterType);
+            }
+
+            // Filtrar por período
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (filterPeriod === 'today') {
+                const todayStr = today.toISOString().split('T')[0];
+                filtered = filtered.filter(a => a.date === todayStr);
+            } else if (filterPeriod === 'week') {
+                const weekEnd = new Date(today);
+                weekEnd.setDate(weekEnd.getDate() + 7);
+                filtered = filtered.filter(a => {
+                    const aptDate = new Date(a.date);
+                    return aptDate >= today && aptDate <= weekEnd;
+                });
+            } else if (filterPeriod === 'month') {
+                filtered = filtered.filter(a => {
+                    const aptDate = new Date(a.date);
+                    return aptDate.getMonth() === today.getMonth() && aptDate.getFullYear() === today.getFullYear();
+                });
+            } else if (filterPeriod === 'upcoming') {
+                filtered = filtered.filter(a => new Date(a.date) >= today);
+            }
+
+            // Ordenar por fecha
+            filtered.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="no-appointments">
+                        <div class="icon"></div>
+                        <h3>No hay citas para mostrar</h3>
+                        <p>Haga clic en "Nueva Cita" para agregar una</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(apt => {
+                const aptDate = new Date(apt.date + 'T' + apt.time);
+                const isUpcoming = aptDate - today < 24 * 60 * 60 * 1000 && aptDate >= today;
+                
+                return `
+                    <div class="appointment-card ${apt.type} ${isUpcoming ? 'upcoming' : ''}">
+                        <div class="appointment-header">
+                            <div>
+                                <div class="appointment-title">${apt.title}</div>
+                                <span class="appointment-type ${apt.type}">${getTypeLabel(apt.type)}</span>
+                            </div>
+                        </div>
+                        <div class="appointment-details">
+                            <div>📅 ${formatDate(apt.date)}</div>
+                            <div> ${apt.time}</div>
+                            ${apt.location ? `<div>📍 ${apt.location}</div>` : ''}
+                        </div>
+                        ${apt.description ? `<div class="appointment-description">${apt.description}</div>` : ''}
+                        <div class="appointment-actions">
+                            <button class="btn btn-secondary" onclick="openModal('${apt.id}')">️ Editar</button>
+                            <button class="btn btn-danger" onclick="deleteAppointment('${apt.id}')">🗑️ Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            const weekEnd = new Date(today);
+            weekEnd.setDate(weekEnd.getDate() + 7);
+
+            document.getElementById('stat-total').textContent = appointments.length;
+            document.getElementById('stat-upcoming').textContent = appointments.filter(a => new Date(a.date) >= today).length;
+            document.getElementById('stat-today').textContent = appointments.filter(a => a.date === todayStr).length;
+            document.getElementById('stat-week').textContent = appointments.filter(a => {
+                const aptDate = new Date(a.date);
+                return aptDate >= today && aptDate <= weekEnd;
+            }).length;
+        }
+
+        // ============================================
+        // SISTEMA DE RECORDATORIOS
+        // ============================================
+        function checkReminders() {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+            const currentTime = now.toTimeString().slice(0, 5);
+
+            appointments.forEach(apt => {
+                if (apt.reminderSent?.includes(todayStr)) return;
+
+                const aptDate = new Date(apt.date);
+                const daysDiff = Math.ceil((aptDate - now) / (1000 * 60 * 60 * 24));
+
+                let shouldRemind = false;
+                let reminderType = '';
+
+                if (apt.reminders?.includes('1day') && daysDiff === 1) {
+                    shouldRemind = true;
+                    reminderType = 'Mañana';
+                } else if (apt.reminders?.includes('sameday') && daysDiff === 0 && currentTime >= '08:00') {
+                    shouldRemind = true;
+                    reminderType = 'Hoy';
+                } else if (apt.reminders?.includes('1hour')) {
+                    const aptTime = new Date(apt.date + 'T' + apt.time);
+                    const hourDiff = (aptTime - now) / (1000 * 60 * 60);
+                    if (hourDiff > 0 && hourDiff <= 1) {
+                        shouldRemind = true;
+                        reminderType = 'En 1 hora';
+                    }
+                }
+
+                if (shouldRemind) {
+                    showReminderAlert(apt, reminderType);
+                    if (!apt.reminderSent) apt.reminderSent = [];
+                    apt.reminderSent.push(todayStr);
+                    saveAppointments();
+                }
+            });
+        }
+
+        function showReminderAlert(apt, reminderType) {
+            const alert = document.createElement('div');
+            alert.className = 'reminder-alert';
+            alert.innerHTML = `
+                <div class="reminder-alert-header">
+                    <h3>🔔 Recordatorio de Cita</h3>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #1a2a4a; font-size: 20px; cursor: pointer;"></button>
+                </div>
+                <div class="reminder-alert-body">
+                    <div class="appointment-info">
+                        <h4>${apt.title}</h4>
+                        <p> ${formatDate(apt.date)} a las ${apt.time}</p>
+                        <p>⏰ ${reminderType}</p>
+                        ${apt.location ? `<p> ${apt.location}</p>` : ''}
+                    </div>
+                    <div class="reminder-alert-actions">
+                        <button class="btn btn-primary" onclick="snoozeReminder('${apt.id}', this)">
+                            ⏰ Recordar después
+                        </button>
+                        <button class="btn btn-warning" onclick="dismissReminder('${apt.id}', this)">
+                            ✓ No volver a mostrar
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(alert);
+
+            // Auto-remover después de 30 segundos si no se interactúa
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.style.animation = 'slideInRight 0.5s ease reverse';
+                    setTimeout(() => alert.remove(), 500);
+                }
+            }, 30000);
+        }
+
+        function snoozeReminder(id, btn) {
+            const apt = appointments.find(a => a.id === id);
+            if (apt) {
+                if (!apt.reminderSent) apt.reminderSent = [];
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (!apt.reminderSent.includes(todayStr)) {
+                    apt.reminderSent.push(todayStr);
+                }
+                saveAppointments();
+                showNotification(' Recordatorio pospuesto', 'info');
+            }
+            btn.closest('.reminder-alert').remove();
+        }
+
+        function dismissReminder(id, btn) {
+            const apt = appointments.find(a => a.id === id);
+            if (apt) {
+                if (!apt.reminders) apt.reminders = [];
+                apt.reminders = []; // Desactivar todos los recordatorios
+                saveAppointments();
+                showNotification('✓ Recordatorios desactivados para esta cita', 'success');
+            }
+            btn.closest('.reminder-alert').remove();
+        }
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+
+        function showDayAppointments(dateStr) {
+            document.getElementById('filter-period').value = 'all';
+            document.getElementById('filter-type').value = 'all';
+            renderAppointments();
+            
+            const container = document.getElementById('appointments-container');
+            const dayAppointments = appointments.filter(a => a.date === dateStr);
+            
+            if (dayAppointments.length > 0) {
+                container.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function filterAppointments() {
+            renderAppointments();
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                reunion: ' Reunión con Padres',
+                evaluacion: '📝 Evaluación',
+                boletin: '📄 Entrega de Boletín',
+                tutoria: '🎓 Tutoría',
+                otro: '📌 Otro'
+            };
+            return labels[type] || type;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('es-DO', options);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 15px 30px;
+                border-radius: 8px;
+                font-family: 'Times New Roman', serif;
+                font-size: 14px;
+                font-weight: bold;
+                z-index: 4000;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                animation: slideDown 0.3s ease;
+            `;
+
+            if (type === 'success') {
+                notification.style.background = '#d4edda';
+                notification.style.border = '3px solid #28a745';
+                notification.style.color = '#155724';
+            } else if (type === 'error') {
+                notification.style.background = '#f8d7da';
+                notification.style.border = '3px solid #dc3545';
+                notification.style.color = '#721c24';
+            } else {
+                notification.style.background = '#d1ecf1';
+                notification.style.border = '3px solid #17a2b8';
+                notification.style.color = '#0c5460';
+            }
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function exportAppointments() {
+            const dataStr = JSON.stringify(appointments, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `agenda_citas_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            showNotification('📤 Citas exportadas exitosamente', 'success');
+        }
+
+        function importAppointments(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        appointments = imported;
+                        saveAppointments();
+                        renderCalendar();
+                        renderAppointments();
+                        updateStats();
+                        showNotification('📥 Citas importadas exitosamente', 'success');
+                    } else {
+                        throw new Error('Formato inválido');
+                    }
+                } catch (error) {
+                    showNotification('❌ Error al importar el archivo', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Animación CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+                to { transform: translateX(-50%) translateY(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ============================================
+// 🏷️ TIPO "FERIADO" EN EL SELECTOR DEL MODAL
+// ============================================
+// Buscar el select de tipo y agregar la opción "Feriado"
+document.addEventListener('DOMContentLoaded', function() {
+    // ... código existente ...
+    
+    // Agregar opción Feriado al select
+    const typeSelect = document.getElementById('appointment-type');
+    if (typeSelect) {
+        const feriadoOption = document.createElement('option');
+        feriadoOption.value = 'feriado';
+        feriadoOption.textContent = '📅 Feriado Escolar';
+        typeSelect.appendChild(feriadoOption);
+    }
+});
+
+// ============================================
+// 📅 GUARDAR FERIADOS EN LOCALSTORAGE SEPARADO
+// ============================================
+function guardarFeriados() {
+    try {
+        const feriados = appointments
+            .filter(a => a.type === 'feriado')
+            .map(a => ({
+                id: a.id,
+                date: a.date,
+                title: a.title,
+                color: '#fce4ec',
+                createdBy: 'docente'
+            }));
+        localStorage.setItem('diasFeriados', JSON.stringify(feriados));
+        console.log('✅ Feriados guardados en localStorage:', feriados.length);
+        
+        // Notificar a Asistencia si está abierta
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: 'diasFeriados',
+            newValue: JSON.stringify(feriados)
+        }));
+    } catch (e) {
+        console.warn('⚠️ Error guardando feriados:', e);
+    }
+}
+
+// ============================================
+// 🗑️ ELIMINAR FERIADO CUANDO SE ELIMINA UNA CITA
+// ============================================
+function deleteAppointment(id) {
+    if (confirm('¿Está seguro que desea eliminar esta cita?')) {
+        const apt = appointments.find(a => a.id === id);
+        appointments = appointments.filter(a => a.id !== id);
+        saveAppointments();
+        
+        // Si era feriado, actualizar la lista de feriados
+        if (apt && apt.type === 'feriado') {
+            guardarFeriados();
+        }
+        
+        renderCalendar();
+        renderAppointments();
+        updateStats();
+        showNotification('🗑️ Cita eliminada', 'info');
+    }
+}
+
+// ============================================
+// ✏️ GUARDAR CITA (MODIFICADO)
+// ============================================
+function saveAppointment() {
+    const title = document.getElementById('appointment-title').value.trim();
+    const date = document.getElementById('appointment-date').value;
+    const time = document.getElementById('appointment-time').value;
+    const type = document.getElementById('appointment-type').value;
+    const location = document.getElementById('appointment-location').value.trim();
+    const description = document.getElementById('appointment-description').value.trim();
+
+    if (!title || !date || !time || !type) {
+        alert('⚠️ Por favor complete todos los campos obligatorios');
+        return;
+    }
+
+    const reminders = [];
+    if (document.getElementById('reminder-1day').checked) reminders.push('1day');
+    if (document.getElementById('reminder-sameday').checked) reminders.push('sameday');
+    if (document.getElementById('reminder-1hour').checked) reminders.push('1hour');
+
+    const appointment = {
+        id: editingId || Date.now().toString(),
+        title,
+        date,
+        time,
+        type,
+        location,
+        description,
+        reminders,
+        createdAt: editingId ? appointments.find(a => a.id === editingId).createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        reminderSent: editingId ? appointments.find(a => a.id === editingId).reminderSent || [] : []
+    };
+
+    if (editingId) {
+        const index = appointments.findIndex(a => a.id === editingId);
+        if (index !== -1) {
+            appointments[index] = appointment;
+        }
+    } else {
+        appointments.push(appointment);
+    }
+
+    saveAppointments();
+    
+    // ✅ Si es feriado, guardar en localStorage separado
+    if (type === 'feriado') {
+        guardarFeriados();
+    } else {
+        // Si era feriado y cambió de tipo, eliminar de feriados
+        const oldApp = editingId ? appointments.find(a => a.id === editingId) : null;
+        if (oldApp && oldApp.type !== 'feriado') {
+            guardarFeriados();
+        }
+    }
+
+    renderCalendar();
+    renderAppointments();
+    updateStats();
+    closeModal();
+    
+    showNotification('✅ Cita guardada exitosamente', 'success');
+}
+
+// ============================================
+// 📤 EXPORTAR FERIADOS (MODIFICADO)
+// ============================================
+function exportAppointments() {
+    const data = {
+        citas: appointments,
+        feriados: appointments.filter(a => a.type === 'feriado'),
+        exportDate: new Date().toISOString()
+    };
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `agenda_citas_${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showNotification('📤 Citas exportadas exitosamente', 'success');
+}
+
+// ============================================
+// 📥 IMPORTAR FERIADOS (MODIFICADO)
+// ============================================
+function importAppointments(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+                appointments = imported;
+                saveAppointments();
+                guardarFeriados();
+                renderCalendar();
+                renderAppointments();
+                updateStats();
+                showNotification('📥 Citas importadas exitosamente', 'success');
+            } else if (imported.citas) {
+                // Formato con citas y feriados
+                appointments = imported.citas || [];
+                saveAppointments();
+                guardarFeriados();
+                renderCalendar();
+                renderAppointments();
+                updateStats();
+                showNotification('📥 Citas importadas exitosamente', 'success');
+            } else {
+                throw new Error('Formato inválido');
+            }
+        } catch (error) {
+            showNotification('❌ Error al importar el archivo', 'error');
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// ============================================
+// 🔄 SINCRONIZAR FERIADOS AL INICIO
+// ============================================
+// Al cargar, asegurar que los feriados estén sincronizados
+document.addEventListener('DOMContentLoaded', function() {
+    // ... código existente ...
+    guardarFeriados();
+});
+
+// ============================================
+// 🎨 ESTILO PARA FERIADOS EN EL CALENDARIO
+// ============================================
+// Modificar renderCalendar para mostrar feriados con color especial
+const renderCalendarOriginal = renderCalendar;
+renderCalendar = function() {
+    renderCalendarOriginal();
+    
+    // Agregar indicador visual de feriados en el calendario
+    const feriados = JSON.parse(localStorage.getItem('diasFeriados') || '[]');
+    const monthStr = String(currentMonth + 1).padStart(2, '0');
+    const monthFeriados = feriados.filter(f => f.date.startsWith(`${currentYear}-${monthStr}`));
+    
+    monthFeriados.forEach(feriado => {
+        const day = parseInt(feriado.date.split('-')[2]);
+        const cells = document.querySelectorAll('.calendar-day');
+        // Buscar la celda correspondiente al día
+        cells.forEach(cell => {
+            const num = cell.querySelector('.day-number')?.textContent;
+            if (num && parseInt(num) === day && !cell.classList.contains('other-month')) {
+                cell.style.background = '#fce4ec';
+                cell.style.borderColor = '#e57373';
+                // Agregar badge de feriado
+                const badge = document.createElement('span');
+                badge.style.cssText = `
+                    position: absolute;
+                    top: 2px;
+                    right: 2px;
+                    font-size: 8px;
+                    background: #e57373;
+                    color: white;
+                    border-radius: 50%;
+                    width: 16px;
+                    height: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                badge.textContent = 'F';
+                cell.style.position = 'relative';
+                cell.appendChild(badge);
+            }
+        });
+    });
+};
+    </script>
+</body>
+</html>
