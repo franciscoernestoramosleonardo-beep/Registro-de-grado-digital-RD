@@ -1861,7 +1861,7 @@
                         const idEstudiante = encodeURIComponent(estudiante.id);
                         
                         // ✅ CORRECTO: Misma carpeta (pages/)
-                        window.location.href = `FORMULARIO.html?origen=cumpleaños&accion=editar&grado=${grado}&seccion=${seccion}&tanda=${tanda}&nombre=${nombre}&fecha=${fecha}&id=${idEstudiante}`;
+                        window.location.href = `formulario.html?origen=cumpleaños&accion=editar&grado=${grado}&seccion=${seccion}&tanda=${tanda}&nombre=${nombre}&fecha=${fecha}&id=${idEstudiante}`;
                     }
                 });
             });
@@ -2139,7 +2139,7 @@
             const tanda = encodeURIComponent(grupo.tanda);
             
             // ✅ CORRECTO: Misma carpeta (pages/)
-            window.location.href = `FORMULARIO.html?origen=cumpleaños&accion=agregar&grado=${grado}&seccion=${seccion}&tanda=${tanda}`;
+            window.location.href = `formulario.html?origen=cumpleaños&accion=agregar&grado=${grado}&seccion=${seccion}&tanda=${tanda}`;
         });
 
         // ============================================
@@ -2464,7 +2464,7 @@
         console.log('📱 WhatsApp usa el teléfono de emergencia de la página 3');
         console.log('🔄 Sincronización activa cada 2 segundos');
         console.log('💾 Los recordatorios son PERSISTENTES en localStorage');
-        console.log('➕ Botón "Agregar" redirige a FORMULARIO.html');
+        console.log('➕ Botón "Agregar" redirige a formulario.html');
 
     });
     </script>
