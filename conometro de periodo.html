@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calendario Escolar 2026-2027</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef3f8;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .app-wrapper {
+            max-width: 1360px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ===== TÍTULO PRINCIPAL ===== */
+        .main-header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding: 20px 0 10px;
+            position: relative;
+        }
+
+        .main-header .titulo-principal {
+            font-family: 'Playfair Display', 'Times New Roman', serif;
+            font-size: 3.8rem;
+            font-weight: 700;
+            color: #0f2d40;
+            letter-spacing: 2px;
+            line-height: 1.1;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .main-header .titulo-principal .ano {
+            display: block;
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: #1f4b66;
+            letter-spacing: 6px;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .main-header .subtitulo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            color: #5b7d93;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .main-header .linea-decorativa {
+            width: 120px;
+            height: 3px;
+            background: linear-gradient(90deg, #1f4b66, #4A90D9, #1f4b66);
+            margin: 12px auto 0;
+            border-radius: 4px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 24px 28px;
+            box-shadow: 0 20px 40px -12px rgba(0, 20, 40, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            margin-bottom: 22px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .card-header h2 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: #0b2a3e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .badge-year {
+            background: #1f4b66;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== HERO ===== */
+        .hero-periodo {
+            background: linear-gradient(145deg, #142f40, #1a4058);
+            border-radius: 28px;
+            padding: 28px 32px;
+            margin-bottom: 22px;
+            color: white;
+            box-shadow: 0 16px 32px -8px rgba(0, 30, 50, 0.45);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hero-left h1 {
+            font-weight: 600;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-left .fechas {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 4px 16px;
+            border-radius: 60px;
+            display: inline-block;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-countdown {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 10px 20px;
+            border-radius: 80px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .countdown-item {
+            text-align: center;
+            min-width: 58px;
+        }
+
+        .countdown-item .numero {
+            font-size: 2.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #fff;
+            display: block;
+            font-variant-numeric: tabular-nums;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .countdown-item .label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .progreso-wrapper {
+            margin-top: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .progreso-bar-bg {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(255, 255, 255, 0.15);
+            height: 8px;
+            border-radius: 60px;
+            overflow: hidden;
+        }
+
+        .progreso-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #f9d976, #f39c12);
+            border-radius: 60px;
+            transition: width 0.7s ease;
+        }
+
+        .progreso-text {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #ffd966;
+            min-width: 60px;
+            text-align: right;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== INFO DÍAS (Estudiantes vs Docentes) ===== */
+        .dias-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .dias-info-card {
+            border-radius: 16px;
+            padding: 18px 20px;
+            text-align: center;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .dias-info-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .dias-info-card .icono {
+            font-size: 2rem;
+            margin-bottom: 4px;
+        }
+
+        .dias-info-card .titulo {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0b2a3e;
+        }
+
+        .dias-info-card .numero {
+            font-size: 2.4rem;
+            font-weight: 700;
+            display: block;
+            line-height: 1.2;
+            margin: 4px 0;
+        }
+
+        .dias-info-card .detalle {
+            font-size: 0.75rem;
+            color: #5b7d93;
+        }
+
+        .dias-info-card.estudiantes {
+            background: linear-gradient(145deg, #ffffff, #f2f8ff);
+            border-color: #4A90D9;
+        }
+
+        .dias-info-card.estudiantes .numero {
+            color: #4A90D9;
+        }
+
+        .dias-info-card.docentes {
+            background: linear-gradient(145deg, #ffffff, #fef7ed);
+            border-color: #E67E22;
+        }
+
+        .dias-info-card.docentes .numero {
+            color: #E67E22;
+        }
+
+        /* ===== MESES ===== */
+        .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+        }
+
+        .mes-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .mes-item:hover {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .mes-item .mes-nombre {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1a4056;
+        }
+
+        .mes-item .mes-dias {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0b2a3e;
+        }
+
+        .mes-item .mes-detalle {
+            font-size: 0.55rem;
+            color: #5b7d93;
+        }
+
+        .mes-item.destacado {
+            background: #1d4055;
+            border-color: #2b5f7a;
+        }
+
+        .mes-item.destacado .mes-nombre,
+        .mes-item.destacado .mes-dias,
+        .mes-item.destacado .mes-detalle {
+            color: white;
+        }
+
+        /* ===== PERÍODOS ===== */
+        .periodos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .periodo-card {
+            border-radius: 20px;
+            padding: 18px 18px 16px;
+            box-shadow: 0 6px 20px -8px rgba(0, 20, 30, 0.1);
+            transition: transform 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            border-left: 6px solid #9bb7d0;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .periodo-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .periodo-card.p1 { border-left-color: #4A90D9; background: linear-gradient(145deg, #ffffff, #f2f8ff); }
+        .periodo-card.p2 { border-left-color: #E67E22; background: linear-gradient(145deg, #ffffff, #fef7ed); }
+        .periodo-card.p3 { border-left-color: #27AE60; background: linear-gradient(145deg, #ffffff, #edfaf2); }
+        .periodo-card.p4 { border-left-color: #8E44AD; background: linear-gradient(145deg, #ffffff, #f7f0fc); }
+
+        .periodo-card.activo {
+            box-shadow: 0 0 0 2px #f1c40f, 0 8px 24px -8px rgba(0,0,0,0.15);
+        }
+
+        .periodo-card.completado {
+            opacity: 0.75;
+            filter: grayscale(0.15);
+        }
+
+        .periodo-card .nombre {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #0f2d40;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .periodo-card .nombre .dias-lab {
+            font-size: 0.65rem;
+            font-weight: 500;
+            background: rgba(0,0,0,0.04);
+            padding: 2px 12px;
+            border-radius: 40px;
+            color: #1f4b66;
+        }
+
+        .periodo-card .detalle {
+            font-size: 0.85rem;
+            color: #1f4057;
+            line-height: 1.6;
+        }
+
+        .periodo-card .detalle span {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e2eaf2;
+            padding: 3px 0;
+        }
+
+        .periodo-card .detalle .label {
+            color: #5b7d93;
+            font-weight: 400;
+        }
+
+        .periodo-card .detalle .valor {
+            font-weight: 600;
+            color: #0b2a3e;
+        }
+
+        .badge-estado {
+            margin-top: 12px;
+            display: inline-block;
+            padding: 3px 16px;
+            border-radius: 60px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            align-self: flex-start;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .badge-pendiente {
+            background: #eaf0f6;
+            color: #3d6b84;
+        }
+
+        .badge-activo {
+            background: #fdebd0;
+            color: #b9770e;
+            animation: pulse-badge 2s infinite;
+        }
+
+        .badge-completado {
+            background: #d5f0e3;
+            color: #1a7a4a;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ===== REPORTES ===== */
+        .reportes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .reporte-item {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 14px;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .reporte-item .periodo {
+            font-weight: 700;
+            color: #0b2a3e;
+            font-size: 0.9rem;
+        }
+
+        .reporte-item .fecha {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f4b66;
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
+            margin-top: 12px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(4px);
+            padding: 14px 10px;
+            border-radius: 18px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .stat-card .numero {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0b2a3e;
+            line-height: 1.2;
+            display: block;
+        }
+
+        .stat-card .label {
+            font-size: 0.7rem;
+            color: #3a647b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+
+        .stat-card.accent {
+            background: #1d4055;
+            border-color: #2b5f7a;
+        }
+
+        .stat-card.accent .numero {
+            color: #f5e56b;
+        }
+
+        .stat-card.accent .label {
+            color: #b6d4e8;
+        }
+
+        /* ===== CONFIG ===== */
+        .config-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px 24px;
+        }
+
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .config-field label {
+            font-weight: 500;
+            font-size: 0.75rem;
+            color: #2b5470;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .config-field select {
+            padding: 8px 16px;
+            border-radius: 60px;
+            border: 1.5px solid #d4e0ea;
+            background: white;
+            font-size: 0.9rem;
+            min-width: 150px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn {
+            border: none;
+            padding: 8px 22px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: #1d4055;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #255c78;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #c4d6e5;
+        }
+
+        .btn-outline:hover {
+            background: #e6eef6;
+        }
+
+        @media (max-width: 720px) {
+            .main-header .titulo-principal {
+                font-size: 2.4rem;
+            }
+            .main-header .titulo-principal .ano {
+                font-size: 1.6rem;
+            }
+            .hero-periodo {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 20px;
+            }
+            .hero-countdown {
+                justify-content: center;
+                padding: 8px 14px;
+            }
+            .countdown-item .numero {
+                font-size: 1.6rem;
+            }
+            .card {
+                padding: 16px;
+            }
+            .meses-grid {
+                grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            }
+            .dias-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-header .titulo-principal {
+                font-size: 1.8rem;
+            }
+            .main-header .titulo-principal .ano {
+                font-size: 1.2rem;
+            }
+            .main-header .subtitulo {
+                font-size: 0.8rem;
+                letter-spacing: 4px;
+            }
+            .periodos-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-left h1 {
+                font-size: 1.2rem;
+            }
+            .config-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .config-field select {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+
+        <!-- ===== TÍTULO PRINCIPAL ===== -->
+        <div class="main-header">
+            <div class="titulo-principal">
+                Conometro del Calendario
+                <span class="ano">Escolar 2026-2027</span>
+            </div>
+            <div class="subtitulo">República Dominicana</div>
+            <div class="linea-decorativa"></div>
+        </div>
+
+        <!-- ===== HERO ===== -->
+        <div class="hero-periodo">
+            <div class="hero-left">
+                <h1>
+                    <i class="fas fa-clock" style="color:#f5c842;"></i>
+                    <span id="tituloPeriodo">Cargando...</span>
+                </h1>
+                <div class="fechas" id="fechasPeriodo">—</div>
+            </div>
+            <div class="hero-countdown">
+                <div class="countdown-item"><span class="numero" id="dias">0</span><span class="label">días</span></div>
+                <div class="countdown-item"><span class="numero" id="horas">00</span><span class="label">horas</span></div>
+                <div class="countdown-item"><span class="numero" id="minutos">00</span><span class="label">min</span></div>
+                <div class="countdown-item"><span class="numero" id="segundos">00</span><span class="label">seg</span></div>
+            </div>
+            <div class="progreso-wrapper">
+                <div class="progreso-bar-bg"><div class="progreso-fill" id="barraRelleno" style="width:0%;"></div></div>
+                <div class="progreso-text" id="progresoTexto">0%</div>
+            </div>
+        </div>
+
+        <!-- ===== DÍAS: ESTUDIANTES vs DOCENTES ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-users" style="color:#1f4b66;"></i> Días laborables</h2>
+                <span class="badge-year">Según calendario oficial</span>
+            </div>
+            <div class="dias-info-grid">
+                <div class="dias-info-card estudiantes">
+                    <div class="icono">👩‍🎓</div>
+                    <div class="titulo">Estudiantes</div>
+                    <div class="numero" id="diasEstudiantes">190</div>
+                    <div class="detalle">Días de docencia efectiva</div>
+                </div>
+                <div class="dias-info-card docentes">
+                    <div class="icono">👨‍🏫</div>
+                    <div class="titulo">Docentes</div>
+                    <div class="numero" id="diasDocentes">210</div>
+                    <div class="detalle">Días laborales (45 semanas)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DÍAS POR MES ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-calendar-alt" style="color:#1f4b66;"></i> Días de docencia por mes</h2>
+                <span class="badge-year">190 días total</span>
+            </div>
+            <div class="meses-grid" id="mesesGrid">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ===== PERÍODOS ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-layer-group" style="color:#1f4b66;"></i> Períodos y reportes de evaluación</h2>
+                <span class="badge-year" id="nivelBadge">Primario</span>
+            </div>
+            <div class="periodos-grid" id="periodosGrid"></div>
+        </div>
+
+        <!-- ===== REPORTES POR NIVEL ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-file-alt" style="color:#1f4b66;"></i> Fechas de reportes</h2>
+                <span class="badge-year" id="reporteNivel">Primario</span>
+            </div>
+            <div class="reportes-grid" id="reportesGrid">
+                <!-- Generado dinámicamente -->
+            </div>
+        </div>
+
+        <!-- ===== RESUMEN ===== -->
+        <div class="card" style="background: linear-gradient(145deg, #1d3e54, #13303f); color:white; border-color:#2a5a75;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2 style="font-weight:500; font-size:1.3rem; display:flex; align-items:center; gap:10px; color:white; font-family:'Inter',sans-serif;">
+                    <i class="fas fa-chart-pie"></i> Resumen anual
+                </h2>
+                <span style="background:rgba(255,255,255,0.08); padding:4px 16px; border-radius:60px; font-size:0.75rem; font-family:'Inter',sans-serif;">actualizado</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card accent"><span class="numero" id="totalDias">190</span><span class="label">días estudiantes</span></div>
+                <div class="stat-card accent"><span class="numero" id="diasTranscurridos">0</span><span class="label">transcurridos</span></div>
+                <div class="stat-card accent"><span class="numero" id="diasRestantes">190</span><span class="label">restantes</span></div>
+                <div class="stat-card accent"><span class="numero" id="porcentajeTotal">0%</span><span class="label">progreso</span></div>
+            </div>
+        </div>
+
+        <!-- ===== CONFIG ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-sliders-h" style="color:#1f4b66;"></i> Configuración</h2>
+            </div>
+            <div class="config-row">
+                <div class="config-field">
+                    <label><i class="fas fa-graduation-cap"></i> Nivel</label>
+                    <select id="nivelSelect" onchange="cambiarNivel()">
+                        <option value="primario">📚 Primario</option>
+                        <option value="secundario">🎓 Secundario</option>
+                        <option value="inicial">🌸 Inicial</option>
+                    </select>
+                </div>
+                <div class="config-field">
+                    <label><i class="fas fa-calendar-plus"></i> Inicio</label>
+                    <input type="date" id="fechaInicio" value="2026-08-24" />
+                </div>
+                <div class="config-field">
+                    <label><i class="fas fa-calendar-check"></i> Fin</label>
+                    <input type="date" id="fechaFin" value="2027-06-18" />
+                </div>
+                <div class="btn-group" style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="aplicarConfiguracion()"><i class="fas fa-check"></i> Actualizar</button>
+                    <button class="btn btn-outline" onclick="restaurarDefaults()"><i class="fas fa-undo-alt"></i> Restaurar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // DATOS EXTRAÍDOS DE LAS IMÁGENES (PÁGINA 15 DEL PDF)
+        // ============================================================
+
+        // DÍAS POR MES (según la imagen)
+        const DIAS_POR_MES = [
+            { mes: 'Agosto', dias: 6, detalle: '6 docencia · 14 formación' },
+            { mes: 'Septiembre', dias: 21, detalle: '21 días' },
+            { mes: 'Octubre', dias: 22, detalle: '22 días' },
+            { mes: 'Noviembre', dias: 20, detalle: '20 días' },
+            { mes: 'Diciembre', dias: 14, detalle: '14 días' },
+            { mes: 'Enero', dias: 15, detalle: '15 días' },
+            { mes: 'Febrero', dias: 20, detalle: '20 días' },
+            { mes: 'Marzo', dias: 18, detalle: '18 días' },
+            { mes: 'Abril', dias: 21, detalle: '21 días' },
+            { mes: 'Mayo', dias: 19, detalle: '19 días' },
+            { mes: 'Junio', dias: 14, detalle: '14 docencia · 5 cierre' }
+        ];
+
+        const TOTAL_DIAS_ESTUDIANTES = 190;
+        const TOTAL_DIAS_DOCENTES = 210;
+
+        // REPORTES POR NIVEL (según la imagen)
+        const REPORTES = {
+            inicial: {
+                nombre: 'Inicial',
+                reportes: [
+                    { periodo: 'P1', fecha: '15-12-2026' },
+                    { periodo: 'P2', fecha: '31-03-2027' },
+                    { periodo: 'P3', fecha: '22-06-2027' }
+                ]
+            },
+            primario: {
+                nombre: 'Primario',
+                reportes: [
+                    { periodo: 'P1', fecha: '30-10-2026' },
+                    { periodo: 'P2', fecha: '29-01-2027' },
+                    { periodo: 'P3', fecha: '29-03-2027' },
+                    { periodo: 'P4', fecha: '11-06-2027' }
+                ]
+            },
+            secundario: {
+                nombre: 'Secundario',
+                reportes: [
+                    { periodo: 'P1', fecha: '30-10-2026' },
+                    { periodo: 'P2', fecha: '29-01-2027' },
+                    { periodo: 'P3', fecha: '31-03-2027' },
+                    { periodo: 'P4', fecha: '01-06-2027' }
+                ]
+            }
+        };
+
+        // PERÍODOS POR NIVEL (con fechas reales basadas en los reportes)
+        const PERIODOS_POR_NIVEL = {
+            inicial: [
+                { nombre: 'P1 · 1er Período', inicio: new Date(2026, 7, 24), fin: new Date(2026, 11, 15), reporte: '15-12-2026' },
+                { nombre: 'P2 · 2do Período', inicio: new Date(2026, 11, 16), fin: new Date(2027, 2, 31), reporte: '31-03-2027' },
+                { nombre: 'P3 · 3er Período', inicio: new Date(2027, 3, 1), fin: new Date(2027, 5, 18), reporte: '22-06-2027' }
+            ],
+            primario: [
+                { nombre: 'P1 · 1er Período', inicio: new Date(2026, 7, 24), fin: new Date(2026, 9, 30), reporte: '30-10-2026' },
+                { nombre: 'P2 · 2do Período', inicio: new Date(2026, 9, 31), fin: new Date(2027, 0, 29), reporte: '29-01-2027' },
+                { nombre: 'P3 · 3er Período', inicio: new Date(2027, 0, 30), fin: new Date(2027, 2, 29), reporte: '29-03-2027' },
+                { nombre: 'P4 · 4to Período', inicio: new Date(2027, 2, 30), fin: new Date(2027, 5, 11), reporte: '11-06-2027' }
+            ],
+            secundario: [
+                { nombre: 'P1 · 1er Período', inicio: new Date(2026, 7, 24), fin: new Date(2026, 9, 30), reporte: '30-10-2026' },
+                { nombre: 'P2 · 2do Período', inicio: new Date(2026, 9, 31), fin: new Date(2027, 0, 29), reporte: '29-01-2027' },
+                { nombre: 'P3 · 3er Período', inicio: new Date(2027, 0, 30), fin: new Date(2027, 2, 31), reporte: '31-03-2027' },
+                { nombre: 'P4 · 4to Período', inicio: new Date(2027, 2, 31), fin: new Date(2027, 5, 1), reporte: '01-06-2027' }
+            ]
+        };
+
+        const FECHA_INICIO_CLASES = new Date(2026, 7, 24);
+        const FECHA_FIN_CLASES = new Date(2027, 5, 18);
+
+        let nivelActual = 'primario';
+        let periodos = PERIODOS_POR_NIVEL[nivelActual];
+
+        // ============================================================
+        // FUNCIONES
+        // ============================================================
+
+        function contarDiasLaborables(inicio, fin) {
+            let dias = 0;
+            const d = new Date(inicio);
+            while (d <= fin) {
+                const dow = d.getDay();
+                if (dow !== 0 && dow !== 6) {
+                    dias++;
+                }
+                d.setDate(d.getDate() + 1);
+            }
+            return dias;
+        }
+
+        function formatearFecha(fecha) {
+            const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+            return `${fecha.getDate()} ${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+        }
+
+        function obtenerIndicePeriodoActual() {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            for (let i = 0; i < periodos.length; i++) {
+                const ini = new Date(periodos[i].inicio);
+                ini.setHours(0, 0, 0, 0);
+                const fin = new Date(periodos[i].fin);
+                fin.setHours(23, 59, 59, 999);
+                if (hoy >= ini && hoy <= fin) return i;
+            }
+            if (hoy < periodos[0].inicio) return -1;
+            return periodos.length;
+        }
+
+        // ============================================================
+        // RENDER
+        // ============================================================
+
+        function renderizarMeses() {
+            const grid = document.getElementById('mesesGrid');
+            grid.innerHTML = '';
+            DIAS_POR_MES.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'mes-item';
+                if (idx === 0 || idx === 10) div.classList.add('destacado');
+                div.innerHTML = `
+                    <div class="mes-nombre">${item.mes}</div>
+                    <div class="mes-dias">${item.dias}</div>
+                    <div class="mes-detalle">${item.detalle}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function renderizarReportes() {
+            const grid = document.getElementById('reportesGrid');
+            grid.innerHTML = '';
+            const data = REPORTES[nivelActual];
+            document.getElementById('reporteNivel').textContent = data.nombre;
+
+            data.reportes.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'reporte-item';
+                div.innerHTML = `
+                    <div class="periodo">${r.periodo}</div>
+                    <div class="fecha">${r.fecha}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function renderizarTodo() {
+            const ahora = new Date();
+            const idxActual = obtenerIndicePeriodoActual();
+
+            renderizarMeses();
+            renderizarReportes();
+            document.getElementById('nivelBadge').textContent = REPORTES[nivelActual].nombre;
+
+            // Mostrar días fijos
+            document.getElementById('diasEstudiantes').textContent = TOTAL_DIAS_ESTUDIANTES;
+            document.getElementById('diasDocentes').textContent = TOTAL_DIAS_DOCENTES;
+
+            // HERO
+            const tituloEl = document.getElementById('tituloPeriodo');
+            const fechasEl = document.getElementById('fechasPeriodo');
+            const diasEl = document.getElementById('dias');
+            const horasEl = document.getElementById('horas');
+            const minutosEl = document.getElementById('minutos');
+            const segundosEl = document.getElementById('segundos');
+            const barra = document.getElementById('barraRelleno');
+            const progTexto = document.getElementById('progresoTexto');
+
+            if (idxActual === -1) {
+                tituloEl.textContent = '⏳ Año escolar no ha iniciado';
+                fechasEl.textContent = `Inicia: ${formatearFecha(FECHA_INICIO_CLASES)}`;
+                const diff = periodos[0].inicio - ahora;
+                mostrarCountdown(diff, diasEl, horasEl, minutosEl, segundosEl);
+                barra.style.width = '0%';
+                progTexto.textContent = '0%';
+            } else if (idxActual >= periodos.length) {
+                tituloEl.textContent = '✅ Año escolar finalizado';
+                fechasEl.textContent = `Finalizó: ${formatearFecha(FECHA_FIN_CLASES)}`;
+                diasEl.textContent = '0';
+                horasEl.textContent = '00';
+                minutosEl.textContent = '00';
+                segundosEl.textContent = '00';
+                barra.style.width = '100%';
+                progTexto.textContent = '100%';
+            } else {
+                const p = periodos[idxActual];
+                tituloEl.textContent = `🎯 ${p.nombre} · EN CURSO`;
+                fechasEl.textContent = `${formatearFecha(p.inicio)} → ${formatearFecha(p.fin)}`;
+                const fin = new Date(p.fin);
+                fin.setHours(23, 59, 59, 999);
+                const diff = fin - ahora;
+                mostrarCountdown(diff, diasEl, horasEl, minutosEl, segundosEl);
+
+                const total = p.fin - p.inicio;
+                const trans = ahora - p.inicio;
+                const pct = Math.min(100, Math.max(0, (trans / total) * 100));
+                barra.style.width = pct + '%';
+                progTexto.textContent = pct.toFixed(1) + '%';
+            }
+
+            renderCardsPeriodos(idxActual);
+
+            const totalDias = TOTAL_DIAS_ESTUDIANTES;
+            const transcurridos = contarDiasLaborables(FECHA_INICIO_CLASES, ahora);
+            const restantes = Math.max(0, totalDias - transcurridos);
+            document.getElementById('totalDias').textContent = totalDias;
+            document.getElementById('diasTranscurridos').textContent = transcurridos;
+            document.getElementById('diasRestantes').textContent = restantes;
+            const pctTotal = totalDias > 0 ? (transcurridos / totalDias) * 100 : 0;
+            document.getElementById('porcentajeTotal').textContent = pctTotal.toFixed(1) + '%';
+        }
+
+        function mostrarCountdown(diff, dEl, hEl, mEl, sEl) {
+            if (diff <= 0) {
+                dEl.textContent = '0';
+                hEl.textContent = '00';
+                mEl.textContent = '00';
+                sEl.textContent = '00';
+                return;
+            }
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+            dEl.textContent = dias;
+            hEl.textContent = String(horas).padStart(2, '0');
+            mEl.textContent = String(minutos).padStart(2, '0');
+            sEl.textContent = String(segundos).padStart(2, '0');
+        }
+
+        function renderCardsPeriodos(idxActual) {
+            const grid = document.getElementById('periodosGrid');
+            grid.innerHTML = '';
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+
+            periodos.forEach((p, idx) => {
+                const card = document.createElement('div');
+                const claseColor = `p${idx + 1}`;
+                card.className = `periodo-card ${claseColor}`;
+
+                let badgeClase = 'badge-pendiente';
+                let badgeTexto = '⏳ Pendiente';
+
+                const finP = new Date(p.fin);
+                finP.setHours(23, 59, 59, 999);
+
+                if (idx < idxActual || hoy > finP) {
+                    card.classList.add('completado');
+                    badgeClase = 'badge-completado';
+                    badgeTexto = '✅ Completado';
+                } else if (idx === idxActual) {
+                    card.classList.add('activo');
+                    badgeClase = 'badge-activo';
+                    badgeTexto = '🔴 En curso';
+                }
+
+                const diasLab = contarDiasLaborables(p.inicio, p.fin);
+
+                card.innerHTML = `
+                    <div class="nombre">
+                        <span>${p.nombre}</span>
+                        <span class="dias-lab"><i class="far fa-calendar-alt"></i> ${diasLab} días</span>
+                    </div>
+                    <div class="detalle">
+                        <span><span class="label">Inicio</span><span class="valor">${formatearFecha(p.inicio)}</span></span>
+                        <span><span class="label">Fin</span><span class="valor">${formatearFecha(p.fin)}</span></span>
+                        <span><span class="label">Reporte</span><span class="valor">${p.reporte}</span></span>
+                    </div>
+                    <span class="badge-estado ${badgeClase}">${badgeTexto}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // ============================================================
+        // CONFIG
+        // ============================================================
+
+        function cambiarNivel() {
+            const nivel = document.getElementById('nivelSelect').value;
+            nivelActual = nivel;
+            periodos = PERIODOS_POR_NIVEL[nivel];
+            renderizarTodo();
+        }
+
+        function aplicarConfiguracion() {
+            const nivel = document.getElementById('nivelSelect').value;
+            nivelActual = nivel;
+            periodos = PERIODOS_POR_NIVEL[nivel];
+            renderizarTodo();
+        }
+
+        function restaurarDefaults() {
+            document.getElementById('nivelSelect').value = 'primario';
+            document.getElementById('fechaInicio').value = '2026-08-24';
+            document.getElementById('fechaFin').value = '2027-06-18';
+            nivelActual = 'primario';
+            periodos = PERIODOS_POR_NIVEL['primario'];
+            renderizarTodo();
+        }
+
+        // ============================================================
+// GUARDAR DÍAS LABORABLES EN LOCALSTORAGE PARA ASISTENCIA
+// ============================================================
+function guardarDiasLaborables() {
+    try {
+        const data = {
+            diasPorMes: DIAS_POR_MES,
+            totalDias: TOTAL_DIAS_ESTUDIANTES,
+            añoEscolar: '2026-2027',
+            fechaInicio: FECHA_INICIO_CLASES.toISOString(),
+            fechaFin: FECHA_FIN_CLASES.toISOString(),
+            nivel: nivelActual,
+            actualizado: new Date().toISOString()
+        };
+        localStorage.setItem('diasLaborablesPorMes', JSON.stringify(data));
+        console.log('✅ Días laborables guardados en localStorage para Asistencia');
+    } catch (e) {
+        console.warn('⚠️ Error guardando días laborables:', e);
+    }
+}
+
+// Modificar renderizarTodo() para que guarde los datos después de renderizar
+const renderizarTodoOriginal = renderizarTodo;
+renderizarTodo = function() {
+    renderizarTodoOriginal();
+    guardarDiasLaborables();
+};
+
+        // ============================================================
+        // INICIO
+        // ============================================================
+
+        renderizarTodo();
+        setInterval(renderizarTodo, 1000);
+
+        window.cambiarNivel = cambiarNivel;
+        window.aplicarConfiguracion = aplicarConfiguracion;
+        window.restaurarDefaults = restaurarDefaults;
+    </script>
+</body>
+</html>
