@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📶 Modo Offline</title>
+    <style>
+        /* ============================================
+           ESTILOS BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: #1a2a4a;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .estado-conexion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .header .estado-conexion.online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #28a745;
+        }
+
+        .header .estado-conexion.offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #dc3545;
+        }
+
+        .header .estado-conexion .indicador {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .header .estado-conexion.online .indicador {
+            background: #28a745;
+        }
+
+        .header .estado-conexion.offline .indicador {
+            background: #dc3545;
+        }
+
+        /* ============================================
+           TARJETAS
+           ============================================ */
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8ecf1;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .card h2 {
+            font-size: 16px;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .card .subtitulo {
+            font-size: 13px;
+            color: #4a5a7a;
+            margin-bottom: 12px;
+        }
+
+        .card .contenido {
+            font-size: 14px;
+            color: #1a2a4a;
+        }
+
+        /* ============================================
+           ESTADÍSTICAS DE DATOS LOCALES
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px 16px;
+            border: 1px solid #e8ecf1;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item .numero {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a3a6b;
+        }
+
+        .stat-item .label {
+            font-size: 11px;
+            color: #4a5a7a;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .stat-item .icono {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* ============================================
+           REGISTRO DE ACTIVIDAD OFFLINE
+           ============================================ */
+        .registro-container {
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #e8ecf1;
+            border-radius: 8px;
+        }
+
+        .registro-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .registro-container::-webkit-scrollbar-track {
+            background: #f0f4f8;
+            border-radius: 3px;
+        }
+        .registro-container::-webkit-scrollbar-thumb {
+            background: #1a3a6b;
+            border-radius: 3px;
+        }
+
+        .registro-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 14px;
+            border-bottom: 1px solid #f0f2f5;
+            font-size: 13px;
+        }
+
+        .registro-item:last-child {
+            border-bottom: none;
+        }
+
+        .registro-item .accion {
+            color: #1a2a4a;
+            flex: 1;
+        }
+
+        .registro-item .fecha {
+            font-size: 11px;
+            color: #8a9aaa;
+            margin-left: 12px;
+            white-space: nowrap;
+        }
+
+        .registro-item .badge-sincronizado {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+        }
+
+        .registro-item .badge-sincronizado.pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .registro-item .badge-sincronizado.sincronizado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .registro-vacio {
+            text-align: center;
+            padding: 30px;
+            color: #8a9aaa;
+            font-size: 14px;
+        }
+
+        .registro-vacio .icono-grande {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ============================================
+           BOTONES
+           ============================================ */
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primario {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        .btn-primario:hover {
+            background: #2a3a5a;
+        }
+
+        .btn-exito {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-exito:hover {
+            background: #218838;
+        }
+
+        .btn-peligro {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-peligro:hover {
+            background: #c82333;
+        }
+
+        .btn-acciones {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* ============================================
+           BARRA DE PROGRESO DE SINCRONIZACIÓN
+           ============================================ */
+        .sincronizacion-progreso {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .sincronizacion-progreso.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sincronizacion-progreso .barra-fondo {
+            width: 100%;
+            height: 8px;
+            background: #e8ecf1;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sincronizacion-progreso .barra-llena {
+            height: 100%;
+            background: #1a3a6b;
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .sincronizacion-progreso .texto-progreso {
+            font-size: 12px;
+            color: #4a5a7a;
+            margin-top: 4px;
+        }
+
+        /* ============================================
+           TOAST MENSAJE
+           ============================================ */
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            opacity: 0;
+            transform: translateX(-50%) translateY(16px);
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .toast-mensaje.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .card { padding: 16px 18px; }
+            .btn-acciones { flex-direction: column; }
+            .btn-acciones .btn { width: 100%; text-align: center; }
+            .registro-item { flex-wrap: wrap; gap: 4px; }
+            .registro-item .fecha { margin-left: 0; }
+            .toast-mensaje { font-size: 13px; padding: 10px 20px; white-space: normal; max-width: 90%; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 17px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ============================================
+        HEADER
+        ============================================ -->
+        <div class="header">
+            <h1>📶 Modo Offline</h1>
+            <div class="estado-conexion online" id="estadoConexion">
+                <span class="indicador"></span>
+                <span id="estadoTexto">Online</span>
+            </div>
+        </div>
+
+        <!-- ============================================
+        TARJETA: ESTADO DE CONEXIÓN
+        ============================================ -->
+        <div class="card">
+            <h2>📡 Estado de Conexión</h2>
+            <div class="contenido">
+                <div id="infoConexion">
+                    <p><strong>Estado:</strong> <span id="detalleEstado" style="color:#28a745;">Conectado a internet</span></p>
+                    <p><strong>Última sincronización:</strong> <span id="ultimaSincronizacion">Nunca</span></p>
+                    <p><strong>Datos almacenados localmente:</strong> <span id="datosLocales">0</span> registros</p>
+                </div>
+                <div class="btn-acciones">
+                    <button class="btn btn-exito" id="btnSincronizar">🔄 Sincronizar ahora</button>
+                    <button class="btn btn-primario" id="btnVerificar">🔍 Verificar conexión</button>
+                </div>
+                <div class="sincronizacion-progreso" id="progresoSincronizacion">
+                    <div class="barra-fondo">
+                        <div class="barra-llena" id="barraProgreso"></div>
+                    </div>
+                    <div class="texto-progreso" id="textoProgreso">Sincronizando...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+        TARJETA: ESTADÍSTICAS DE DATOS LOCALES
+        ============================================ -->
+        <div class="card">
+            <h2>💾 Datos Almacenados Localmente</h2>
+            <div class="subtitulo">Información disponible sin conexión a internet</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="icono">👥</span>
+                    <div class="numero" id="statEstudiantes">0</div>
+                    <div class="label">Estudiantes</div>
+                </div>
+                <div class="stat-item">
+                    <span class="icono">👨‍👩‍👧</span>
+                    <div class="numero" id="statPadres">0</div>
+                    <div class="label">Padres/Tutores</div>
+                </div>
+                <div class="stat-item">
+                    <span class="icono">🧩</span>
+                    <div class="numero" id="statNEAE">0</div>
+                    <div class="label">Registros NEAE</div>
+                </div>
+                <div class="stat-item">
+                    <span class="icono">🏥</span>
+                    <div class="numero" id="statMedico">0</div>
+                    <div class="label">Historial Médico</div>
+                </div>
+                <div class="stat-item">
+                    <span class="icono">🎯</span>
+                    <div class="numero" id="statAjustes">0</div>
+                    <div class="label">Ajustes Curriculares</div>
+                </div>
+                <div class="stat-item">
+                    <span class="icono">📊</span>
+                    <div class="numero" id="statTotal">0</div>
+                    <div class="label">Total de Datos</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================
+        TARJETA: REGISTRO DE ACTIVIDAD OFFLINE
+        ============================================ -->
+        <div class="card">
+            <h2>📋 Registro de Actividad Offline</h2>
+            <div class="subtitulo">Acciones realizadas sin conexión a internet</div>
+            <div class="registro-container" id="registroContainer">
+                <div id="registroBody">
+                    <div class="registro-vacio">
+                        <span class="icono-grande">📭</span>
+                        No hay actividad offline registrada
+                    </div>
+                </div>
+            </div>
+            <div class="btn-acciones" style="margin-top:12px;">
+                <button class="btn btn-peligro" id="btnLimpiarRegistro">🗑️ Limpiar registro</button>
+            </div>
+        </div>
+
+        <!-- ============================================
+        TARJETA: INFORMACIÓN ADICIONAL
+        ============================================ -->
+        <div class="card" style="background:#f8fafc;border:2px dashed #d0d8e0;">
+            <p style="font-size:13px;color:#4a5a7a;text-align:center;">
+                💡 El modo offline permite trabajar sin conexión a internet.
+                <br>
+                <span style="font-size:11px;color:#8a9aaa;">Todos los datos se guardan automáticamente en tu navegador.</span>
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+    TOAST MENSAJE
+    ============================================ -->
+    <div id="toastMensaje" class="toast-mensaje">📌 Mensaje</div>
+
+    <!-- ============================================
+    SCRIPT PRINCIPAL
+    ============================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================
+            // 1. REFERENCIAS A DOM
+            // ============================================
+            const estadoConexion = document.getElementById('estadoConexion');
+            const estadoTexto = document.getElementById('estadoTexto');
+            const detalleEstado = document.getElementById('detalleEstado');
+            const ultimaSincronizacion = document.getElementById('ultimaSincronizacion');
+            const datosLocales = document.getElementById('datosLocales');
+            const registroBody = document.getElementById('registroBody');
+
+            const statEstudiantes = document.getElementById('statEstudiantes');
+            const statPadres = document.getElementById('statPadres');
+            const statNEAE = document.getElementById('statNEAE');
+            const statMedico = document.getElementById('statMedico');
+            const statAjustes = document.getElementById('statAjustes');
+            const statTotal = document.getElementById('statTotal');
+
+            const btnSincronizar = document.getElementById('btnSincronizar');
+            const btnVerificar = document.getElementById('btnVerificar');
+            const btnLimpiarRegistro = document.getElementById('btnLimpiarRegistro');
+            const progresoSincronizacion = document.getElementById('progresoSincronizacion');
+            const barraProgreso = document.getElementById('barraProgreso');
+            const textoProgreso = document.getElementById('textoProgreso');
+
+            const toast = document.getElementById('toastMensaje');
+
+            // ============================================
+            // 2. ESTADO
+            // ============================================
+            let estaOnline = navigator.onLine;
+            let registroOffline = [];
+            let ultimaSync = localStorage.getItem('ultimaSincronizacionOffline') || null;
+
+            // ============================================
+            // 3. CARGAR REGISTRO OFFLINE
+            // ============================================
+            function cargarRegistroOffline() {
+                try {
+                    const stored = localStorage.getItem('registroOffline');
+                    if (stored) {
+                        registroOffline = JSON.parse(stored);
+                        if (!Array.isArray(registroOffline)) registroOffline = [];
+                    }
+                } catch (e) {
+                    registroOffline = [];
+                }
+                renderizarRegistro();
+            }
+
+            // ============================================
+            // 4. GUARDAR REGISTRO OFFLINE
+            // ============================================
+            function guardarRegistroOffline() {
+                try {
+                    localStorage.setItem('registroOffline', JSON.stringify(registroOffline));
+                } catch (e) {
+                    console.warn('⚠️ No se pudo guardar el registro offline:', e);
+                }
+            }
+
+            // ============================================
+            // 5. AGREGAR ACCIÓN AL REGISTRO
+            // ============================================
+            function agregarAccionRegistro(accion, sincronizado) {
+                const ahora = new Date();
+                const fechaStr = ahora.toLocaleString('es-DO', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                registroOffline.unshift({
+                    accion: accion,
+                    fecha: fechaStr,
+                    sincronizado: sincronizado || false,
+                    timestamp: ahora.getTime()
+                });
+
+                // Limitar a 100 registros
+                if (registroOffline.length > 100) {
+                    registroOffline = registroOffline.slice(0, 100);
+                }
+
+                guardarRegistroOffline();
+                renderizarRegistro();
+            }
+
+            // ============================================
+            // 6. RENDERIZAR REGISTRO
+            // ============================================
+            function renderizarRegistro() {
+                if (registroOffline.length === 0) {
+                    registroBody.innerHTML = `
+                        <div class="registro-vacio">
+                            <span class="icono-grande">📭</span>
+                            No hay actividad offline registrada
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                registroOffline.forEach(item => {
+                    const badgeClase = item.sincronizado ? 'sincronizado' : 'pendiente';
+                    const badgeTexto = item.sincronizado ? '✅ Sincronizado' : '⏳ Pendiente';
+                    html += `
+                        <div class="registro-item">
+                            <span class="accion">${item.accion}</span>
+                            <span class="badge-sincronizado ${badgeClase}">${badgeTexto}</span>
+                            <span class="fecha">${item.fecha}</span>
+                        </div>
+                    `;
+                });
+                registroBody.innerHTML = html;
+            }
+
+            // ============================================
+            // 7. ACTUALIZAR ESTADÍSTICAS DE DATOS LOCALES
+            // ============================================
+            function actualizarEstadisticas() {
+                let total = 0;
+
+                // Estudiantes
+                let estudiantes = 0;
+                try {
+                    const stored = localStorage.getItem('registrosSigerd');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        estudiantes = Array.isArray(data) ? data.length : 0;
+                    }
+                } catch (e) { /* Ignorar */ }
+                statEstudiantes.textContent = estudiantes;
+                total += estudiantes;
+
+                // Padres
+                let padres = 0;
+                try {
+                    const stored = localStorage.getItem('datosPadresTutores');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        padres = Object.keys(data).length;
+                    }
+                } catch (e) { /* Ignorar */ }
+                statPadres.textContent = padres;
+                total += padres;
+
+                // NEAE
+                let neae = 0;
+                try {
+                    const stored = localStorage.getItem('datosNEAE');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        neae = Object.keys(data).length;
+                    }
+                } catch (e) { /* Ignorar */ }
+                statNEAE.textContent = neae;
+                total += neae;
+
+                // Historial Médico
+                let medico = 0;
+                try {
+                    const stored = localStorage.getItem('historialMedico');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        medico = Object.keys(data).length;
+                    }
+                } catch (e) { /* Ignorar */ }
+                statMedico.textContent = medico;
+                total += medico;
+
+                // Ajustes Curriculares
+                let ajustes = 0;
+                try {
+                    const stored = localStorage.getItem('ajustesCurriculares');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        ajustes = Object.keys(data).length;
+                    }
+                } catch (e) { /* Ignorar */ }
+                statAjustes.textContent = ajustes;
+                total += ajustes;
+
+                // Total
+                statTotal.textContent = total;
+                datosLocales.textContent = total;
+
+                // Última sincronización
+                if (ultimaSync) {
+                    const fecha = new Date(ultimaSync);
+                    ultimaSincronizacion.textContent = fecha.toLocaleString('es-DO', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                } else {
+                    ultimaSincronizacion.textContent = 'Nunca';
+                }
+            }
+
+            // ============================================
+            // 8. ACTUALIZAR ESTADO DE CONEXIÓN
+            // ============================================
+            function actualizarEstadoConexion() {
+                estaOnline = navigator.onLine;
+
+                if (estaOnline) {
+                    estadoConexion.className = 'estado-conexion online';
+                    estadoTexto.textContent = 'Online';
+                    detalleEstado.textContent = 'Conectado a internet';
+                    detalleEstado.style.color = '#28a745';
+                } else {
+                    estadoConexion.className = 'estado-conexion offline';
+                    estadoTexto.textContent = 'Offline';
+                    detalleEstado.textContent = 'Sin conexión a internet';
+                    detalleEstado.style.color = '#dc3545';
+                }
+            }
+
+            // ============================================
+            // 9. SINCRONIZAR
+            // ============================================
+            function sincronizar() {
+                if (!navigator.onLine) {
+                    mostrarToast('❌ No hay conexión a internet. No se puede sincronizar.', 'error');
+                    return;
+                }
+
+                // Mostrar progreso
+                progresoSincronizacion.classList.add('visible');
+                barraProgreso.style.width = '0%';
+                textoProgreso.textContent = 'Iniciando sincronización...';
+
+                // Simular sincronización
+                let progreso = 0;
+                const interval = setInterval(() => {
+                    progreso += Math.random() * 15 + 5;
+                    if (progreso >= 100) {
+                        progreso = 100;
+                        clearInterval(interval);
+                        barraProgreso.style.width = '100%';
+                        textoProgreso.textContent = '✅ Sincronización completada';
+
+                        // Actualizar última sincronización
+                        ultimaSync = new Date().toISOString();
+                        localStorage.setItem('ultimaSincronizacionOffline', ultimaSync);
+
+                        // Marcar todos los registros como sincronizados
+                        registroOffline.forEach(item => {
+                            item.sincronizado = true;
+                        });
+                        guardarRegistroOffline();
+                        renderizarRegistro();
+
+                        setTimeout(() => {
+                            progresoSincronizacion.classList.remove('visible');
+                            barraProgreso.style.width = '0%';
+                        }, 2000);
+
+                        mostrarToast('✅ Sincronización completada exitosamente', 'success');
+                        actualizarEstadisticas();
+
+                        // Agregar acción al registro
+                        agregarAccionRegistro('🔄 Sincronización manual completada', true);
+                    } else {
+                        barraProgreso.style.width = Math.min(progreso, 100) + '%';
+                        textoProgreso.textContent = `Sincronizando... ${Math.min(Math.round(progreso), 100)}%`;
+                    }
+                }, 300);
+            }
+
+            // ============================================
+            // 10. VERIFICAR CONEXIÓN
+            // ============================================
+            function verificarConexion() {
+                actualizarEstadoConexion();
+                if (navigator.onLine) {
+                    mostrarToast('✅ Conexión a internet disponible', 'success');
+                    agregarAccionRegistro('🔍 Verificación de conexión - Online', true);
+                } else {
+                    mostrarToast('❌ Sin conexión a internet', 'error');
+                    agregarAccionRegistro('🔍 Verificación de conexión - Offline', false);
+                }
+                actualizarEstadisticas();
+            }
+
+            // ============================================
+            // 11. LIMPIAR REGISTRO
+            // ============================================
+            function limpiarRegistro() {
+                if (registroOffline.length === 0) {
+                    mostrarToast('📭 El registro ya está vacío', 'warning');
+                    return;
+                }
+                if (!confirm('¿Estás seguro de que deseas eliminar todo el registro de actividad offline?')) return;
+
+                registroOffline = [];
+                guardarRegistroOffline();
+                renderizarRegistro();
+                mostrarToast('🗑️ Registro limpiado correctamente', 'success');
+            }
+
+            // ============================================
+            // 12. MOSTRAR TOAST
+            // ============================================
+            function mostrarToast(mensaje, tipo) {
+                toast.textContent = mensaje || '📌 Mensaje';
+                toast.style.background = tipo === 'error' ? '#dc3545' :
+                    tipo === 'success' ? '#28a745' :
+                    tipo === 'warning' ? '#ffc107' : '#1a2a4a';
+                toast.style.color = tipo === 'warning' ? '#1a2a4a' : '#ffffff';
+                toast.classList.add('visible');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 3000);
+            }
+
+            // ============================================
+            // 13. EVENTOS DE CONEXIÓN
+            // ============================================
+            window.addEventListener('online', function() {
+                actualizarEstadoConexion();
+                mostrarToast('🟢 Conexión restablecida', 'success');
+                agregarAccionRegistro('🟢 Conexión restablecida - Online', true);
+                actualizarEstadisticas();
+            });
+
+            window.addEventListener('offline', function() {
+                actualizarEstadoConexion();
+                mostrarToast('🔴 Sin conexión a internet', 'error');
+                agregarAccionRegistro('🔴 Conexión perdida - Offline', false);
+                actualizarEstadisticas();
+            });
+
+            // ============================================
+            // 14. EVENTOS DE BOTONES
+            // ============================================
+            btnSincronizar.addEventListener('click', sincronizar);
+            btnVerificar.addEventListener('click', verificarConexion);
+            btnLimpiarRegistro.addEventListener('click', limpiarRegistro);
+
+            // ============================================
+            // 15. ESCUCHAR EVENTOS DE ACTUALIZACIÓN
+            // ============================================
+            document.addEventListener('formulariosActualizado', function(e) {
+                if (!navigator.onLine) {
+                    const detalle = e.detail || {};
+                    const accion = detalle.tipo || '📝 Datos actualizados';
+                    agregarAccionRegistro(`📝 ${accion} (offline)`, false);
+                }
+                actualizarEstadisticas();
+            });
+
+            // También escuchar cambios en localStorage desde otras pestañas
+            window.addEventListener('storage', function(e) {
+                if (e.key && e.key.startsWith('datos') || e.key === 'registrosSigerd') {
+                    actualizarEstadisticas();
+                }
+            });
+
+            // ============================================
+            // 16. INICIALIZAR
+            // ============================================
+            function inicializar() {
+                actualizarEstadoConexion();
+                cargarRegistroOffline();
+                actualizarEstadisticas();
+
+                console.log('✅ MODO-OFFLINE.html cargado correctamente');
+                console.log('📶 Estado de conexión:', navigator.onLine ? 'Online' : 'Offline');
+                console.log('📋 Registros offline:', registroOffline.length);
+
+                // Si está online, sincronizar automáticamente al cargar
+                if (navigator.onLine && registroOffline.length > 0) {
+                    setTimeout(() => {
+                        const pendientes = registroOffline.filter(item => !item.sincronizado);
+                        if (pendientes.length > 0) {
+                            mostrarToast(`🔄 Sincronizando ${pendientes.length} acciones pendientes...`, 'warning');
+                            sincronizar();
+                        }
+                    }, 1000);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', inicializar);
+            } else {
+                inicializar();
+            }
+
+            // Exponer funciones globales
+            window.sincronizarOffline = sincronizar;
+            window.verificarConexionOffline = verificarConexion;
+            window.agregarAccionRegistro = agregarAccionRegistro;
+
+        })();
+    </script>
+
+</body>
+</html>
