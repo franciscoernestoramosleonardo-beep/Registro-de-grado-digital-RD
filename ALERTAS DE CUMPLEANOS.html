@@ -1,0 +1,2473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎂 Alertas de Cumpleaños - Sincronizado con Datos del Estudiante</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(145deg, #f5f0eb 0%, #e8e0d8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .cumple-container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cumple-header {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            border-radius: 24px;
+            padding: 28px 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 40px rgba(26, 42, 74, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cumple-header::before {
+            content: '🎂';
+            position: absolute;
+            right: -30px;
+            top: -30px;
+            font-size: 180px;
+            opacity: 0.08;
+            transform: rotate(-10deg);
+        }
+
+        .cumple-header-left h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .cumple-header-left h1 span {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            animation: pulseBadge 2s infinite;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .cumple-header-left p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .cumple-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cumple-header-right .fecha-actual {
+            background: rgba(255, 255, 255, 0.12);
+            padding: 8px 20px;
+            border-radius: 60px;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cumple-header-right .fecha-actual i {
+            margin-right: 8px;
+            color: #FFD700;
+        }
+
+        .btn-tema {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-tema:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(15deg);
+        }
+
+        .badge-grupo-actual {
+            margin-top: 6px;
+        }
+
+        .badge-grupo-actual div {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 18px;
+            border-radius: 60px;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .badge-grupo-actual div .separador {
+            color: rgba(255, 255, 255, 0.4);
+            margin: 0 6px;
+        }
+
+        .badge-grupo-actual div .grado-text {
+            color: #ffffff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card-cumple {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 22px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .stat-card-cumple:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card-cumple .icono {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card-cumple .icono.rosa { background: #fce4ec; color: #c62828; }
+        .stat-card-cumple .icono.azul { background: #e3f2fd; color: #0d47a1; }
+        .stat-card-cumple .icono.verde { background: #e8f5e9; color: #1b5e20; }
+        .stat-card-cumple .icono.naranja { background: #fff3e0; color: #e65100; }
+
+        .stat-card-cumple .info .numero {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1a2a4a;
+            line-height: 1.2;
+        }
+
+        .stat-card-cumple .info .label {
+            font-size: 0.75rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filtros-cumple {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .filtros-cumple label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filtros-cumple select,
+        .filtros-cumple input {
+            padding: 8px 16px;
+            border-radius: 60px;
+            border: 1.5px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: #f7fafc;
+            outline: none;
+            transition: border-color 0.2s;
+            min-width: 130px;
+        }
+
+        .filtros-cumple select:focus,
+        .filtros-cumple input:focus {
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.1);
+        }
+
+        .filtros-cumple .btn-filtro {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-filtro.primario {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        .btn-filtro.primario:hover {
+            background: #2a4a7a;
+            transform: translateY(-2px);
+        }
+
+        .btn-filtro.secundario {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .btn-filtro.secundario:hover {
+            background: #d0d8e0;
+        }
+
+        .btn-filtro.whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-filtro.whatsapp:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+        }
+
+        .cumple-list-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .cumple-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .cumple-list-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cumple-list-header h2 .badge {
+            background: #1a2a4a;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 12px;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+
+        .cumple-list-header .acciones-header {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .cumple-list-header .btn-accion {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-agregar {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-agregar:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-exportar {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .btn-exportar:hover {
+            background: #1557b0;
+            transform: translateY(-2px);
+        }
+
+        .btn-restaurar {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-restaurar:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .cumple-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            background: #fafbfc;
+            border: 1px solid #eef2f6;
+            transition: all 0.3s ease;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cumple-item:hover {
+            background: #f0f4f8;
+            border-color: #d0d8e0;
+            transform: translateX(4px);
+        }
+
+        .cumple-item .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            font-weight: 700;
+            color: white;
+            position: relative;
+        }
+
+        .cumple-item .avatar .iniciales {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .cumple-item .avatar.verde { background: #27ae60; }
+        .cumple-item .avatar.azul { background: #2980b9; }
+        .cumple-item .avatar.rosa { background: #e74c8b; }
+        .cumple-item .avatar.naranja { background: #e67e22; }
+        .cumple-item .avatar.morado { background: #8e44ad; }
+        .cumple-item .avatar.rojo { background: #c0392b; }
+
+        .cumple-item .info {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .cumple-item .info .nombre {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .cumple-item .info .nombre .etiqueta {
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 12px;
+            border-radius: 60px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cumple-item .info .nombre .etiqueta.hoy {
+            background: #fdebd0;
+            color: #b9770e;
+            animation: pulseBadge 1.5s infinite;
+        }
+
+        .cumple-item .info .nombre .etiqueta.esta-semana {
+            background: #d4e3fd;
+            color: #1a4a8a;
+        }
+
+        .cumple-item .info .nombre .etiqueta.este-mes {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .cumple-item .info .detalle {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-top: 2px;
+        }
+
+        .cumple-item .info .detalle i {
+            margin-right: 4px;
+            color: #a0b0c0;
+        }
+
+        .cumple-item .fecha-badge {
+            background: #e8ecf1;
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1a2a4a;
+            white-space: nowrap;
+        }
+
+        .cumple-item .fecha-badge i {
+            margin-right: 6px;
+            color: #c0392b;
+        }
+
+        .cumple-item .acciones {
+            display: flex;
+            gap: 4px;
+        }
+
+        .cumple-item .acciones button {
+            background: transparent;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            color: #718096;
+        }
+
+        .cumple-item .acciones button:hover {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .cumple-item .acciones button.whatsapp:hover {
+            background: #d4edda;
+            color: #25D366;
+        }
+
+        .cumple-item .acciones button.eliminar:hover {
+            background: #fde8e8;
+            color: #c0392b;
+        }
+
+        .mensaje-vacio {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+
+        .mensaje-vacio .icono {
+            font-size: 4rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .mensaje-vacio h3 {
+            font-size: 1.2rem;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .mensaje-vacio p {
+            font-size: 0.9rem;
+        }
+
+        .confeti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            overflow: hidden;
+        }
+
+        .confeti {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            animation: confetiFall linear forwards;
+        }
+
+        .confeti.circulo {
+            border-radius: 50%;
+        }
+
+        .confeti.estrella {
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        @keyframes confetiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-20px) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(110vh) rotate(720deg) scale(0.3);
+            }
+        }
+
+        .modal-felicitacion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .modal-felicitacion.activo {
+            display: flex;
+            animation: modalFadeIn 0.5s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido {
+            background: linear-gradient(145deg, #fff9f0, #ffe8d0);
+            border-radius: 30px;
+            padding: 40px 50px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 3px solid #FFD700;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .confeti-felicitacion {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 80px;
+            opacity: 0.15;
+            transform: rotate(15deg);
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .globo {
+            font-size: 60px;
+            margin-bottom: 10px;
+            animation: flotar 2s ease-in-out infinite;
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido h2 {
+            font-size: 2rem;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido #nombreFelicitacion {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #c0392b;
+            margin: 6px 0;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .mensaje-felicitacion {
+            color: #555;
+            font-size: 1rem;
+            margin: 10px 0 20px;
+            line-height: 1.6;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion button {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion button:first-child {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion button:first-child:hover {
+            background: #2a4a7a;
+            transform: translateY(-3px);
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion button:last-child {
+            background: #25D366;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .botones-felicitacion button:last-child:hover {
+            background: #1da851;
+            transform: translateY(-3px);
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .cerrar-felicitacion {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.2s;
+        }
+
+        .modal-felicitacion .modal-felicitacion-contenido .cerrar-felicitacion:hover {
+            color: #c0392b;
+        }
+
+        .modal-exportar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-exportar.activo {
+            display: flex;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .modal-exportar .modal-contenido {
+            background: white;
+            border-radius: 24px;
+            padding: 30px 35px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-exportar .modal-contenido .cerrar-exportar {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+            transition: color 0.2s;
+        }
+
+        .modal-exportar .modal-contenido .cerrar-exportar:hover {
+            color: #c0392b;
+        }
+
+        .modal-exportar .modal-contenido h2 {
+            font-size: 1.4rem;
+            color: #1a2a4a;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-exportar .modal-contenido .opcion-exportar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-exportar .modal-contenido .opcion-exportar:hover {
+            border-color: #1a3a6b;
+            background: #f0f4f8;
+            transform: translateX(4px);
+        }
+
+        .modal-exportar .modal-contenido .opcion-exportar .icono {
+            font-size: 1.8rem;
+        }
+
+        .modal-exportar .modal-contenido .opcion-exportar .info .titulo {
+            font-weight: 700;
+            color: #1a2a4a;
+        }
+
+        .modal-exportar .modal-contenido .opcion-exportar .info .descripcion {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 99999;
+            font-weight: 500;
+            max-width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .toast-mensaje.ocultar {
+            animation: fadeOutDown 0.3s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @keyframes fadeOutDown {
+            from {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cumple-header {
+                padding: 20px;
+            }
+            .cumple-header-left h1 {
+                font-size: 1.5rem;
+                flex-wrap: wrap;
+            }
+            .cumple-header-left h1 span {
+                font-size: 0.65rem;
+            }
+            .cumple-header-right .fecha-actual {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .cumple-item {
+                padding: 12px 14px;
+                gap: 12px;
+            }
+            .cumple-item .fecha-badge {
+                font-size: 0.7rem;
+                padding: 2px 12px;
+            }
+            .modal-felicitacion .modal-felicitacion-contenido {
+                padding: 25px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .cumple-header-left h1 {
+                font-size: 1.2rem;
+            }
+            .filtros-cumple {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filtros-cumple select,
+            .filtros-cumple input {
+                min-width: 100%;
+            }
+            .cumple-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .cumple-item .acciones {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .cumple-list-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .cumple-list-header .acciones-header {
+                justify-content: stretch;
+            }
+            .cumple-list-header .acciones-header button {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.65rem;
+                padding: 6px 10px;
+            }
+        }
+
+        body.modo-oscuro {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+        }
+        body.modo-oscuro .cumple-header {
+            background: linear-gradient(135deg, #0d1b2a, #1b3a5c);
+        }
+        body.modo-oscuro .stat-card-cumple {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+        body.modo-oscuro .stat-card-cumple .info .numero {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .stat-card-cumple .info .label {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .filtros-cumple {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+        body.modo-oscuro .filtros-cumple label {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .filtros-cumple select,
+        body.modo-oscuro .filtros-cumple input {
+            background: #2a2a4a;
+            color: #e8ecf1;
+            border-color: #3a3a5a;
+        }
+        body.modo-oscuro .cumple-list-container {
+            background: #1a1a2e;
+            border-color: #2a2a4a;
+        }
+        body.modo-oscuro .cumple-list-header h2 {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .cumple-item {
+            background: #222244;
+            border-color: #333355;
+        }
+        body.modo-oscuro .cumple-item:hover {
+            background: #2a2a55;
+            border-color: #444477;
+        }
+        body.modo-oscuro .cumple-item .info .nombre {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .cumple-item .info .detalle {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .cumple-item .fecha-badge {
+            background: #2a2a4a;
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .cumple-item .acciones button {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .cumple-item .acciones button:hover {
+            background: #333355;
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .mensaje-vacio h3 {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .mensaje-vacio p {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .modal-felicitacion .modal-felicitacion-contenido {
+            background: linear-gradient(145deg, #1a1a2e, #2a2a4a);
+            border-color: #FFD700;
+        }
+        body.modo-oscuro .modal-felicitacion .modal-felicitacion-contenido h2 {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .modal-felicitacion .modal-felicitacion-contenido .mensaje-felicitacion {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido {
+            background: #1a1a2e;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido h2 {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido .opcion-exportar {
+            border-color: #3a3a5a;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido .opcion-exportar .info .titulo {
+            color: #e8ecf1;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido .opcion-exportar .info .descripcion {
+            color: #8a9aaa;
+        }
+        body.modo-oscuro .modal-exportar .modal-contenido .opcion-exportar:hover {
+            background: #2a2a4a;
+            border-color: #FFD700;
+        }
+        body.modo-oscuro .badge-grupo-actual div {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cumple-container">
+
+        <!-- HEADER -->
+        <div class="cumple-header">
+            <div class="cumple-header-left">
+                <h1>
+                    🎂 Alertas de Cumpleaños
+                    <span id="badgeHoy">🎈 Hoy</span>
+                </h1>
+                <p><i class="fas fa-calendar-alt" style="color:#FFD700;"></i> Celebrar a nuestros estudiantes es importante</p>
+                <div class="badge-grupo-actual" id="badgeGrupoContainer"></div>
+            </div>
+            <div class="cumple-header-right">
+                <div class="fecha-actual">
+                    <i class="fas fa-calendar-day"></i>
+                    <span id="fechaActual">Cargando...</span>
+                </div>
+                <button class="btn-tema" id="btnTema" title="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="btn-tema" id="btnRecargar" title="Recargar desde Datos del Estudiante" style="background: rgba(255, 215, 0, 0.2); border: 1px solid rgba(255, 215, 0, 0.3); color: #FFD700;">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <div class="stats-grid">
+            <div class="stat-card-cumple" data-filtro="todos">
+                <div class="icono rosa">🎂</div>
+                <div class="info">
+                    <div class="numero" id="totalEstudiantes">0</div>
+                    <div class="label">Total Estudiantes</div>
+                </div>
+            </div>
+            <div class="stat-card-cumple" data-filtro="hoy">
+                <div class="icono azul">🎈</div>
+                <div class="info">
+                    <div class="numero" id="cumpleHoy">0</div>
+                    <div class="label">Cumpleaños Hoy</div>
+                </div>
+            </div>
+            <div class="stat-card-cumple" data-filtro="semana">
+                <div class="icono verde">📅</div>
+                <div class="info">
+                    <div class="numero" id="cumpleSemana">0</div>
+                    <div class="label">Esta Semana</div>
+                </div>
+            </div>
+            <div class="stat-card-cumple" data-filtro="mes">
+                <div class="icono naranja">🎊</div>
+                <div class="info">
+                    <div class="numero" id="cumpleMes">0</div>
+                    <div class="label">Este Mes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros-cumple">
+            <label>
+                <i class="fas fa-filter"></i> Filtrar:
+                <select id="filtroPeriodo">
+                    <option value="todos">📋 Todos</option>
+                    <option value="hoy">🎈 Hoy</option>
+                    <option value="semana">📅 Esta semana</option>
+                    <option value="mes">📆 Este mes</option>
+                </select>
+            </label>
+            <label>
+                <i class="fas fa-search"></i> Buscar:
+                <input type="text" id="buscarEstudiante" placeholder="Nombre del estudiante..." />
+            </label>
+            <button class="btn-filtro primario" id="btnFiltrar"><i class="fas fa-sync"></i> Filtrar</button>
+            <button class="btn-filtro secundario" id="btnResetFiltros"><i class="fas fa-undo"></i> Reset</button>
+            <button class="btn-filtro whatsapp" id="btnWhatsappMasivo"><i class="fab fa-whatsapp"></i> Enviar saludos</button>
+        </div>
+
+        <!-- LISTA -->
+        <div class="cumple-list-container">
+            <div class="cumple-list-header">
+                <h2>
+                    🎉 Lista de Cumpleaños
+                    <span class="badge" id="contadorLista">0</span>
+                </h2>
+                <div class="acciones-header">
+                    <button class="btn-accion btn-agregar" id="btnAgregarCumple">
+                        <i class="fas fa-plus"></i> Agregar
+                    </button>
+                    <button class="btn-accion btn-exportar" id="btnExportar">
+                        <i class="fas fa-file-export"></i> Exportar
+                    </button>
+                    <button class="btn-accion btn-restaurar" id="btnRestaurar">
+                        <i class="fas fa-undo-alt"></i> Restaurar
+                    </button>
+                </div>
+            </div>
+
+            <div id="listaCumpleaños"></div>
+        </div>
+
+    </div>
+
+    <!-- MODAL DE FELICITACIÓN -->
+    <div class="modal-felicitacion" id="modalFelicitacion">
+        <div class="modal-felicitacion-contenido">
+            <button class="cerrar-felicitacion" id="cerrarFelicitacion">✕</button>
+            <div class="confeti-felicitacion">🎉</div>
+            <div class="globo">🎈</div>
+            <h2>🎂 ¡Feliz Cumpleaños!</h2>
+            <p id="nombreFelicitacion">María Pérez</p>
+            <p class="mensaje-felicitacion">Que tengas un día maravilloso lleno de alegría y bendiciones. 🎊</p>
+            <div class="botones-felicitacion">
+                <button id="btnCerrarFelicitacion">🎈 Gracias</button>
+                <button id="btnWhatsappFelicitacion"><i class="fab fa-whatsapp"></i> Enviar saludo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EXPORTACIÓN -->
+    <div class="modal-exportar" id="modalExportar">
+        <div class="modal-contenido">
+            <button class="cerrar-exportar" id="cerrarExportar">✕</button>
+            <h2><i class="fas fa-file-export"></i> Exportar</h2>
+            <div class="opcion-exportar" id="exportarPDF">
+                <div class="icono">📄</div>
+                <div class="info">
+                    <div class="titulo">Exportar a PDF</div>
+                    <div class="descripcion">Genera un reporte en formato PDF</div>
+                </div>
+            </div>
+            <div class="opcion-exportar" id="exportarExcel">
+                <div class="icono">📊</div>
+                <div class="info">
+                    <div class="titulo">Exportar a Excel</div>
+                    <div class="descripcion">Descarga la lista en formato CSV</div>
+                </div>
+            </div>
+            <div class="opcion-exportar" id="exportarWhatsapp">
+                <div class="icono">💬</div>
+                <div class="info">
+                    <div class="titulo">Enviar por WhatsApp</div>
+                    <div class="descripcion">Envía la lista por WhatsApp</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="confeti-container" id="confetiContainer"></div>
+
+    <!-- ========== SCRIPT COMPLETO ========== -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ============================================
+        // 📦 ARRAY DE ESTUDIANTES
+        // ============================================
+        let estudiantes = [];
+        let contadorId = 1;
+        let estudianteParaFelicitacion = null;
+        let temaOscuro = false;
+
+        // ============================================
+        // 💾 RECORDATORIOS PERSISTENTES EN localStorage
+        // ============================================
+
+        function obtenerRecordatorios() {
+            try {
+                const data = localStorage.getItem('cumpleRecordatorios');
+                return data ? JSON.parse(data) : {};
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function guardarRecordatorio(key) {
+            try {
+                const recordatorios = obtenerRecordatorios();
+                recordatorios[key] = true;
+                localStorage.setItem('cumpleRecordatorios', JSON.stringify(recordatorios));
+            } catch (e) {
+                console.warn('⚠️ Error guardando recordatorio:', e);
+            }
+        }
+
+        function recordatorioYaMostrado(key) {
+            const recordatorios = obtenerRecordatorios();
+            return recordatorios[key] === true;
+        }
+
+        function limpiarRecordatoriosViejos() {
+            try {
+                const hoy = new Date();
+                const mesActual = hoy.getMonth();
+                const anioActual = hoy.getFullYear();
+                const claveMes = `${anioActual}-${mesActual}`;
+                
+                const ultimoMes = localStorage.getItem('cumpleUltimoMes');
+                if (ultimoMes !== claveMes) {
+                    localStorage.removeItem('cumpleRecordatorios');
+                    localStorage.setItem('cumpleUltimoMes', claveMes);
+                    console.log('🧹 Recordatorios limpiados por cambio de mes');
+                }
+            } catch (e) {
+                console.warn('⚠️ Error limpiando recordatorios:', e);
+            }
+        }
+
+        // ============================================
+        // 🔗 CONEXIÓN CON DATOS DEL ESTUDIANTE
+        // ============================================
+
+        function obtenerGrupoActual() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const gradoUrl = urlParams.get('grado');
+                const seccionUrl = urlParams.get('seccion');
+                const tandaUrl = urlParams.get('tanda');
+
+                if (gradoUrl && seccionUrl) {
+                    return {
+                        grado: decodeURIComponent(gradoUrl),
+                        seccion: decodeURIComponent(seccionUrl),
+                        tanda: decodeURIComponent(tandaUrl || 'Matutina')
+                    };
+                }
+
+                const fuentes = [
+                    localStorage.getItem('datosSincronizados'),
+                    localStorage.getItem('registroGradoData'),
+                    localStorage.getItem('minerd_grado_completo'),
+                    localStorage.getItem('gradoSeleccionado'),
+                    localStorage.getItem('gradoActual')
+                ];
+
+                for (const fuente of fuentes) {
+                    if (fuente) {
+                        try {
+                            const datos = JSON.parse(fuente);
+                            if (datos && datos.grado) {
+                                return {
+                                    grado: datos.grado,
+                                    seccion: datos.seccion || 'A',
+                                    tanda: datos.tanda || 'Matutina'
+                                };
+                            }
+                        } catch (e) { continue; }
+                    }
+                }
+
+                if (typeof AuthSystem !== 'undefined') {
+                    const sesion = AuthSystem.obtenerSesion();
+                    if (sesion && sesion.cedula) {
+                        const gradoGuardado = AuthSystem.obtenerGradoSeleccionado(sesion.cedula);
+                        if (gradoGuardado) {
+                            return {
+                                grado: gradoGuardado,
+                                seccion: 'A',
+                                tanda: 'Matutina'
+                            };
+                        }
+                    }
+                }
+
+                return { grado: 'No asignado', seccion: '-', tanda: 'Matutina' };
+            } catch (e) {
+                console.warn('⚠️ Error obteniendo grupo:', e);
+                return { grado: 'No asignado', seccion: '-', tanda: 'Matutina' };
+            }
+        }
+
+        function normalizarTexto(texto) {
+            return String(texto || '')
+                .toUpperCase()
+                .trim()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/\./g, '')
+                .replace(/°/g, '')
+                .trim();
+        }
+
+        function mostrarGrupoActual(grupo) {
+            const container = document.getElementById('badgeGrupoContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div>
+                    📚 <span class="grado-text">${grupo.grado}</span>
+                    <span class="separador">|</span>
+                    Sección <span class="grado-text">${grupo.seccion}</span>
+                    <span class="separador">|</span>
+                    <span class="grado-text">${grupo.tanda}</span>
+                </div>
+            `;
+        }
+
+        function obtenerTelefonoEmergencia(estudianteOriginal) {
+            if (!estudianteOriginal) return null;
+            const telefonos = [
+                estudianteOriginal.emergenciaTelefono,
+                estudianteOriginal.tutorTelefono,
+                estudianteOriginal.telefono,
+                estudianteOriginal.celular,
+                estudianteOriginal.telefonoEmergencia,
+                estudianteOriginal.numeroEmergencia,
+                estudianteOriginal.contactoEmergencia,
+                estudianteOriginal.telefonoContacto
+            ];
+            for (const tel of telefonos) {
+                if (tel) {
+                    const telLimpio = String(tel).replace(/\D/g, '');
+                    if (telLimpio.length >= 10) {
+                        return telLimpio;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // ============================================
+        // FUNCIONES DE FILTRO
+        // ============================================
+
+        function hoy() {
+            const d = new Date();
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        function esHoy(fechaStr) {
+            try {
+                const h = hoy();
+                const f = new Date(fechaStr + 'T00:00:00');
+                return h.getDate() === f.getDate() && h.getMonth() === f.getMonth();
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function esEstaSemana(fechaStr) {
+            try {
+                const hoy = new Date();
+                const f = new Date(fechaStr + 'T00:00:00');
+                
+                const inicioSemana = new Date(hoy);
+                inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+                inicioSemana.setHours(0, 0, 0, 0);
+                
+                const finSemana = new Date(inicioSemana);
+                finSemana.setDate(inicioSemana.getDate() + 6);
+                finSemana.setHours(23, 59, 59, 999);
+                
+                const fechaCumple = new Date(hoy.getFullYear(), f.getMonth(), f.getDate());
+                
+                if (fechaCumple < hoy) {
+                    fechaCumple.setFullYear(hoy.getFullYear() + 1);
+                }
+                
+                return fechaCumple >= inicioSemana && fechaCumple <= finSemana;
+            } catch (e) {
+                console.warn('⚠️ Error en esEstaSemana:', e);
+                return false;
+            }
+        }
+
+        function esEsteMes(fechaStr) {
+            try {
+                const hoy = new Date();
+                const f = new Date(fechaStr + 'T00:00:00');
+                
+                const fechaCumple = new Date(hoy.getFullYear(), f.getMonth(), f.getDate());
+                
+                if (fechaCumple < hoy) {
+                    fechaCumple.setFullYear(hoy.getFullYear() + 1);
+                }
+                
+                return fechaCumple.getMonth() === hoy.getMonth() && 
+                       fechaCumple.getFullYear() === hoy.getFullYear();
+            } catch (e) {
+                console.warn('⚠️ Error en esEsteMes:', e);
+                return false;
+            }
+        }
+
+        // ============================================
+        // FUNCIÓN PRINCIPAL DE CARGA
+        // ============================================
+
+        function cargarEstudiantesDesdeDatosEstudiante() {
+            console.log('🔄 Iniciando carga desde Datos del Estudiante...');
+
+            try {
+                const grupo = obtenerGrupoActual();
+                console.log('📋 Grupo actual:', grupo);
+                mostrarGrupoActual(grupo);
+
+                const stored = localStorage.getItem('registrosSigerd');
+                if (!stored) {
+                    console.log('ℹ️ No hay registros en localStorage');
+                    mostrarToast('📭 No hay datos en registrosSigerd');
+                    return false;
+                }
+
+                const registros = JSON.parse(stored);
+                if (!Array.isArray(registros) || registros.length === 0) {
+                    console.log('ℹ️ No hay registros en el array');
+                    mostrarToast('📭 No hay estudiantes registrados');
+                    return false;
+                }
+
+                console.log(`📊 Total de registros: ${registros.length}`);
+
+                const gradoActual = normalizarTexto(grupo.grado);
+                const seccionActual = normalizarTexto(grupo.seccion);
+                const tandaActual = normalizarTexto(grupo.tanda);
+
+                console.log(`🔍 Filtrando por: Grado="${gradoActual}", Sección="${seccionActual}", Tanda="${tandaActual}"`);
+
+                const estudiantesFiltrados = registros.filter(r => {
+                    const gradoRegistro = normalizarTexto(r.grado);
+                    const seccionRegistro = normalizarTexto(r.seccion);
+                    const tandaRegistro = normalizarTexto(r.tanda);
+                    if (!gradoRegistro) return false;
+                    const coincideGrado = gradoRegistro === gradoActual;
+                    const coincideSeccion = seccionRegistro === seccionActual;
+                    const coincideTanda = !tandaRegistro || tandaRegistro === tandaActual;
+                    return coincideGrado && coincideSeccion && coincideTanda;
+                });
+
+                console.log(`✅ ${estudiantesFiltrados.length} estudiantes filtrados`);
+
+                if (estudiantesFiltrados.length === 0) {
+                    console.log('ℹ️ No hay estudiantes en este grado');
+                    mostrarToast(`📭 No hay estudiantes en ${grupo.grado} - ${grupo.seccion}`);
+                    return false;
+                }
+
+                const estudiantesCumple = estudiantesFiltrados.map((est, index) => {
+                    let fechaNac = null;
+                    if (est.fechaNac) {
+                        const partes = est.fechaNac.split('/');
+                        if (partes.length === 3) {
+                            const dia = parseInt(partes[0], 10);
+                            const mes = parseInt(partes[1], 10);
+                            const anio = parseInt(partes[2], 10);
+                            if (!isNaN(dia) && !isNaN(mes) && !isNaN(anio)) {
+                                fechaNac = `${anio}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+                            }
+                        }
+                    }
+                    if (!fechaNac) {
+                        console.warn(`⚠️ ${est.nombre} ${est.apellido} sin fecha de nacimiento`);
+                        return null;
+                    }
+                    const nombreCompleto = `${est.nombre || ''} ${est.apellido || ''}`.trim().toUpperCase();
+                    const colores = ['verde', 'azul', 'rosa', 'naranja', 'morado', 'rojo'];
+                    let color = colores[Math.floor(Math.random() * colores.length)];
+                    if (est.sexo === 'FEMENINO') color = 'rosa';
+                    else if (est.sexo === 'MASCULINO') color = 'azul';
+                    const telefono = obtenerTelefonoEmergencia(est);
+                    return {
+                        id: est.cedula || est.id || `est-${String(index + 1).padStart(3, '0')}`,
+                        nombre: nombreCompleto,
+                        fecha: fechaNac,
+                        color: color,
+                        telefono: telefono,
+                        _original: est
+                    };
+                }).filter(e => e !== null);
+
+                if (estudiantesCumple.length === 0) {
+                    console.log('ℹ️ Ningún estudiante tiene fecha de nacimiento válida');
+                    mostrarToast('⚠️ No hay fechas de nacimiento válidas');
+                    return false;
+                }
+
+                estudiantes = estudiantesCumple;
+                guardarDatos();
+                mostrarGrupoActual(grupo);
+                renderizarLista('todos', '');
+                actualizarEstadisticas();
+                verificarCumpleañosAlAbrir();
+
+                console.log(`✅ ${estudiantesCumple.length} estudiantes cargados desde Datos del Estudiante`);
+                mostrarToast(`📚 ${estudiantesCumple.length} estudiantes cargados desde ${grupo.grado} - ${grupo.seccion}`);
+
+                return true;
+            } catch (e) {
+                console.error('❌ Error cargando estudiantes:', e);
+                mostrarToast('❌ Error al cargar estudiantes: ' + e.message);
+                return false;
+            }
+        }
+
+        function forzarSincronizacion() {
+            console.log('🔄 FORZANDO sincronización...');
+            const icono = document.getElementById('btnRecargar')?.querySelector('i');
+            if (icono) {
+                icono.className = 'fas fa-spinner fa-spin';
+            }
+            setTimeout(() => {
+                const success = cargarEstudiantesDesdeDatosEstudiante();
+                if (icono) {
+                    icono.className = 'fas fa-sync-alt';
+                }
+                if (success) {
+                    const btn = document.getElementById('btnRecargar');
+                    if (btn) {
+                        btn.style.color = '#28a745';
+                        setTimeout(() => { btn.style.color = '#FFD700'; }, 2000);
+                    }
+                }
+            }, 300);
+        }
+
+        function iniciarMonitoreoContinuo() {
+            let grupoAnterior = '';
+            setInterval(() => {
+                const grupoActual = obtenerGrupoActual();
+                const clave = `${grupoActual.grado}|${grupoActual.seccion}|${grupoActual.tanda}`;
+                if (grupoAnterior && grupoAnterior !== clave) {
+                    console.log(`🔄 Cambio de grado detectado: ${grupoAnterior} -> ${clave}`);
+                    mostrarToast(`🔄 Cambiando a: ${grupoActual.grado} - ${grupoActual.seccion}`);
+                    forzarSincronizacion();
+                }
+                grupoAnterior = clave;
+            }, 2000);
+
+            let ultimoHash = '';
+            setInterval(() => {
+                try {
+                    const stored = localStorage.getItem('registrosSigerd');
+                    if (stored) {
+                        const hash = stored.length + '_' + stored.substring(0, 50);
+                        if (hash !== ultimoHash) {
+                            ultimoHash = hash;
+                            console.log('🔄 Detectado cambio en registrosSigerd (hash)');
+                            forzarSincronizacion();
+                        }
+                    }
+                } catch (e) {}
+            }, 1500);
+        }
+
+        function escucharEventos() {
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'registrosSigerd' || e.key === 'datosSincronizados' || 
+                    e.key === 'registroGradoData' || e.key === 'minerd_grado_completo') {
+                    console.log('🔄 Storage event:', e.key);
+                    setTimeout(forzarSincronizacion, 300);
+                }
+            });
+
+            document.addEventListener('formulariosActualizado', function(e) {
+                console.log('🔄 Evento formulariosActualizado');
+                setTimeout(forzarSincronizacion, 200);
+            });
+
+            document.addEventListener('gradoCambiado', function(e) {
+                console.log('🔄 Evento gradoCambiado:', e.detail);
+                setTimeout(forzarSincronizacion, 200);
+            });
+
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    console.log('👁️ Página visible nuevamente');
+                    forzarSincronizacion();
+                }
+            });
+        }
+
+        // ============================================
+        // 💾 PERSISTENCIA
+        // ============================================
+        function cargarDatos() {
+            try {
+                const datosGuardados = localStorage.getItem('cumpleEstudiantes');
+                if (datosGuardados) {
+                    const datos = JSON.parse(datosGuardados);
+                    if (Array.isArray(datos) && datos.length > 0) {
+                        estudiantes = datos;
+                        const maxId = estudiantes.reduce((max, e) => {
+                            const num = parseInt(e.id.replace('est-', ''));
+                            return num > max ? num : max;
+                        }, 0);
+                        contadorId = maxId + 1;
+                        return true;
+                    }
+                }
+                return false;
+            } catch (e) {
+                console.warn('⚠️ Error al cargar datos:', e);
+                return false;
+            }
+        }
+
+        function guardarDatos() {
+            try {
+                localStorage.setItem('cumpleEstudiantes', JSON.stringify(estudiantes));
+            } catch (e) {
+                console.warn('⚠️ Error al guardar datos:', e);
+            }
+        }
+
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+
+        function formatearFecha(fechaStr) {
+            try {
+                const d = new Date(fechaStr + 'T00:00:00');
+                return d.toLocaleDateString('es-DO', { day: 'numeric', month: 'long', year: 'numeric' });
+            } catch (e) {
+                return fechaStr;
+            }
+        }
+
+        function formatearFechaCorta(fechaStr) {
+            try {
+                const d = new Date(fechaStr + 'T00:00:00');
+                return d.toLocaleDateString('es-DO', { day: 'numeric', month: 'short' });
+            } catch (e) {
+                return fechaStr;
+            }
+        }
+
+        function obtenerEdad(fechaStr) {
+            try {
+                const hoy = new Date();
+                const nac = new Date(fechaStr + 'T00:00:00');
+                let edad = hoy.getFullYear() - nac.getFullYear();
+                const m = hoy.getMonth() - nac.getMonth();
+                if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) {
+                    edad--;
+                }
+                return edad;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function obtenerEdadExacta(fechaStr) {
+            try {
+                const hoy = new Date();
+                const nac = new Date(fechaStr + 'T00:00:00');
+                let años = hoy.getFullYear() - nac.getFullYear();
+                let meses = hoy.getMonth() - nac.getMonth();
+                if (meses < 0 || (meses === 0 && hoy.getDate() < nac.getDate())) {
+                    años--;
+                    meses += 12;
+                }
+                return `${años} años, ${meses} meses`;
+            } catch (e) {
+                return '0 años';
+            }
+        }
+
+        function proximoCumple(fechaStr) {
+            try {
+                const hoy = new Date();
+                const nac = new Date(fechaStr + 'T00:00:00');
+                let prox = new Date(hoy.getFullYear(), nac.getMonth(), nac.getDate());
+                if (prox < hoy) {
+                    prox.setFullYear(prox.getFullYear() + 1);
+                }
+                return prox;
+            } catch (e) {
+                return new Date();
+            }
+        }
+
+        function diasHasta(fecha) {
+            try {
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                const diff = fecha - hoy;
+                return Math.ceil(diff / (1000 * 60 * 60 * 24));
+            } catch (e) {
+                return 999;
+            }
+        }
+
+        function getColorNombre(color) {
+            const colores = {
+                verde: '#27ae60',
+                azul: '#2980b9',
+                rosa: '#e74c8b',
+                naranja: '#e67e22',
+                morado: '#8e44ad',
+                rojo: '#c0392b'
+            };
+            return colores[color] || '#1a2a4a';
+        }
+
+        function getIniciales(nombre) {
+            if (!nombre) return '?';
+            return nombre.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function generarId() {
+            return 'est-' + String(contadorId++).padStart(3, '0');
+        }
+
+        // ============================================
+        // RENDERIZAR LISTA
+        // ============================================
+        function renderizarLista(filtro = 'todos', busqueda = '') {
+            const container = document.getElementById('listaCumpleaños');
+            const contador = document.getElementById('contadorLista');
+
+            let filtrados = [...estudiantes];
+
+            if (filtro === 'hoy') {
+                filtrados = filtrados.filter(e => esHoy(e.fecha));
+            } else if (filtro === 'semana') {
+                filtrados = filtrados.filter(e => esEstaSemana(e.fecha));
+            } else if (filtro === 'mes') {
+                filtrados = filtrados.filter(e => esEsteMes(e.fecha));
+            }
+
+            if (busqueda.trim()) {
+                const term = busqueda.trim().toLowerCase();
+                filtrados = filtrados.filter(e => e.nombre.toLowerCase().includes(term));
+            }
+
+            filtrados.sort((a, b) => {
+                const da = diasHasta(proximoCumple(a.fecha));
+                const db = diasHasta(proximoCumple(b.fecha));
+                return da - db;
+            });
+
+            contador.textContent = filtrados.length;
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `
+                    <div class="mensaje-vacio">
+                        <div class="icono">🎈</div>
+                        <h3>${estudiantes.length === 0 ? '📥 No hay estudiantes cargados' : 'No hay cumpleaños para mostrar'}</h3>
+                        <p>${estudiantes.length === 0 ? 'Haz clic en 🔄 para cargar desde Datos del Estudiante' : filtro === 'todos' ? 'Agrega estudiantes para comenzar' : 'No hay cumpleaños en este período'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtrados.map(e => {
+                const edad = obtenerEdad(e.fecha);
+                const edadExacta = obtenerEdadExacta(e.fecha);
+                const prox = proximoCumple(e.fecha);
+                const dias = diasHasta(prox);
+                const fechaFormateada = formatearFecha(e.fecha);
+                const esHoyCumple = esHoy(e.fecha);
+                const esSemana = esEstaSemana(e.fecha);
+                const esMes = esEsteMes(e.fecha);
+
+                let etiqueta = '';
+                let etiquetaClase = '';
+                if (esHoyCumple) {
+                    etiqueta = '🎈 Hoy';
+                    etiquetaClase = 'hoy';
+                } else if (esSemana) {
+                    etiqueta = `📅 En ${dias} días`;
+                    etiquetaClase = 'esta-semana';
+                } else if (esMes) {
+                    etiqueta = '📆 Este mes';
+                    etiquetaClase = 'este-mes';
+                } else {
+                    etiqueta = `📅 En ${dias} días`;
+                    etiquetaClase = '';
+                }
+
+                const colorBg = getColorNombre(e.color);
+                const iniciales = getIniciales(e.nombre);
+
+                const tieneTelefono = e.telefono && e.telefono.length >= 10;
+                const telefonoDisplay = tieneTelefono ? 
+                    `<span style="font-size:0.7rem;color:#25D366;margin-left:6px;"><i class="fas fa-phone"></i> ${e.telefono.substring(0,3)}-${e.telefono.substring(3,6)}-${e.telefono.substring(6,10)}</span>` : '';
+
+                return `
+                    <div class="cumple-item" data-id="${e.id}">
+                        <div class="avatar ${e.color}" style="background:${colorBg};">
+                            <span class="iniciales">${iniciales}</span>
+                        </div>
+                        <div class="info">
+                            <div class="nombre">
+                                ${e.nombre}
+                                ${telefonoDisplay}
+                                ${etiqueta ? `<span class="etiqueta ${etiquetaClase}">${etiqueta}</span>` : ''}
+                            </div>
+                            <div class="detalle">
+                                <i class="fas fa-birthday-cake"></i>
+                                ${fechaFormateada} · ${edad} años (${edadExacta})
+                                ${!esHoyCumple && !esSemana && !esMes ? `· <i class="fas fa-clock"></i> ${dias} días` : ''}
+                            </div>
+                        </div>
+                        <div class="fecha-badge">
+                            <i class="fas fa-calendar-check"></i>
+                            ${formatearFechaCorta(prox.toISOString().split('T')[0])}
+                        </div>
+                        <div class="acciones">
+                            <button class="whatsapp" data-id="${e.id}" title="Enviar saludo por WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                            <button class="editar" data-id="${e.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="eliminar" data-id="${e.id}" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // ============================================
+            // WHATSAPP
+            // ============================================
+            container.querySelectorAll('.whatsapp').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const estudiante = estudiantes.find(e => e.id === id);
+                    if (estudiante) {
+                        enviarWhatsApp(estudiante.nombre, estudiante.telefono);
+                    }
+                });
+            });
+
+            // ============================================
+            // EDITAR - REDIRIGE A FORMULARIO.html
+            // ============================================
+            container.querySelectorAll('.editar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const estudiante = estudiantes.find(e => e.id === id);
+                    if (estudiante) {
+                        const grupo = obtenerGrupoActual();
+                        const grado = encodeURIComponent(grupo.grado);
+                        const seccion = encodeURIComponent(grupo.seccion);
+                        const tanda = encodeURIComponent(grupo.tanda);
+                        const nombre = encodeURIComponent(estudiante.nombre);
+                        const fecha = encodeURIComponent(estudiante.fecha);
+                        const idEstudiante = encodeURIComponent(estudiante.id);
+                        
+                        // ✅ CORRECTO: Misma carpeta (pages/)
+                        window.location.href = `FORMULARIO.html?origen=cumpleaños&accion=editar&grado=${grado}&seccion=${seccion}&tanda=${tanda}&nombre=${nombre}&fecha=${fecha}&id=${idEstudiante}`;
+                    }
+                });
+            });
+
+            // ============================================
+            // ELIMINAR
+            // ============================================
+            container.querySelectorAll('.eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const estudiante = estudiantes.find(e => e.id === id);
+                    if (estudiante && confirm(`¿Eliminar a "${estudiante.nombre}"?`)) {
+                        estudiantes = estudiantes.filter(e => e.id !== id);
+                        guardarDatos();
+                        renderizarLista(
+                            document.getElementById('filtroPeriodo').value,
+                            document.getElementById('buscarEstudiante').value
+                        );
+                        actualizarEstadisticas();
+                        mostrarToast('🗑️ Estudiante eliminado');
+                    }
+                });
+            });
+
+            actualizarEstadisticas();
+            verificarCumpleañosHoy();
+        }
+
+        // ============================================
+        // ACTUALIZAR ESTADÍSTICAS
+        // ============================================
+        function actualizarEstadisticas() {
+            document.getElementById('totalEstudiantes').textContent = estudiantes.length;
+            document.getElementById('cumpleHoy').textContent = estudiantes.filter(e => esHoy(e.fecha)).length;
+            document.getElementById('cumpleSemana').textContent = estudiantes.filter(e => esEstaSemana(e.fecha)).length;
+            document.getElementById('cumpleMes').textContent = estudiantes.filter(e => esEsteMes(e.fecha)).length;
+        }
+
+        function verificarCumpleañosHoy() {
+            const hoyCumples = estudiantes.filter(e => esHoy(e.fecha));
+            const badge = document.getElementById('badgeHoy');
+            if (hoyCumples.length > 0) {
+                badge.textContent = `🎈 ${hoyCumples.length} hoy`;
+                badge.style.animation = 'pulseBadge 1s infinite';
+            } else {
+                badge.textContent = '🎈 Hoy';
+                badge.style.animation = 'pulseBadge 2s infinite';
+            }
+        }
+
+        // ============================================
+        // RECORDATORIOS CON PERSISTENCIA
+        // ============================================
+        function verificarRecordatorios() {
+            limpiarRecordatoriosViejos();
+            
+            estudiantes.forEach(e => {
+                const prox = proximoCumple(e.fecha);
+                const dias = diasHasta(prox);
+                const key = `${e.id}-${dias}`;
+                
+                if (!recordatorioYaMostrado(key)) {
+                    if (dias === 7) {
+                        mostrarToast(`📅 En 7 días: ${e.nombre} cumple años 🎂`);
+                        guardarRecordatorio(key);
+                    }
+                    if (dias === 3) {
+                        mostrarToast(`🎈 En 3 días: ${e.nombre} cumple años 🎉`);
+                        guardarRecordatorio(key);
+                    }
+                    if (dias === 1) {
+                        mostrarToast(`🎂 Mañana: ${e.nombre} cumple años 🎊`);
+                        guardarRecordatorio(key);
+                    }
+                    if (dias === 0) {
+                        const hoyKey = `${e.id}-hoy`;
+                        if (!recordatorioYaMostrado(hoyKey)) {
+                            mostrarToast(`🎉 ¡HOY es el cumpleaños de ${e.nombre}! 🎂`);
+                            lanzarLluviaConfeti();
+                            abrirFelicitacion(e);
+                            guardarRecordatorio(hoyKey);
+                            guardarRecordatorio(key);
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // CONFETI
+        // ============================================
+        function lanzarLluviaConfeti() {
+            const container = document.getElementById('confetiContainer');
+            const colores = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF6BD6', '#FF9F43', '#00D2D3', '#F368E0',
+                '#FF4757', '#2ED573', '#1E90FF', '#FFA502', '#A29BFE', '#FD79A8'
+            ];
+            const formas = ['●', '■', '▲', '★', '♦', '♥', '◆', '⬟', '⬡'];
+
+            for (let i = 0; i < 300; i++) {
+                const confeti = document.createElement('div');
+                confeti.className = 'confeti';
+                const rand = Math.random();
+                if (rand < 0.15) confeti.classList.add('circulo');
+                else if (rand < 0.25) confeti.classList.add('estrella');
+                const color = colores[Math.floor(Math.random() * colores.length)];
+                const size = 6 + Math.random() * 14;
+                const forma = formas[Math.floor(Math.random() * formas.length)];
+                const left = Math.random() * 100;
+                const delay = Math.random() * 3;
+                const duration = 2 + Math.random() * 4;
+                confeti.style.cssText = `
+                    left: ${left}%;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: ${color};
+                    color: ${color};
+                    font-size: ${size * 1.2}px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    animation-delay: ${delay}s;
+                    animation-duration: ${duration}s;
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    transform: rotate(${Math.random() * 360}deg);
+                `;
+                confeti.textContent = forma;
+                container.appendChild(confeti);
+                setTimeout(() => { confeti.remove(); }, (delay + duration) * 1000 + 500);
+            }
+            setTimeout(() => {
+                for (let i = 0; i < 150; i++) {
+                    const confeti = document.createElement('div');
+                    confeti.className = 'confeti';
+                    const color = colores[Math.floor(Math.random() * colores.length)];
+                    const size = 5 + Math.random() * 10;
+                    const forma = formas[Math.floor(Math.random() * formas.length)];
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 2;
+                    const duration = 2 + Math.random() * 3;
+                    confeti.style.cssText = `
+                        left: ${left}%;
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: ${color};
+                        color: ${color};
+                        font-size: ${size * 1.2}px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        animation-delay: ${delay}s;
+                        animation-duration: ${duration}s;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                        transform: rotate(${Math.random() * 360}deg);
+                    `;
+                    confeti.textContent = forma;
+                    container.appendChild(confeti);
+                    setTimeout(() => { confeti.remove(); }, (delay + duration) * 1000 + 500);
+                }
+            }, 1500);
+            setTimeout(() => {
+                for (let i = 0; i < 80; i++) {
+                    const confeti = document.createElement('div');
+                    confeti.className = 'confeti';
+                    const color = colores[Math.floor(Math.random() * colores.length)];
+                    const size = 8 + Math.random() * 12;
+                    const forma = formas[Math.floor(Math.random() * formas.length)];
+                    const left = Math.random() * 100;
+                    const delay = Math.random() * 1.5;
+                    const duration = 2 + Math.random() * 3;
+                    confeti.style.cssText = `
+                        left: ${left}%;
+                        width: ${size}px;
+                        height: ${size}px;
+                        background: ${color};
+                        color: ${color};
+                        font-size: ${size * 1.2}px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        animation-delay: ${delay}s;
+                        animation-duration: ${duration}s;
+                        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                        transform: rotate(${Math.random() * 360}deg);
+                    `;
+                    confeti.textContent = forma;
+                    container.appendChild(confeti);
+                    setTimeout(() => { confeti.remove(); }, (delay + duration) * 1000 + 500);
+                }
+            }, 3000);
+        }
+
+        // ============================================
+        // MODAL DE FELICITACIÓN
+        // ============================================
+        function abrirFelicitacion(estudiante) {
+            estudianteParaFelicitacion = estudiante;
+            document.getElementById('nombreFelicitacion').textContent = estudiante.nombre;
+            document.getElementById('modalFelicitacion').classList.add('activo');
+            lanzarLluviaConfeti();
+            setTimeout(lanzarLluviaConfeti, 1500);
+        }
+
+        function cerrarFelicitacion() {
+            document.getElementById('modalFelicitacion').classList.remove('activo');
+            estudianteParaFelicitacion = null;
+        }
+
+        document.getElementById('cerrarFelicitacion').addEventListener('click', cerrarFelicitacion);
+        document.getElementById('btnCerrarFelicitacion').addEventListener('click', cerrarFelicitacion);
+        document.getElementById('modalFelicitacion').addEventListener('click', function(e) {
+            if (e.target === this) cerrarFelicitacion();
+        });
+        document.getElementById('btnWhatsappFelicitacion').addEventListener('click', function() {
+            if (estudianteParaFelicitacion) {
+                enviarWhatsApp(estudianteParaFelicitacion.nombre, estudianteParaFelicitacion.telefono);
+                cerrarFelicitacion();
+            }
+        });
+
+        // ============================================
+        // WHATSAPP CON TELÉFONO
+        // ============================================
+        function enviarWhatsApp(nombre, telefono) {
+            const mensaje = `🎂 ¡Feliz cumpleaños ${nombre}! 🎉 Que tengas un día maravilloso lleno de alegría y bendiciones. 🎈🎊`;
+            let url;
+            if (telefono && telefono.length >= 10) {
+                const telefonoLimpio = String(telefono).replace(/\D/g, '');
+                let numeroCompleto = telefonoLimpio;
+                if (telefonoLimpio.length === 10) {
+                    numeroCompleto = '1' + telefonoLimpio;
+                }
+                url = `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensaje)}`;
+                mostrarToast(`💬 Enviando WhatsApp a ${nombre} (${telefonoLimpio})`);
+            } else {
+                url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+                mostrarToast(`💬 Abriendo WhatsApp para ${nombre} (sin número registrado)`);
+            }
+            window.open(url, '_blank');
+        }
+
+        document.getElementById('btnWhatsappMasivo').addEventListener('click', function() {
+            const filtro = document.getElementById('filtroPeriodo').value;
+            let destinatarios = [];
+            if (filtro === 'hoy') {
+                destinatarios = estudiantes.filter(e => esHoy(e.fecha));
+            } else if (filtro === 'semana') {
+                destinatarios = estudiantes.filter(e => esEstaSemana(e.fecha));
+            } else if (filtro === 'mes') {
+                destinatarios = estudiantes.filter(e => esEsteMes(e.fecha));
+            } else {
+                destinatarios = estudiantes;
+            }
+            if (destinatarios.length === 0) {
+                mostrarToast('⚠️ No hay estudiantes para enviar saludos');
+                return;
+            }
+            if (destinatarios.length === 1 && destinatarios[0].telefono) {
+                enviarWhatsApp(destinatarios[0].nombre, destinatarios[0].telefono);
+                return;
+            }
+            const nombres = destinatarios.map(e => e.nombre).join(', ');
+            const mensaje = `🎂 ¡Feliz cumpleaños a todos! 🎉\n\n${nombres}\n\n¡Que tengan un día maravilloso! 🎈🎊`;
+            const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            mostrarToast(`💬 Enviando saludos a ${destinatarios.length} estudiantes`);
+        });
+
+        // ============================================
+        // BOTÓN AGREGAR - REDIRIGE A FORMULARIO.html
+        // ============================================
+        document.getElementById('btnAgregarCumple').addEventListener('click', function() {
+            const grupo = obtenerGrupoActual();
+            const grado = encodeURIComponent(grupo.grado);
+            const seccion = encodeURIComponent(grupo.seccion);
+            const tanda = encodeURIComponent(grupo.tanda);
+            
+            // ✅ CORRECTO: Misma carpeta (pages/)
+            window.location.href = `FORMULARIO.html?origen=cumpleaños&accion=agregar&grado=${grado}&seccion=${seccion}&tanda=${tanda}`;
+        });
+
+        // ============================================
+        // EXPORTAR
+        // ============================================
+        document.getElementById('btnExportar').addEventListener('click', function() {
+            document.getElementById('modalExportar').classList.add('activo');
+        });
+        document.getElementById('cerrarExportar').addEventListener('click', function() {
+            document.getElementById('modalExportar').classList.remove('activo');
+        });
+        document.getElementById('modalExportar').addEventListener('click', function(e) {
+            if (e.target === this) {
+                document.getElementById('modalExportar').classList.remove('activo');
+            }
+        });
+
+        document.getElementById('exportarPDF').addEventListener('click', function() {
+            exportarPDF();
+            document.getElementById('modalExportar').classList.remove('activo');
+        });
+        document.getElementById('exportarExcel').addEventListener('click', function() {
+            exportarExcel();
+            document.getElementById('modalExportar').classList.remove('activo');
+        });
+        document.getElementById('exportarWhatsapp').addEventListener('click', function() {
+            const mensaje = '📋 Lista de cumpleaños:\n\n' +
+                estudiantes.map(e => `${e.nombre} - ${formatearFecha(e.fecha)}`).join('\n');
+            const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            document.getElementById('modalExportar').classList.remove('activo');
+            mostrarToast('💬 Enviando lista por WhatsApp');
+        });
+
+        function exportarPDF() {
+            if (estudiantes.length === 0) {
+                mostrarToast('⚠️ No hay estudiantes para exportar');
+                return;
+            }
+            const contenido = document.createElement('div');
+            contenido.style.cssText = 'padding:20px; font-family:Arial;';
+            contenido.innerHTML = `
+                <h1 style="text-align:center;color:#1a2a4a;">🎂 Lista de Cumpleaños</h1>
+                <p style="text-align:center;color:#718096;">${new Date().toLocaleDateString('es-DO')}</p>
+                <hr style="border:2px solid #1a2a4a;margin:15px 0;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#1a2a4a;color:white;">
+                            <th style="padding:10px;text-align:left;">Estudiante</th>
+                            <th style="padding:10px;text-align:left;">Fecha de nacimiento</th>
+                            <th style="padding:10px;text-align:left;">Edad</th>
+                            <th style="padding:10px;text-align:left;">Próximo cumpleaños</th>
+                            <th style="padding:10px;text-align:left;">Teléfono</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${estudiantes.map(e => `
+                            <tr style="border-bottom:1px solid #e2e8f0;">
+                                <td style="padding:8px;">${e.nombre}</td>
+                                <td style="padding:8px;">${formatearFecha(e.fecha)}</td>
+                                <td style="padding:8px;">${obtenerEdad(e.fecha)} años</td>
+                                <td style="padding:8px;">${formatearFechaCorta(proximoCumple(e.fecha).toISOString().split('T')[0])}</td>
+                                <td style="padding:8px;">${e.telefono || 'No registrado'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <hr style="border:1px solid #e2e8f0;margin:15px 0;">
+                <p style="text-align:center;color:#718096;font-size:0.8rem;">
+                    Total: ${estudiantes.length} estudiantes · Generado el ${new Date().toLocaleString('es-DO')}
+                </p>
+            `;
+            const ventana = window.open('', '_blank', 'width=800,height=600');
+            ventana.document.write(`
+                <html>
+                    <head><title>Lista de Cumpleaños</title></head>
+                    <body>${contenido.innerHTML}</body>
+                </html>
+            `);
+            ventana.document.close();
+            setTimeout(() => ventana.print(), 500);
+            mostrarToast('📄 Abriendo PDF...');
+        }
+
+        function exportarExcel() {
+            if (estudiantes.length === 0) {
+                mostrarToast('⚠️ No hay estudiantes para exportar');
+                return;
+            }
+            let csv = 'Estudiante,Fecha de nacimiento,Edad,Próximo cumpleaños,Teléfono\n';
+            estudiantes.forEach(e => {
+                csv += `${e.nombre},${formatearFecha(e.fecha)},${obtenerEdad(e.fecha)} años,${formatearFechaCorta(proximoCumple(e.fecha).toISOString().split('T')[0])},${e.telefono || 'No registrado'}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `cumpleaños_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            mostrarToast('📊 CSV descargado');
+        }
+
+        // ============================================
+        // RESTAURAR
+        // ============================================
+        document.getElementById('btnRestaurar').addEventListener('click', function() {
+            if (confirm('¿Eliminar todos los datos de cumpleaños? Esta acción no se puede deshacer.')) {
+                estudiantes = [];
+                contadorId = 1;
+                localStorage.removeItem('cumpleEstudiantes');
+                localStorage.removeItem('cumpleRecordatorios');
+                renderizarLista('todos', '');
+                actualizarEstadisticas();
+                mostrarToast('🗑️ Datos eliminados correctamente');
+            }
+        });
+
+        // ============================================
+        // FILTROS
+        // ============================================
+        document.getElementById('btnFiltrar').addEventListener('click', function() {
+            const filtro = document.getElementById('filtroPeriodo').value;
+            const busqueda = document.getElementById('buscarEstudiante').value;
+            renderizarLista(filtro, busqueda);
+            if (filtro === 'hoy' && estudiantes.some(e => esHoy(e.fecha))) {
+                lanzarLluviaConfeti();
+                mostrarToast('🎉 ¡Hay cumpleaños hoy! 🎂');
+            }
+        });
+
+        document.getElementById('btnResetFiltros').addEventListener('click', function() {
+            document.getElementById('filtroPeriodo').value = 'todos';
+            document.getElementById('buscarEstudiante').value = '';
+            renderizarLista('todos', '');
+            mostrarToast('🔄 Filtros restablecidos');
+        });
+
+        let timeoutBusqueda;
+        document.getElementById('buscarEstudiante').addEventListener('input', function() {
+            clearTimeout(timeoutBusqueda);
+            timeoutBusqueda = setTimeout(() => {
+                const filtro = document.getElementById('filtroPeriodo').value;
+                renderizarLista(filtro, this.value);
+            }, 300);
+        });
+
+        document.querySelectorAll('.stat-card-cumple').forEach(card => {
+            card.addEventListener('click', function() {
+                const filtro = this.dataset.filtro;
+                document.getElementById('filtroPeriodo').value = filtro;
+                renderizarLista(filtro, document.getElementById('buscarEstudiante').value);
+                mostrarToast(`📋 Filtrado: ${this.querySelector('.label').textContent}`);
+            });
+        });
+
+        // ============================================
+        // TEMA OSCURO
+        // ============================================
+        document.getElementById('btnTema').addEventListener('click', function() {
+            temaOscuro = !temaOscuro;
+            document.body.classList.toggle('modo-oscuro', temaOscuro);
+            this.innerHTML = temaOscuro ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            mostrarToast(temaOscuro ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
+        });
+
+        // ============================================
+        // BOTÓN RECARGAR
+        // ============================================
+        document.getElementById('btnRecargar').addEventListener('click', function() {
+            forzarSincronizacion();
+        });
+
+        // ============================================
+        // TOAST
+        // ============================================
+        function mostrarToast(mensaje) {
+            const toastAnterior = document.querySelector('.toast-mensaje');
+            if (toastAnterior) {
+                toastAnterior.remove();
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast-mensaje';
+            toast.textContent = mensaje;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('ocultar');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ============================================
+        // ACTUALIZAR FECHA
+        // ============================================
+        function actualizarFecha() {
+            const ahora = new Date();
+            document.getElementById('fechaActual').textContent =
+                ahora.toLocaleDateString('es-DO', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+        }
+
+        // ============================================
+        // VERIFICAR CUMPLEAÑOS AL ABRIR (CON PERSISTENCIA)
+        // ============================================
+        function verificarCumpleañosAlAbrir() {
+            if (estudiantes.length === 0) return;
+            
+            limpiarRecordatoriosViejos();
+            
+            const hoyCumples = estudiantes.filter(e => esHoy(e.fecha));
+            
+            if (hoyCumples.length > 0) {
+                const hoyKey = `${hoyCumples[0].id}-hoy`;
+                
+                if (!recordatorioYaMostrado(hoyKey)) {
+                    lanzarLluviaConfeti();
+                    setTimeout(lanzarLluviaConfeti, 1000);
+                    setTimeout(lanzarLluviaConfeti, 2500);
+                    
+                    const nombres = hoyCumples.map(e => e.nombre).join(', ');
+                    mostrarToast(`🎉 ¡HOY es el cumpleaños de ${nombres}! 🎂`);
+                    abrirFelicitacion(hoyCumples[0]);
+                    
+                    guardarRecordatorio(hoyKey);
+                } else {
+                    console.log(`ℹ️ Felicitación ya mostrada para ${hoyCumples[0].nombre}`);
+                }
+            } else {
+                const proximos = estudiantes.filter(e => {
+                    const dias = diasHasta(proximoCumple(e.fecha));
+                    return dias > 0 && dias <= 7;
+                });
+                
+                if (proximos.length > 0) {
+                    const nombres = proximos.map(e => e.nombre).join(', ');
+                    mostrarToast(`📅 Esta semana: ${nombres} cumplen años 🎈`);
+                    setTimeout(lanzarLluviaConfeti, 500);
+                }
+            }
+        }
+
+        // ============================================
+        // EXPONER FUNCIONES
+        // ============================================
+        window.cargarEstudiantesDesdeDatosEstudiante = cargarEstudiantesDesdeDatosEstudiante;
+        window.sincronizarCumpleaños = cargarEstudiantesDesdeDatosEstudiante;
+        window.recargarCumpleaños = forzarSincronizacion;
+        window.forzarSincronizacion = forzarSincronizacion;
+        window.obtenerGrupoActual = obtenerGrupoActual;
+
+        window.agregarEstudiante = function(nombre, fecha, color, telefono) {
+            if (!nombre || !fecha) {
+                console.warn('⚠️ Nombre y fecha son obligatorios');
+                return false;
+            }
+            const nuevoId = generarId();
+            const colorFinal = color || ['verde', 'azul', 'rosa', 'naranja', 'morado', 'rojo'][Math.floor(Math.random() * 6)];
+            estudiantes.push({ id: nuevoId, nombre, fecha: fecha, color: colorFinal, telefono: telefono || null });
+            guardarDatos();
+            renderizarLista('todos', '');
+            actualizarEstadisticas();
+            return true;
+        };
+
+        window.obtenerEstudiantes = function() {
+            return [...estudiantes];
+        };
+
+        window.limpiarEstudiantes = function() {
+            if (confirm('¿Eliminar todos los estudiantes?')) {
+                estudiantes = [];
+                contadorId = 1;
+                localStorage.removeItem('cumpleEstudiantes');
+                localStorage.removeItem('cumpleRecordatorios');
+                renderizarLista('todos', '');
+                actualizarEstadisticas();
+                mostrarToast('🗑️ Todos los estudiantes eliminados');
+                return true;
+            }
+            return false;
+        };
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        actualizarFecha();
+        iniciarMonitoreoContinuo();
+        escucharEventos();
+
+        const datosCargados = cargarDatos();
+
+        if (datosCargados && estudiantes.length > 0) {
+            renderizarLista('todos', '');
+            actualizarEstadisticas();
+            verificarCumpleañosAlAbrir();
+            mostrarToast(`📚 ${estudiantes.length} estudiantes cargados`);
+            console.log(`📥 ${estudiantes.length} estudiantes cargados desde localStorage`);
+            const grupo = obtenerGrupoActual();
+            if (grupo.grado !== 'No asignado') {
+                mostrarGrupoActual(grupo);
+            }
+        } else {
+            console.log('🔄 Intentando cargar desde Datos del Estudiante...');
+            mostrarToast('🔄 Cargando estudiantes desde Datos del Estudiante...');
+            setTimeout(() => {
+                const success = cargarEstudiantesDesdeDatosEstudiante();
+                if (!success) {
+                    mostrarToast('📭 No se encontraron estudiantes. Usa "Recargar" o importa manualmente.');
+                }
+            }, 500);
+        }
+
+        setInterval(verificarRecordatorios, 3600000);
+        setInterval(actualizarFecha, 60000);
+
+        console.log('🎂 Alertas de Cumpleaños - CONECTADO CON DATOS DEL ESTUDIANTE');
+        console.log('📊 Usa el botón 🔄 para recargar manualmente');
+        console.log('📥 Los estudiantes se cargan automáticamente desde registrosSigerd');
+        console.log('📱 WhatsApp usa el teléfono de emergencia de la página 3');
+        console.log('🔄 Sincronización activa cada 2 segundos');
+        console.log('💾 Los recordatorios son PERSISTENTES en localStorage');
+        console.log('➕ Botón "Agregar" redirige a FORMULARIO.html');
+
+    });
+    </script>
+
+</body>
+</html>
