@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Dashboard del Docente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: #f0f4f8; min-height: 100vh; }
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 1.5rem 2rem; min-height: 100vh; }
+
+        .top-header {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            gap: 1rem; background: white; padding: 1rem 1.5rem; border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 1.5rem;
+        }
+        .top-header .page-title h1 { font-size: 1.4rem; color: #1a2a4a; display: flex; align-items: center; gap: 0.8rem; }
+        .top-header .page-title p { font-size: 0.8rem; color: #6a8a9e; }
+        .top-header .header-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .top-header .header-actions .fecha { font-size: 0.8rem; color: #4a6a8a; background: #f0f4f8; padding: 0.4rem 1rem; border-radius: 50px; }
+        .top-header .header-actions .btn-actualizar {
+            background: #1a3a6b; color: white; border: none; padding: 0.5rem 1.5rem;
+            border-radius: 50px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
+            transition: all 0.3s ease; font-family: inherit;
+        }
+        .top-header .header-actions .btn-actualizar:hover { background: #0f2a52; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(26,58,107,0.3); }
+        .top-header .header-actions .btn-actualizar:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .grupo-badges {
+            display: flex; align-items: center; gap: 0.8rem; background: white;
+            padding: 0.6rem 1.2rem; border-radius: 50px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            flex-wrap: wrap; margin-bottom: 1.5rem;
+        }
+        .grupo-badges .badge { padding: 0.25rem 1rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .grupo-badges .badge.grado { background: #1a3a6b; color: #ffd700; }
+        .grupo-badges .badge.seccion { background: #2a6a4a; color: #a0e0c0; }
+        .grupo-badges .badge.tanda { background: #8a6a2a; color: #ffe0a0; }
+        .grupo-badges .badge.anio { background: #e8eef4; color: #1a2a4a; }
+        .grupo-badges .badge.docente { background: #4a7a8a; color: #c0e8f0; }
+        .grupo-badges .badge.estado { background: #d4edda; color: #155724; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: white; border-radius: 16px; padding: 1.2rem 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e8eef4;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        .stat-card .stat-icon { font-size: 1.6rem; margin-bottom: 0.3rem; display: block; }
+        .stat-card .stat-number { font-size: 1.8rem; font-weight: 800; color: #1a2a4a; line-height: 1.2; }
+        .stat-card .stat-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #6a8a9e; margin-top: 0.2rem; }
+        .stat-card .stat-change { font-size: 0.55rem; font-weight: 600; margin-top: 0.3rem; display: inline-block; padding: 0.1rem 0.6rem; border-radius: 50px; }
+        .stat-card .stat-change.positivo { background: #d4edda; color: #155724; }
+        .stat-card .stat-change.negativo { background: #f8d7da; color: #721c24; }
+        .stat-card .stat-change.neutro { background: #e8eef4; color: #4a6a8a; }
+        .stat-card .stat-change.riesgo { background: #fff3cd; color: #856404; }
+        .stat-card.azul .stat-number { color: #1a3a6b; }
+        .stat-card.verde .stat-number { color: #2a7a4a; }
+        .stat-card.rojo .stat-number { color: #c0392b; }
+        .stat-card.morado .stat-number { color: #6c2a8a; }
+        .stat-card.teal .stat-number { color: #1a7a7a; }
+        .stat-card.naranja .stat-number { color: #d46a1a; }
+        .stat-card.rosa .stat-number { color: #b0306a; }
+        .stat-card.amarillo .stat-number { color: #b88220; }
+
+        .panels-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .panels-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .panels-asistencia { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+        .panel {
+            background: white; border-radius: 16px; padding: 1.2rem 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e8eef4;
+        }
+        .panel h3 {
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            color: #1a2a4a; margin-bottom: 0.8rem; padding-bottom: 0.4rem;
+            border-bottom: 2px solid #e8eef4; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+        }
+        .panel h3 .badge-count {
+            font-size: 0.6rem; background: #1a3a6b; color: white;
+            padding: 0.1rem 0.6rem; border-radius: 50px; margin-left: auto;
+        }
+        .panel h3 .badge-count.riesgo { background: #c0392b; }
+        .panel h3 .badge-count.incompleto { background: #b88220; }
+        .panel h3 .badge-count.asistencia { background: #2a7a4a; }
+
+        .lista-estudiantes {
+            list-style: none; max-height: 220px; overflow-y: auto;
+        }
+        .lista-estudiantes::-webkit-scrollbar { width: 4px; }
+        .lista-estudiantes::-webkit-scrollbar-track { background: #f0f4f8; border-radius: 10px; }
+        .lista-estudiantes::-webkit-scrollbar-thumb { background: #c0d0e0; border-radius: 10px; }
+        .lista-estudiantes li {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.5rem 0; border-bottom: 1px solid #f0f4f8;
+        }
+        .lista-estudiantes li:last-child { border-bottom: none; }
+        .lista-estudiantes .nombre { font-weight: 600; color: #1a2a4a; font-size: 0.8rem; }
+        .lista-estudiantes .posicion { font-size: 0.55rem; color: #6a8a9e; font-weight: 600; margin-right: 0.5rem; }
+        .lista-estudiantes .badge-estado { font-size: 0.5rem; padding: 0.1rem 0.5rem; border-radius: 50px; font-weight: 600; margin-left: 0.3rem; }
+        .badge-estado.completo { background: #d4edda; color: #155724; }
+        .badge-estado.riesgo { background: #f8d7da; color: #721c24; }
+        .badge-estado.incompleto { background: #fff3cd; color: #856404; }
+        .badge-estado.asistencia-alta { background: #d4edda; color: #155724; }
+        .badge-estado.asistencia-media { background: #fff3cd; color: #856404; }
+        .badge-estado.asistencia-baja { background: #f8d7da; color: #721c24; }
+        .promedio { font-weight: 700; font-size: 0.8rem; padding: 0.1rem 0.6rem; border-radius: 50px; }
+        .promedio.aprobado { color: #2a7a4a; background: #d4edda; }
+        .promedio.riesgo { color: #c0392b; background: #f8d7da; }
+        .promedio.incompleto { color: #856404; background: #fff3cd; }
+
+        .barra-progreso { margin-top: 0.3rem; }
+        .barra-progreso .item {
+            display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem;
+        }
+        .barra-progreso .item .label {
+            font-size: 0.65rem; font-weight: 600; color: #1a2a4a; min-width: 85px;
+        }
+        .barra-progreso .item .barra {
+            flex: 1; height: 6px; background: #e8eef4; border-radius: 10px; overflow: hidden;
+        }
+        .barra-progreso .item .barra .relleno {
+            height: 100%; border-radius: 10px; transition: width 0.6s ease;
+        }
+        .barra-progreso .item .valor {
+            font-size: 0.65rem; font-weight: 700; color: #1a2a4a; min-width: 35px; text-align: right;
+        }
+        .relleno.azul { background: #1a3a6b; }
+        .relleno.verde { background: #2a7a4a; }
+        .relleno.rojo { background: #c0392b; }
+        .relleno.amarillo { background: #b88220; }
+
+        .toast-stats {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: #1a2a4a; color: white; padding: 10px 24px; border-radius: 60px;
+            font-family: 'Inter', sans-serif; font-size: 0.85rem; box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 99999; font-weight: 500; max-width: 90%; text-align: center;
+            opacity: 0; transition: all 0.4s ease; pointer-events: none;
+        }
+        .toast-stats.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 1024px) {
+            .panels-grid { grid-template-columns: 1fr; }
+            .panels-bottom { grid-template-columns: 1fr 1fr; }
+            .panels-asistencia { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+            .panels-bottom { grid-template-columns: 1fr; }
+            .top-header { flex-direction: column; align-items: stretch; }
+            .top-header .page-title h1 { font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+            .stat-card { padding: 0.8rem; }
+            .stat-card .stat-number { font-size: 1.3rem; }
+            .grupo-badges { justify-content: center; gap: 0.4rem; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stat-card { animation: fadeInUp 0.4s ease forwards; }
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.10s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.20s; }
+        .stat-card:nth-child(5) { animation-delay: 0.25s; }
+        .stat-card:nth-child(6) { animation-delay: 0.30s; }
+        .stat-card:nth-child(7) { animation-delay: 0.35s; }
+        .stat-card:nth-child(8) { animation-delay: 0.40s; }
+        .panel { animation: fadeInUp 0.5s ease forwards; }
+        .panel:nth-child(1) { animation-delay: 0.1s; }
+        .panel:nth-child(2) { animation-delay: 0.15s; }
+        .panel:nth-child(3) { animation-delay: 0.2s; }
+        .panel:nth-child(4) { animation-delay: 0.25s; }
+        .panel:nth-child(5) { animation-delay: 0.3s; }
+        .panel:nth-child(6) { animation-delay: 0.35s; }
+    </style>
+</head>
+<body>
+
+<div class="main-content">
+
+    <!-- ===== TOP HEADER ===== -->
+    <header class="top-header">
+        <div class="page-title">
+            <h1>📊 Dashboard del Docente <span style="font-size:0.6rem;background:#1a3a6b;color:white;padding:0.1rem 0.8rem;border-radius:50px;font-weight:400;">en vivo</span></h1>
+            <p>Vista panorámica de tu grupo y rendimiento académico</p>
+        </div>
+        <div class="header-actions">
+            <span class="fecha">🗓️ <span id="fechaActual">Cargando...</span></span>
+            <button class="btn-actualizar" onclick="actualizarDatos()">🔄 Actualizar</button>
+        </div>
+    </header>
+
+    <!-- ===== BADGES DE GRUPO (CON DOCENTE) ===== -->
+    <div class="grupo-badges" id="grupoBadges">
+        <span class="badge grado" id="badgeGrado">🎓 TERCER GRADO</span>
+        <span class="badge seccion" id="badgeSeccion">📚 Sección A</span>
+        <span class="badge tanda" id="badgeTanda">🕐 Matutina</span>
+        <span class="badge anio" id="badgeAnio">📅 2025-2026</span>
+        <span class="badge docente" id="badgeDocente">👨‍🏫 Docente: <span id="nombreDocenteBadge">Cargando...</span></span>
+        <span class="badge estado" id="estadoSincronizacion">✅ Sincronizado</span>
+    </div>
+
+    <!-- ===== 8 TARJETAS DE ESTADÍSTICAS ===== -->
+    <section class="stats-grid" id="statsGrid">
+        <div class="stat-card azul">
+            <span class="stat-icon">👨‍</span>
+            <div class="stat-number" id="totalEstudiantes">0</div>
+            <div class="stat-label">Total Estudiantes</div>
+            <span class="stat-change positivo" id="totalEstudiantesChange">📊 0 registrados</span>
+        </div>
+        <div class="stat-card verde">
+            <span class="stat-icon">✅</span>
+            <div class="stat-number" id="evaluados">0</div>
+            <div class="stat-label">Evaluados</div>
+            <span class="stat-change positivo" id="evaluadosChange">0% del total</span>
+        </div>
+        <div class="stat-card teal">
+            <span class="stat-icon">📊</span>
+            <div class="stat-number" id="promedioGeneral">--</div>
+            <div class="stat-label">Promedio General</div>
+            <span class="stat-change neutro" id="promedioGeneralChange">0 estudiantes</span>
+        </div>
+        <div class="stat-card verde">
+            <span class="stat-icon">🎓</span>
+            <div class="stat-number" id="aprobados">0</div>
+            <div class="stat-label">Aprobados</div>
+            <span class="stat-change positivo" id="aprobadosChange">0%</span>
+        </div>
+        <div class="stat-card rojo">
+            <span class="stat-icon">⚠️</span>
+            <div class="stat-number" id="enRiesgo">0</div>
+            <div class="stat-label">En Riesgo</div>
+            <span class="stat-change negativo" id="enRiesgoChange">0</span>
+        </div>
+        <div class="stat-card naranja">
+            <span class="stat-icon">📋</span>
+            <div class="stat-number" id="incompletos">0</div>
+            <div class="stat-label">Notas Incompletas</div>
+            <span class="stat-change riesgo" id="incompletosChange">Faltan materias</span>
+        </div>
+        <div class="stat-card morado">
+            <span class="stat-icon">📊</span>
+            <div class="stat-number" id="asistenciaPromedio">--</div>
+            <div class="stat-label">Asistencia Promedio</div>
+            <span class="stat-change positivo" id="asistenciaChange">--</span>
+        </div>
+        <div class="stat-card rosa">
+            <span class="stat-icon">⏳</span>
+            <div class="stat-number" id="periodoActual">--</div>
+            <div class="stat-label">Período Actual</div>
+            <span class="stat-change neutro" id="periodoChange">Semana --/6</span>
+        </div>
+    </section>
+
+    <!-- ===== PANELES PRINCIPALES ===== -->
+    <section class="panels-grid">
+        <div class="panel">
+            <h3>🏆 Top 5 Mejores Promedios <span class="badge-count" id="topCount">0</span></h3>
+            <ul class="lista-estudiantes" id="topEstudiantes">
+                <li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Cargando datos...</li>
+            </ul>
+        </div>
+        <div class="panel">
+            <h3>📊 Distribución por Competencias</h3>
+            <div class="barra-progreso">
+                <div class="item"><span class="label">Comunicativa</span><div class="barra"><div id="barraC1" class="relleno azul" style="width:0%;"></div></div><span class="valor" id="valorC1">0%</span></div>
+                <div class="item"><span class="label">Pensamiento Lógico</span><div class="barra"><div id="barraC2" class="relleno verde" style="width:0%;"></div></div><span class="valor" id="valorC2">0%</span></div>
+                <div class="item"><span class="label">Ética y Ciudadana</span><div class="barra"><div id="barraC3" class="relleno amarillo" style="width:0%;"></div></div><span class="valor" id="valorC3">0%</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PANELES INFERIORES ===== -->
+    <section class="panels-bottom">
+        <div class="panel">
+            <h3>⚠️ Estudiantes en Riesgo <span class="badge-count riesgo" id="riesgoCount">0</span></h3>
+            <ul class="lista-estudiantes" id="riesgoEstudiantes">
+                <li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Cargando datos...</li>
+            </ul>
+        </div>
+        <div class="panel">
+            <h3>📋 Notas Incompletas <span class="badge-count incompleto" id="incompletosCount">0</span></h3>
+            <ul class="lista-estudiantes" id="incompletosEstudiantes">
+                <li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Cargando datos...</li>
+            </ul>
+        </div>
+        <div class="panel">
+            <h3>🎂 Próximos Cumpleaños <span class="badge-count" id="cumpleCount">0</span></h3>
+            <ul class="lista-estudiantes" id="proximosCumpleanos">
+                <li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Cargando datos...</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- ===== PANEL DE ASISTENCIA DETALLADA ===== -->
+    <section class="panels-asistencia">
+        <div class="panel">
+            <h3>📊 Top 5 Mejor Asistencia <span class="badge-count asistencia" id="asistenciaTopCount">0</span></h3>
+            <ul class="lista-estudiantes" id="asistenciaTopEstudiantes">
+                <li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Cargando datos de asistencia...</li>
+            </ul>
+        </div>
+        <div class="panel">
+            <h3>📊 Resumen de Asistencia Anual</h3>
+            <div class="barra-progreso">
+                <div class="item">
+                    <span class="label">Asistencia Promedio</span>
+                    <div class="barra"><div id="barraAsistenciaGeneral" class="relleno verde" style="width:0%;"></div></div>
+                    <span class="valor" id="valorAsistenciaGeneral">0%</span>
+                </div>
+                <div class="item" style="margin-top:0.5rem;">
+                    <span class="label">Estudiantes con datos</span>
+                    <div style="flex:1;font-size:0.8rem;font-weight:600;color:#1a2a4a;">
+                        <span id="asistenciaEstudiantesConDatos">0</span> de <span id="asistenciaTotalEstudiantes">0</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:0.8rem;font-size:0.65rem;color:#6a8a9e;border-top:1px solid #e8eef4;padding-top:0.8rem;">
+                📌 Fórmula: (P + T + E) / Días Reales × 100
+            </div>
+        </div>
+    </section>
+
+    <div style="margin-top:1.5rem;padding-top:0.8rem;border-top:1px solid #e8eef4;text-align:center;font-size:0.65rem;color:#6a8a9e;">
+        Ministerio de Educación • República Dominicana • Sistema de Gestión Escolar v2.0
+    </div>
+
+</div>
+
+<div class="toast-stats" id="toastStats">📊 Dashboard actualizado</div>
+
+<script>
+/**
+ * DASHBOARD DEL DOCENTE - VERSIÓN COMPLETA
+ * ✅ Todas las funciones de ESTADITICA RAPIDA.HTML
+ * ✅ Nombre del docente en los badges
+ * ✅ 8 indicadores, Top 5, Competencias, Riesgo, Incompletos, Asistencia, Cumpleaños
+ * ✅ Barra "Estudiantes con datos" en asistencia
+ * ✅ Badge de estado con conteo de calificaciones
+ * ✅ Fórmula de asistencia visible
+ * ✅ Sincronización automática con localStorage
+ * ✅ Orden AZ detectado desde localStorage
+ */
+
+// ============================================
+// 📊 FUNCIONES DE ASISTENCIA DESDE RESUMEN ANUAL
+// ============================================
+
+function leerDatosAsistenciaDesdeResumenAnual() {
+    try {
+        const clave = `boletin_asistencia_data_${currentGrade}_${currentSeccion}_${currentTanda}_${currentSchoolYear}`;
+        const stored = localStorage.getItem(clave);
+        if (!stored) return null;
+        return JSON.parse(stored);
+    } catch (e) { return null; }
+}
+
+function calcularAsistenciaPromedioGeneral() {
+    const datosAsistencia = leerDatosAsistenciaDesdeResumenAnual();
+    if (!datosAsistencia || !datosAsistencia.estudiantes) {
+        return { promedio: 0, total: 0, conDatos: 0, estudiantes: [] };
+    }
+    let suma = 0, contador = 0;
+    const estudiantesConDatos = [];
+    datosAsistencia.estudiantes.forEach(est => {
+        if (est.pctAsistencia !== undefined && est.pctAsistencia !== null && est.pctAsistencia > 0) {
+            suma += est.pctAsistencia;
+            contador++;
+            estudiantesConDatos.push({
+                orden: est.orden,
+                nombre: `${est.nombre || ''} ${est.apellido || ''}`.trim() || `Estudiante #${est.orden}`,
+                pctAsistencia: est.pctAsistencia
+            });
+        }
+    });
+    estudiantesConDatos.sort((a, b) => b.pctAsistencia - a.pctAsistencia);
+    return {
+        promedio: contador > 0 ? Math.round(suma / contador) : 0,
+        total: datosAsistencia.estudiantes.length,
+        conDatos: contador,
+        estudiantes: estudiantesConDatos
+    };
+}
+
+// ============================================
+// VARIABLES GLOBALES
+// ============================================
+
+let currentGrade = 3, currentSeccion = 'A', currentTanda = 'Matutina', currentSchoolYear = '2025-2026';
+let calificacionesData = {};
+let intervaloActualizacion = null;
+let ultimoHashCalificaciones = '';
+let _ultimoGrupo = '';
+let toastTimeout = null;
+
+// ============================================
+// FUNCIONES DE OBTENCIÓN DE DATOS
+// ============================================
+
+function obtenerGradoDesdePortada() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('grado')) return decodeURIComponent(urlParams.get('grado'));
+        const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+        for (const key of keys) {
+            const item = localStorage.getItem(key);
+            if (item) {
+                const datos = JSON.parse(item);
+                if (datos && datos.grado) return datos.grado;
+            }
+        }
+        return 'Tercer Grado';
+    } catch (e) { return 'Tercer Grado'; }
+}
+
+function obtenerSeccionDesdePortada() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('seccion')) return decodeURIComponent(urlParams.get('seccion'));
+        const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+        for (const key of keys) {
+            const item = localStorage.getItem(key);
+            if (item) {
+                const datos = JSON.parse(item);
+                if (datos && datos.seccion) return datos.seccion;
+            }
+        }
+        return 'A';
+    } catch (e) { return 'A'; }
+}
+
+function obtenerTandaDesdePortada() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('tanda')) return decodeURIComponent(urlParams.get('tanda'));
+        const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+        for (const key of keys) {
+            const item = localStorage.getItem(key);
+            if (item) {
+                const datos = JSON.parse(item);
+                if (datos && datos.tanda) return datos.tanda;
+            }
+        }
+        return 'Matutina';
+    } catch (e) { return 'Matutina'; }
+}
+
+function obtenerGrupoActual() {
+    return {
+        grado: (obtenerGradoDesdePortada() || 'Tercer Grado').trim(),
+        seccion: (obtenerSeccionDesdePortada() || 'A').trim(),
+        tanda: (obtenerTandaDesdePortada() || 'Matutina').trim()
+    };
+}
+
+function convertirGradoANumero(gradoTexto) {
+    const mapa = {
+        'Primer Grado': 1, 'Segundo Grado': 2, 'Tercer Grado': 3,
+        'Cuarto Grado': 4, 'Quinto Grado': 5, 'Sexto Grado': 6,
+        '1ER GRADO': 1, '2DO GRADO': 2, '3ER GRADO': 3,
+        '4TO GRADO': 4, '5TO GRADO': 5, '6TO GRADO': 6,
+        '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6
+    };
+    const normalizado = String(gradoTexto).toUpperCase().trim();
+    return mapa[normalizado] || mapa[gradoTexto] || 3;
+}
+
+function getGradeText(grade) {
+    const textos = { 1: '1er', 2: '2do', 3: '3er', 4: '4to', 5: '5to', 6: '6to' };
+    return textos[grade] || '3er';
+}
+
+function getCurrentSchoolYear() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const beforeAugustFirst = (now.getMonth() < 7) || (now.getMonth() === 7 && now.getDate() < 1);
+    return beforeAugustFirst ? `${year - 1}-${year}` : `${year}-${year + 1}`;
+}
+
+function getPeriodoActual() {
+    const mes = new Date().getMonth();
+    if (mes >= 7 && mes <= 9) return 'P1';
+    if (mes >= 10 || mes === 0) return 'P2';
+    if (mes >= 1 && mes <= 2) return 'P3';
+    if (mes >= 3 && mes <= 5) return 'P4';
+    return 'P1';
+}
+
+function getStorageKeyRegistro() {
+    return `registro_${getGradeText(currentGrade)}_sec${currentSeccion}_v25`;
+}
+
+// ============================================
+// FUNCIONES DE CARGA DE DATOS
+// ============================================
+
+function cargarCalificaciones() {
+    try {
+        const key = getStorageKeyRegistro();
+        const saved = localStorage.getItem(key);
+        if (!saved) { calificacionesData = {}; return {}; }
+        calificacionesData = JSON.parse(saved);
+        return calificacionesData;
+    } catch (e) { calificacionesData = {}; return {}; }
+}
+
+// ✅ FUNCIÓN PARA OBTENER NOMBRE DEL DOCENTE
+function obtenerNombreDocente() {
+    try {
+        const datosSync = localStorage.getItem('datosSincronizados');
+        if (datosSync) {
+            const datos = JSON.parse(datosSync);
+            if (datos.docente) return datos.docente;
+        }
+        const maestroData = localStorage.getItem('datos_maestro_' + currentGrade + '_' + currentSeccion);
+        if (maestroData) {
+            const datos = JSON.parse(maestroData);
+            const nombre = datos.maestroNombre || datos.maestroNombres || '';
+            const apellido = datos.maestroApellido || datos.maestroApellidos || '';
+            return (nombre + ' ' + apellido).trim() || 'Docente';
+        }
+        return 'Docente';
+    } catch (e) { return 'Docente'; }
+}
+
+function obtenerEstudiantesDesdeSigerd() {
+    try {
+        const stored = localStorage.getItem('registrosSigerd');
+        if (!stored) return [];
+        const registros = JSON.parse(stored);
+        if (!Array.isArray(registros) || registros.length === 0) return [];
+        const grupo = obtenerGrupoActual();
+        const gradoActual = grupo.grado.toUpperCase().trim();
+        const seccionActual = grupo.seccion.toUpperCase().trim();
+        const tandaActual = grupo.tanda.toUpperCase().trim();
+        const filtrados = registros.filter(r => {
+            const gradoRegistro = (r.grado || '').toUpperCase().trim();
+            const seccionRegistro = (r.seccion || '').toUpperCase().trim();
+            const tandaRegistro = (r.tanda || '').toUpperCase().trim();
+            if (!gradoRegistro) return false;
+            return gradoRegistro === gradoActual && seccionRegistro === seccionActual && tandaRegistro === tandaActual;
+        });
+        let ordenAZ = false;
+        try { ordenAZ = JSON.parse(localStorage.getItem('ordenAZActivo')); } catch (e) {}
+        if (ordenAZ) {
+            filtrados.sort((a, b) => (a.nombre || '').toUpperCase().localeCompare((b.nombre || '').toUpperCase()));
+        } else {
+            filtrados.sort((a, b) => parseInt(a.orden) - parseInt(b.orden));
+        }
+        return filtrados;
+    } catch (e) { return []; }
+}
+
+// ============================================
+// FUNCIONES DE CÁLCULO ACADÉMICO
+// ============================================
+
+function calcularPromedioEstudiante(orden) {
+    const totalMaterias = (currentGrade >= 4) ? 8 : 7;
+    const prefix = `g${currentGrade}s${currentSeccion}`;
+    let sumaNotas = 0, materiasConNota = 0;
+    for (let m = 1; m <= totalMaterias; m++) {
+        const nota = calificacionesData[`${prefix}m${m}r${orden}final`];
+        if (nota !== undefined && nota !== '' && nota !== null) {
+            const num = parseFloat(nota);
+            if (!isNaN(num) && num >= 0 && num <= 100) { sumaNotas += num; materiasConNota++; }
+        }
+    }
+    if (materiasConNota === 0) return { promedio: null, completas: false, materiasConNota: 0, totalMaterias };
+    const promedio = Math.round(sumaNotas / materiasConNota);
+    return { promedio, completas: materiasConNota === totalMaterias, materiasConNota, totalMaterias };
+}
+
+function verificarCompetenciaCompleta(orden, competencia) {
+    const prefix = `g${currentGrade}s${currentSeccion}`;
+    const totalMaterias = (currentGrade >= 4) ? 8 : 7;
+    let materiasCompletas = 0;
+    for (let m = 1; m <= totalMaterias; m++) {
+        let materiaCompleta = true;
+        for (let p = 1; p <= 4; p++) {
+            const valor = calificacionesData[`${prefix}m${m}r${orden}c${competencia}p${p}`];
+            if (valor === undefined || valor === null || (typeof valor === 'string' && valor.trim() === '')) {
+                materiaCompleta = false; break;
+            }
+            const num = parseFloat(valor);
+            if (isNaN(num) || num < 0 || num > 100) { materiaCompleta = false; break; }
+        }
+        if (materiaCompleta) materiasCompletas++;
+    }
+    return materiasCompletas === totalMaterias;
+}
+
+// ============================================
+// FUNCIÓN PRINCIPAL DE CÁLCULO DE ESTADÍSTICAS
+// ============================================
+
+function calcularEstadisticas() {
+    const estudiantes = obtenerEstudiantesDesdeSigerd();
+    const totalEstudiantes = estudiantes.length;
+    const resultadoBase = {
+        total: totalEstudiantes, evaluados: 0, aprobados: 0, enRiesgo: 0, incompletos: 0,
+        promedioGeneral: 0, topEstudiantes: [], riesgoEstudiantes: [], incompletosEstudiantes: [],
+        proximosCumpleanos: [], distribucionCompetencias: { C1: 0, C2: 0, C3: 0 },
+        asistenciaPromedio: 0, asistenciaDetalle: { total: 0, conDatos: 0, estudiantes: [] }
+    };
+    if (totalEstudiantes === 0) return resultadoBase;
+
+    cargarCalificaciones();
+    let sumaPromediosCompletos = 0, evaluadosCount = 0, aprobadosCount = 0, enRiesgoCount = 0, incompletosCount = 0;
+    let topList = [], riesgoList = [], incompletosList = [], cumpleanosList = [];
+    const ahora = new Date(), mesActual = ahora.getMonth();
+    const totalMaterias = (currentGrade >= 4) ? 8 : 7;
+    let c1Completados = 0, c2Completados = 0, c3Completados = 0;
+
+    estudiantes.forEach((est, index) => {
+        const orden = index + 1;
+        const nombreCompleto = `${est.nombre || ''} ${est.apellido || ''}`.trim() || `Estudiante #${orden}`;
+        const resultado = calcularPromedioEstudiante(orden);
+
+        if (resultado.completas && resultado.promedio !== null) {
+            evaluadosCount++;
+            sumaPromediosCompletos += resultado.promedio;
+            if (resultado.promedio >= 65) {
+                aprobadosCount++;
+                topList.push({ orden, nombre: nombreCompleto, promedio: resultado.promedio });
+            } else {
+                enRiesgoCount++;
+                riesgoList.push({ orden, nombre: nombreCompleto, promedio: resultado.promedio });
+                topList.push({ orden, nombre: nombreCompleto, promedio: resultado.promedio });
+            }
+            if (verificarCompetenciaCompleta(orden, 1)) c1Completados++;
+            if (verificarCompetenciaCompleta(orden, 2)) c2Completados++;
+            if (verificarCompetenciaCompleta(orden, 3)) c3Completados++;
+        } else if (resultado.materiasConNota > 0) {
+            incompletosCount++;
+            incompletosList.push({ orden, nombre: nombreCompleto, materiasConNota: resultado.materiasConNota, totalMaterias: resultado.totalMaterias, promedio: resultado.promedio });
+        } else {
+            incompletosCount++;
+            incompletosList.push({ orden, nombre: nombreCompleto, materiasConNota: 0, totalMaterias: resultado.totalMaterias, promedio: null });
+        }
+
+        if (est.fechaNac) {
+            try {
+                const partes = String(est.fechaNac).split('/');
+                if (partes.length === 3) {
+                    const diaNac = parseInt(partes[0], 10), mesNac = parseInt(partes[1], 10) - 1;
+                    if (!isNaN(diaNac) && !isNaN(mesNac) && mesNac >= 0 && mesNac <= 11) {
+                        const fechaNacimiento = new Date(ahora.getFullYear(), mesNac, diaNac);
+                        if (fechaNacimiento < ahora) fechaNacimiento.setFullYear(ahora.getFullYear() + 1);
+                        const diffDias = Math.ceil((fechaNacimiento - ahora) / (1000 * 60 * 60 * 24));
+                        if (diffDias >= 0 && diffDias <= 30) {
+                            cumpleanosList.push({ orden, nombre: nombreCompleto, dias: diffDias, dia: diaNac, mes: mesNac });
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+    });
+
+    topList.sort((a, b) => b.promedio - a.promedio);
+    topList = topList.slice(0, 5);
+    riesgoList.sort((a, b) => a.promedio - b.promedio);
+    riesgoList = riesgoList.slice(0, 5);
+    incompletosList.sort((a, b) => (b.materiasConNota / b.totalMaterias) - (a.materiasConNota / a.totalMaterias));
+    incompletosList = incompletosList.slice(0, 5);
+    cumpleanosList.sort((a, b) => a.dias - b.dias);
+    cumpleanosList = cumpleanosList.slice(0, 5);
+
+    const promedioGeneral = evaluadosCount > 0 ? Math.round(sumaPromediosCompletos / evaluadosCount) : 0;
+    const distribucion = {
+        C1: evaluadosCount > 0 ? Math.round((c1Completados / evaluadosCount) * 100) : 0,
+        C2: evaluadosCount > 0 ? Math.round((c2Completados / evaluadosCount) * 100) : 0,
+        C3: evaluadosCount > 0 ? Math.round((c3Completados / evaluadosCount) * 100) : 0
+    };
+    const asistenciaData = calcularAsistenciaPromedioGeneral();
+
+    return {
+        total: totalEstudiantes, evaluados: evaluadosCount, aprobados: aprobadosCount,
+        enRiesgo: enRiesgoCount, incompletos: incompletosCount, promedioGeneral,
+        topEstudiantes: topList, riesgoEstudiantes: riesgoList, incompletosEstudiantes: incompletosList,
+        proximosCumpleanos: cumpleanosList, distribucionCompetencias: distribucion,
+        asistenciaPromedio: asistenciaData.promedio,
+        asistenciaDetalle: { total: asistenciaData.total, conDatos: asistenciaData.conDatos, estudiantes: asistenciaData.estudiantes || [] }
+    };
+}
+
+// ============================================
+// ACTUALIZAR UI (CON TODAS LAS FUNCIONES)
+// ============================================
+
+function actualizarDashboardUI() {
+    const grupo = obtenerGrupoActual();
+    currentGrade = convertirGradoANumero(grupo.grado);
+    currentSeccion = grupo.seccion;
+    currentTanda = grupo.tanda;
+    currentSchoolYear = getCurrentSchoolYear();
+
+    // Badges de grupo
+    document.getElementById('badgeGrado').textContent = `🎓 ${grupo.grado.toUpperCase()}`;
+    document.getElementById('badgeSeccion').textContent = `📚 Sección ${grupo.seccion}`;
+    document.getElementById('badgeTanda').textContent = `🕐 ${grupo.tanda}`;
+    document.getElementById('badgeAnio').textContent = `📅 ${currentSchoolYear}`;
+
+    // ✅ NOMBRE DEL DOCENTE
+    const nombreDocente = obtenerNombreDocente();
+    document.getElementById('nombreDocenteBadge').textContent = nombreDocente;
+
+    const stats = calcularEstadisticas();
+
+    // 8 indicadores
+    document.getElementById('totalEstudiantes').textContent = stats.total;
+    document.getElementById('totalEstudiantesChange').textContent = `📊 ${stats.total} registrados`;
+
+    document.getElementById('evaluados').textContent = stats.evaluados;
+    if (stats.total > 0) document.getElementById('evaluadosChange').textContent = `${Math.round((stats.evaluados/stats.total)*100)}% del total`;
+
+    document.getElementById('promedioGeneral').textContent = stats.promedioGeneral > 0 ? stats.promedioGeneral : '--';
+    document.getElementById('promedioGeneralChange').textContent = `${stats.evaluados} estudiantes evaluados`;
+
+    document.getElementById('aprobados').textContent = stats.aprobados;
+    if (stats.evaluados > 0) document.getElementById('aprobadosChange').textContent = `${Math.round((stats.aprobados/stats.evaluados)*100)}% de evaluados`;
+
+    document.getElementById('enRiesgo').textContent = stats.enRiesgo;
+    document.getElementById('enRiesgoChange').textContent = `⚠️ ${stats.enRiesgo} en riesgo real`;
+
+    document.getElementById('incompletos').textContent = stats.incompletos;
+    document.getElementById('incompletosChange').textContent = `📋 ${stats.incompletos} sin notas completas`;
+
+    const asistenciaEl = document.getElementById('asistenciaPromedio');
+    const asistenciaChangeEl = document.getElementById('asistenciaChange');
+    if (stats.asistenciaPromedio > 0) {
+        asistenciaEl.textContent = `${stats.asistenciaPromedio}%`;
+        asistenciaChangeEl.textContent = `📊 ${stats.asistenciaDetalle.conDatos}/${stats.asistenciaDetalle.total} estudiantes`;
+        asistenciaChangeEl.className = 'stat-change positivo';
+    } else {
+        asistenciaEl.textContent = '--';
+        asistenciaChangeEl.textContent = '📋 Registrar en "Resumen Anual"';
+        asistenciaChangeEl.className = 'stat-change riesgo';
+    }
+
+    document.getElementById('periodoActual').textContent = getPeriodoActual();
+    const semana = Math.min(Math.ceil((new Date().getDate() + 1) / 7), 6);
+    document.getElementById('periodoChange').textContent = `Semana ${semana}/6`;
+
+    // Top 5
+    const topList = document.getElementById('topEstudiantes');
+    document.getElementById('topCount').textContent = stats.topEstudiantes.length;
+    if (stats.topEstudiantes.length === 0) {
+        topList.innerHTML = '<li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Sin estudiantes con notas completas</li>';
+    } else {
+        topList.innerHTML = stats.topEstudiantes.map((est, idx) =>
+            `<li><span><span class="posicion">#${idx+1}</span> <span class="nombre">${est.nombre}</span> <span class="badge-estado completo">✅</span></span><span class="promedio aprobado">${est.promedio}</span></li>`
+        ).join('');
+    }
+
+    // Riesgo
+    const riesgoList = document.getElementById('riesgoEstudiantes');
+    document.getElementById('riesgoCount').textContent = stats.riesgoEstudiantes.length;
+    if (stats.riesgoEstudiantes.length === 0) {
+        riesgoList.innerHTML = '<li style="text-align:center;color:#6a8a9e;padding:10px;">✅ No hay estudiantes en riesgo</li>';
+    } else {
+        riesgoList.innerHTML = stats.riesgoEstudiantes.map(est =>
+            `<li><span><span class="posicion">#${est.orden}</span> <span class="nombre">${est.nombre}</span> <span class="badge-estado riesgo">⚠️ Riesgo</span></span><span class="promedio riesgo">${est.promedio}</span></li>`
+        ).join('');
+    }
+
+    // Incompletos
+    const incList = document.getElementById('incompletosEstudiantes');
+    document.getElementById('incompletosCount').textContent = stats.incompletosEstudiantes.length;
+    if (stats.incompletosEstudiantes.length === 0) {
+        incList.innerHTML = '<li style="text-align:center;color:#6a8a9e;padding:10px;">✅ Todos tienen notas completas</li>';
+    } else {
+        incList.innerHTML = stats.incompletosEstudiantes.map(est =>
+            `<li><span><span class="posicion">#${est.orden}</span> <span class="nombre">${est.nombre}</span> <span class="badge-estado incompleto">📋 ${est.materiasConNota}/${est.totalMaterias}</span></span><span class="promedio incompleto">${est.promedio !== null ? est.promedio : 'Sin notas'}</span></li>`
+        ).join('');
+    }
+
+    // Cumpleaños
+    const cumpleList = document.getElementById('proximosCumpleanos');
+    document.getElementById('cumpleCount').textContent = stats.proximosCumpleanos.length;
+    const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    if (stats.proximosCumpleanos.length === 0) {
+        cumpleList.innerHTML = '<li style="text-align:center;color:#6a8a9e;padding:10px;">🎂 Sin cumpleaños próximos (30 días)</li>';
+    } else {
+        cumpleList.innerHTML = stats.proximosCumpleanos.map(est =>
+            `<li><span class="nombre">${est.nombre}</span><span style="font-size:0.65rem;color:#6a8a9e;">${est.dia} de ${meses[est.mes]} (${est.dias === 0 ? '🎉 Hoy!' : est.dias === 1 ? 'Mañana' : `en ${est.dias} días`})</span></li>`
+        ).join('');
+    }
+
+    // Competencias
+    const barras = [
+        { id: 'barraC1', val: 'valorC1', v: stats.distribucionCompetencias.C1, c: 'azul' },
+        { id: 'barraC2', val: 'valorC2', v: stats.distribucionCompetencias.C2, c: 'verde' },
+        { id: 'barraC3', val: 'valorC3', v: stats.distribucionCompetencias.C3, c: 'amarillo' }
+    ];
+    barras.forEach(b => {
+        const el = document.getElementById(b.id);
+        if (el) { el.style.width = `${Math.min(b.v, 100)}%`; el.className = `relleno ${b.c}`; }
+        document.getElementById(b.val).textContent = `${b.v}%`;
+    });
+
+    // Asistencia
+    const asistenciaTopList = document.getElementById('asistenciaTopEstudiantes');
+    document.getElementById('asistenciaTopCount').textContent = stats.asistenciaDetalle.estudiantes.length;
+    const barraAsistencia = document.getElementById('barraAsistenciaGeneral');
+    const valorAsistencia = document.getElementById('valorAsistenciaGeneral');
+    if (barraAsistencia) { barraAsistencia.style.width = `${Math.min(stats.asistenciaPromedio, 100)}%`; }
+    if (valorAsistencia) valorAsistencia.textContent = `${stats.asistenciaPromedio}%`;
+    document.getElementById('asistenciaEstudiantesConDatos').textContent = stats.asistenciaDetalle.conDatos;
+    document.getElementById('asistenciaTotalEstudiantes').textContent = stats.asistenciaDetalle.total;
+
+    const topAsistencia = stats.asistenciaDetalle.estudiantes || [];
+    if (topAsistencia.length === 0) {
+        asistenciaTopList.innerHTML = '<li style="text-align:center;color:#6a8a9e;padding:10px;">📭 Sin datos de asistencia</li>';
+    } else {
+        asistenciaTopList.innerHTML = topAsistencia.slice(0, 5).map((est, idx) => {
+            const pct = est.pctAsistencia || 0;
+            let badgeClass = 'asistencia-alta', badgeText = '✅ Alta';
+            if (pct < 60) { badgeClass = 'asistencia-baja'; badgeText = '❌ Baja'; }
+            else if (pct < 80) { badgeClass = 'asistencia-media'; badgeText = '⚠️ Media'; }
+            return `<li><span><span class="posicion">#${idx+1}</span><span class="nombre">${est.nombre}</span><span class="badge-estado ${badgeClass}">${badgeText}</span></span><span style="font-size:0.7rem;font-weight:700;color:${pct >= 80 ? '#2a7a4a' : pct >= 60 ? '#b88220' : '#c0392b'}">${pct}%</span></li>`;
+        }).join('');
+    }
+
+    document.getElementById('fechaActual').textContent = new Date().toLocaleDateString('es-DO', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    const estadoEl = document.getElementById('estadoSincronizacion');
+    if (estadoEl) {
+        const califCount = Object.keys(calificacionesData).length;
+        estadoEl.textContent = `✅ ${califCount} calificaciones · ${stats.total} estudiantes · Asist: ${stats.asistenciaPromedio}%`;
+        estadoEl.style.background = '#d4edda';
+        estadoEl.style.color = '#155724';
+    }
+
+    mostrarToast(`📊 ${stats.evaluados} evaluados · ${stats.enRiesgo} en riesgo · Asistencia: ${stats.asistenciaPromedio}%`);
+}
+
+// ============================================
+// ACTUALIZAR Y SINCRONIZAR
+// ============================================
+
+function actualizarDatos() {
+    const boton = document.querySelector('.btn-actualizar');
+    if (boton) { boton.textContent = '⏳ Actualizando...'; boton.disabled = true; }
+    setTimeout(() => {
+        actualizarDashboardUI();
+        if (boton) { boton.textContent = '🔄 Actualizar'; boton.disabled = false; }
+    }, 300);
+}
+
+function sincronizarConCambios() {
+    try {
+        const grupo = obtenerGrupoActual();
+        const nuevoGrado = convertirGradoANumero(grupo.grado);
+        const grupoKey = `${nuevoGrado}|${grupo.seccion}|${grupo.tanda}`;
+        if (grupoKey !== _ultimoGrupo) { _ultimoGrupo = grupoKey; actualizarDatos(); return; }
+
+        const califKey = getStorageKeyRegistro();
+        const califSaved = localStorage.getItem(califKey);
+        if (califSaved) {
+            const califHash = califSaved.length + '|' + (califSaved.substring(0, 200) || '');
+            if (califHash !== ultimoHashCalificaciones) { ultimoHashCalificaciones = califHash; actualizarDatos(); return; }
+        }
+
+        const asistenciaKey = `boletin_asistencia_data_${currentGrade}_${currentSeccion}_${currentTanda}_${currentSchoolYear}`;
+        const asistenciaSaved = localStorage.getItem(asistenciaKey);
+        if (asistenciaSaved) {
+            const asistenciaHash = asistenciaSaved.length + '|' + (asistenciaSaved.substring(0, 200) || '');
+            if (asistenciaHash !== (window._ultimoHashAsistencia || '')) {
+                window._ultimoHashAsistencia = asistenciaHash;
+                actualizarDatos();
+                return;
+            }
+        }
+
+        const sigerdSaved = localStorage.getItem('registrosSigerd');
+        if (sigerdSaved) {
+            const sigerdHash = sigerdSaved.length + '|' + (sigerdSaved.substring(0, 200) || '');
+            if (sigerdHash !== (window._ultimoHashSigerd || '')) {
+                window._ultimoHashSigerd = sigerdHash;
+                actualizarDatos();
+            }
+        }
+    } catch (e) {}
+}
+
+function mostrarToast(mensaje) {
+    const toast = document.getElementById('toastStats');
+    if (!toast) return;
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toast.textContent = mensaje;
+    toast.classList.add('visible');
+    toastTimeout = setTimeout(() => toast.classList.remove('visible'), 4000);
+}
+
+// ============================================
+// INICIALIZACIÓN
+// ============================================
+
+function inicializar() {
+    console.log('📊 Dashboard del Docente - Versión completa con nombre de docente');
+    const grupo = obtenerGrupoActual();
+    currentGrade = convertirGradoANumero(grupo.grado);
+    currentSeccion = grupo.seccion;
+    currentTanda = grupo.tanda;
+    currentSchoolYear = getCurrentSchoolYear();
+    _ultimoGrupo = `${currentGrade}|${currentSeccion}|${currentTanda}`;
+
+    actualizarDashboardUI();
+
+    window.addEventListener('storage', (e) => {
+        if ((e.key && e.key.startsWith('registro_') && e.key.endsWith('_v25')) ||
+            e.key === 'registrosSigerd' ||
+            e.key === 'ordenAZActivo' ||
+            e.key === 'datosSincronizados' ||
+            (e.key && e.key.startsWith('boletin_asistencia_data_'))) {
+            console.log(`🔄 Cambio en ${e.key}, actualizando...`);
+            setTimeout(actualizarDatos, 500);
+        }
+    });
+
+    if (intervaloActualizacion) clearInterval(intervaloActualizacion);
+    intervaloActualizacion = setInterval(sincronizarConCambios, 8000);
+
+    document.addEventListener('keydown', (e) => { if (e.key === 'F5') { e.preventDefault(); actualizarDatos(); } });
+
+    console.log('✅ Dashboard completo inicializado correctamente');
+    mostrarToast('📊 Dashboard listo con todas las funciones');
+}
+
+window.actualizarDatos = actualizarDatos;
+window.actualizarDashboardUI = actualizarDashboardUI;
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', inicializar);
+else inicializar();
+</script>
+
+</body>
+</html>
