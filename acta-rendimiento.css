@@ -1,0 +1,1070 @@
+/* ============================================
+   RESET Y ESTILOS BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    background: #f0f2f5;
+    padding: 20px;
+    color: #000;
+    overflow-x: hidden; /* Evita scroll lateral del body */
+    word-wrap: break-word; /* Rompe palabras largas si es necesario */
+}
+
+.container {
+    max-width: 11in;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+    padding: 25px 30px;
+    overflow: hidden;
+}
+
+/* ============================================
+   ENCABEZADO DE CONTROLES (NO SE IMPRIME)
+   ============================================ */
+.controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    border-bottom: 3px solid #1a3a6b;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    gap: 15px;
+}
+
+.header-title h1 {
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #1a2a4a;
+    margin-bottom: 8px;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 14px;
+}
+
+.header-info .badge {
+    background: #1a3a6b;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.header-info .badge-grade {
+    background: #2e7d32;
+}
+
+.header-info .badge-section {
+    background: #1a73e8;
+}
+
+/* ✅ NUEVO: Badge de Tanda */
+.header-info .badge-tanda {
+    background: #8a6a2a;
+    color: #ffe0a0;
+}
+
+.controls-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.controls-buttons .btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #1a3a6b;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2a5a8b;
+    transform: scale(1.02);
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+    transform: scale(1.02);
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: scale(1.02);
+}
+
+/* ============================================
+   NAVEGACIÓN (NO SE IMPRIME)
+   ============================================ */
+.nav-container {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 2px solid #1a73e8;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(26, 115, 232, 0.15);
+    margin-bottom: 18px;
+}
+
+.nav-container .nav-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1a3a6b;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.nav-container .nav-btn:hover:not(:disabled) {
+    background: #e8f0fe;
+}
+
+.nav-container .nav-btn:disabled {
+    color: #bdbdbd;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.nav-container .page-indicator {
+    padding: 8px 20px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #1a3a6b;
+    border-left: 1px solid #d0d8e0;
+    border-right: 1px solid #d0d8e0;
+    min-width: 120px;
+    text-align: center;
+}
+
+/* ============================================
+   ACTA DE RENDIMIENTO - ESTILOS PRINCIPALES
+   ============================================ */
+.student-page {
+    display: none;
+}
+
+.student-page.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Título del acta */
+.acta-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+/* Fila de información del encabezado */
+.acta-info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    align-items: center;
+}
+
+.acta-info-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.acta-info-item label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.acta-info-input {
+    border: none;
+    border-bottom: 1px solid #000;
+    background: transparent;
+    font-size: 11px;
+    padding: 2px 5px;
+    outline: none;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.acta-info-input:focus {
+    background-color: #e8f0fe;
+    border-bottom: 1px solid #1a73e8;
+}
+
+.acta-info-input[readonly] {
+    background: #f1f3f4;
+    cursor: default;
+}
+
+.auto-sync-badge {
+    display: inline-block;
+    background: #28a745;
+    color: white;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-left: 8px;
+    animation: syncPulse 2s infinite;
+}
+
+@keyframes syncPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* ============================================
+   TABLA DEL ACTA
+   ============================================ */
+.table-wrapper {
+    overflow-x: auto; /* Permite scroll horizontal en móvil */
+    margin-top: 8px;
+    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+}
+
+table.acta-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9px;
+    table-layout: fixed;
+    min-width: 700px; /* Ancho mínimo para mantener estructura en escritorio/tablet */
+}
+
+table.acta-table th,
+table.acta-table td {
+    border: 1px solid #000;
+    padding: 2px 1px;
+    text-align: center;
+    vertical-align: middle;
+    height: 18px;
+}
+
+table.acta-table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+    font-size: 8px;
+    padding: 3px 1px;
+}
+
+/* ============================================
+   ENCABEZADOS DE MATERIAS (HORIZONTAL)
+   ============================================ */
+.materia-header {
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    transform: none !important;
+    height: 35px !important;
+    min-height: 35px !important;
+    max-height: 35px !important;
+    padding: 4px 2px !important;
+    font-size: 9px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    background-color: #f5f5f5 !important;
+}
+
+/* ============================================
+   SUB-ENCABEZADOS (VERTICAL - Rotados 180°)
+   ============================================ */
+.sub-header-vertical {
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    transform: rotate(180deg) !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    max-height: 100px !important;
+    padding: 8px 4px !important;
+    font-size: 9px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    background-color: #f5f5f5 !important;
+}
+
+/* Columna de número de orden (encabezado) - VERTICAL */
+.num-col-header {
+    writing-mode: vertical-rl !important;
+    text-orientation: mixed !important;
+    transform: rotate(180deg) !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 100px !important;
+    min-height: 100px !important;
+    font-size: 9px !important;
+    font-weight: bold !important;
+    background-color: #f5f5f5 !important;
+    text-align: center !important;
+}
+
+/* Columna de número de orden (celdas) */
+.num-col {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    font-size: 9px !important;
+    font-weight: bold !important;
+    background: #ffffff !important;
+    color: #000 !important;
+    text-align: center !important;
+}
+
+/* Columna de nombres (ANCHA - HORIZONTAL) */
+.name-col-header {
+    writing-mode: horizontal-tb !important;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+    text-align: left !important;
+    padding-left: 8px !important;
+    font-size: 10px !important;
+    background-color: #f5f5f5 !important;
+}
+
+.name-col {
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+    text-align: left !important;
+    padding-left: 8px !important;
+}
+
+/* Columna de observaciones (ANCHA - HORIZONTAL) */
+.obs-col-header {
+    writing-mode: horizontal-tb !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    background-color: #f5f5f5 !important;
+}
+
+.obs-col {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+}
+
+/* Inputs dentro de la tabla */
+.acta-input {
+    width: 100%;
+    border: none;
+    text-align: center;
+    background: transparent;
+    font-size: 9px;
+    font-weight: bold;
+    outline: none;
+    padding: 2px 0;
+    font-family: 'Times New Roman', Times, serif;
+    height: 100%;
+}
+
+.acta-input:focus {
+    background-color: #e8f0fe;
+}
+
+.acta-input.auto-field {
+    background-color: #e8f5e9 !important;
+    color: #137333 !important;
+    font-weight: bold !important;
+    cursor: not-allowed !important;
+}
+
+.acta-input.uppercase-input {
+    text-transform: uppercase;
+}
+
+.acta-input.name-input {
+    text-align: left;
+    padding-left: 5px;
+}
+
+/* ============================================
+   PIE DEL ACTA (FIRMAS)
+   ============================================ */
+.acta-footer {
+    margin-top: 30px;
+    font-size: 11px;
+    padding: 0 10px;
+}
+
+.acta-footer-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.acta-footer-input {
+    border: none;
+    border-bottom: 1px solid #000;
+    background: transparent;
+    font-size: 11px;
+    padding: 2px 8px;
+    outline: none;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.acta-footer-input:focus {
+    background-color: #e8f0fe;
+    border-bottom: 1px solid #1a73e8;
+}
+
+/* ============================================
+   FOOTER DE LA PÁGINA (NO SE IMPRIME)
+   ============================================ */
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 10px;
+    border-top: 2px solid #1a3a6b;
+    font-size: 9px;
+    color: #8a9aaa;
+}
+
+.footer .watermark {
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.footer .page-number {
+    font-weight: bold;
+    color: #1a2a4a;
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-box {
+    background: white;
+    border-radius: 12px;
+    padding: 30px 40px;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-box .modal-icon {
+    font-size: 50px;
+    margin-bottom: 10px;
+}
+
+.modal-box h3 {
+    color: #1a73e8;
+    margin: 10px 0;
+    font-size: 18px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.modal-box p {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.modal-box button {
+    background: #1a73e8;
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.modal-box button:hover {
+    background: #1557b0;
+}
+
+.modal-box button.btn-danger-modal {
+    background: #dc3545;
+}
+
+.modal-box button.btn-danger-modal:hover {
+    background: #c82333;
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL (≤ 768px)
+   ============================================ */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    
+    .container {
+        padding: 18px;
+        border-radius: 8px;
+    }
+    
+    .controls-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .header-title {
+        text-align: center;
+    }
+    
+    .header-title h1 {
+        font-size: 17px;
+        letter-spacing: 1.5px;
+        margin-bottom: 6px;
+    }
+    
+    .header-info {
+        justify-content: center;
+        font-size: 12px;
+        gap: 8px;
+    }
+    
+    .header-info .badge {
+        font-size: 11px;
+        padding: 5px 12px;
+    }
+    
+    .controls-buttons {
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .controls-buttons .btn {
+        flex: 1;
+        min-width: 110px;
+        font-size: 12px;
+        padding: 8px 14px;
+    }
+    
+    .nav-container {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 14px;
+    }
+    
+    .nav-container .nav-btn {
+        padding: 7px 14px;
+        font-size: 12px;
+    }
+    
+    .nav-container .page-indicator {
+        padding: 7px 14px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+    
+    .acta-title {
+        font-size: 13px;
+    }
+    
+    .acta-info-row {
+        font-size: 10px;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .acta-info-input {
+        font-size: 10px;
+    }
+    
+    /* Tabla optimizada para tablet/móvil grande */
+    table.acta-table {
+        font-size: 8px;
+        min-width: 650px; /* Mantiene estructura pero permite scroll */
+    }
+    
+    .num-col {
+        width: 24px !important;
+        min-width: 24px !important;
+        max-width: 24px !important;
+    }
+    
+    .name-col, .name-col-header {
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+    }
+    
+    .obs-col, .obs-col-header {
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
+    }
+    
+    .sub-header-vertical {
+        height: 80px !important;
+        min-height: 80px !important;
+        font-size: 8px !important;
+    }
+    
+    .num-col-header {
+        height: 80px !important;
+        min-height: 80px !important;
+        font-size: 8px !important;
+    }
+    
+    .acta-footer {
+        font-size: 10px;
+        margin-top: 20px;
+    }
+    
+    .footer {
+        font-size: 8px;
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL PEQUEÑO (≤ 480px)
+   ============================================ */
+@media (max-width: 480px) {
+    body {
+        padding: 8px;
+    }
+    
+    .container {
+        padding: 12px;
+        border-radius: 6px;
+    }
+    
+    .header-title h1 {
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+    
+    .header-info {
+        font-size: 11px;
+        gap: 6px;
+    }
+    
+    .header-info .badge {
+        font-size: 10px;
+        padding: 4px 10px;
+    }
+    
+    .controls-buttons .btn {
+        font-size: 11px;
+        padding: 6px 12px;
+        min-width: 90px;
+    }
+    
+    .nav-container .nav-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    
+    .nav-container .page-indicator {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-width: 90px;
+    }
+    
+    .acta-title {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .acta-info-row {
+        font-size: 9px;
+        gap: 6px;
+    }
+    
+    .acta-info-input {
+        font-size: 9px;
+    }
+    
+    /* Tabla ultra compacta con scroll */
+    table.acta-table {
+        font-size: 7px;
+        min-width: 600px; /* Fuerza scroll horizontal para no romper diseño */
+    }
+    
+    .num-col {
+        width: 22px !important;
+        min-width: 22px !important;
+        max-width: 22px !important;
+    }
+    
+    .name-col, .name-col-header {
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
+    }
+    
+    .obs-col, .obs-col-header {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    
+    .sub-header-vertical {
+        height: 65px !important;
+        min-height: 65px !important;
+        font-size: 7px !important;
+        padding: 6px 2px !important;
+    }
+    
+    .num-col-header {
+        height: 65px !important;
+        min-height: 65px !important;
+        font-size: 7px !important;
+    }
+    
+    .acta-footer {
+        font-size: 9px;
+    }
+    
+    .acta-footer-input {
+        font-size: 9px;
+        padding: 2px 4px;
+    }
+    
+    .modal-box {
+        padding: 20px;
+        max-width: 95%;
+    }
+    
+    .modal-box h3 {
+        font-size: 16px;
+    }
+    
+    .modal-box p {
+        font-size: 12px;
+    }
+    
+    .footer {
+        font-size: 7px;
+    }
+}
+
+/* ============================================
+   RESPONSIVE - MÓVIL MUY PEQUEÑO (≤ 360px)
+   ============================================ */
+@media (max-width: 360px) {
+    body {
+        padding: 5px;
+    }
+    
+    .container {
+        padding: 8px;
+    }
+    
+    .header-title h1 {
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+    
+    .header-info {
+        font-size: 10px;
+        gap: 5px;
+    }
+    
+    .header-info .badge {
+        font-size: 9px;
+        padding: 3px 8px;
+    }
+    
+    .controls-buttons .btn {
+        font-size: 10px;
+        padding: 5px 10px;
+        min-width: 80px;
+    }
+    
+    .nav-container .nav-btn {
+        padding: 5px 8px;
+        font-size: 10px;
+    }
+    
+    .nav-container .page-indicator {
+        font-size: 10px;
+        min-width: 80px;
+        padding: 5px 8px;
+    }
+    
+    .acta-title {
+        font-size: 11px;
+    }
+    
+    .acta-info-row {
+        font-size: 8px;
+    }
+    
+    .acta-info-input {
+        font-size: 8px;
+    }
+    
+    /* Tabla mínima viable con scroll obligatorio */
+    table.acta-table {
+        font-size: 6.5px;
+        min-width: 550px; /* Garantiza que se pueda leer haciendo scroll */
+    }
+    
+    .num-col {
+        width: 20px !important;
+        min-width: 20px !important;
+        max-width: 20px !important;
+    }
+    
+    .name-col, .name-col-header {
+        width: 120px !important;
+        min-width: 120px !important;
+        max-width: 120px !important;
+    }
+    
+    .obs-col, .obs-col-header {
+        width: 100px !important;
+        min-width: 100px !important;
+        max-width: 100px !important;
+    }
+    
+    .sub-header-vertical {
+        height: 55px !important;
+        min-height: 55px !important;
+        font-size: 6.5px !important;
+    }
+    
+    .num-col-header {
+        height: 55px !important;
+        min-height: 55px !important;
+        font-size: 6.5px !important;
+    }
+}
+
+/* ============================================
+   IMPRESIÓN - TAMAÑO CARTA (LETTER)
+   8.5 x 11 pulgadas = 215.9 x 279.4 mm
+   ============================================ */
+@media print {
+    @page {
+        size: letter;
+        margin: 0.3in 0.4in;
+    }
+
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        font-size: 9px !important;
+    }
+
+    .container {
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Ocultar elementos no imprimibles */
+    .controls-header,
+    .nav-container,
+    .footer,
+    .auto-sync-badge,
+    .modal-overlay {
+        display: none !important;
+    }
+
+    /* Mostrar SOLO 2 páginas (Hoja 1 y Hoja 2) */
+    .student-page {
+        display: block !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+    }
+
+    .student-page:last-child {
+        page-break-after: avoid !important;
+    }
+
+    /* Ajustes de tabla para impresión */
+    table.acta-table {
+        page-break-inside: avoid !important;
+        font-size: 8px !important;
+        width: 100% !important;
+        min-width: auto !important; /* En impresión no necesita scroll */
+    }
+
+    table.acta-table th,
+    table.acta-table td {
+        padding: 1px !important;
+        font-size: 8px !important;
+        border: 0.5px solid #000 !important;
+        height: 16px !important;
+    }
+
+    table.acta-table th {
+        background-color: #f5f5f5 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Encabezados de materias en HORIZONTAL */
+    .materia-header {
+        writing-mode: horizontal-tb !important;
+        height: 30px !important;
+        font-size: 8px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Sub-encabezados en VERTICAL */
+    .sub-header-vertical {
+        writing-mode: vertical-rl !important;
+        text-orientation: mixed !important;
+        transform: rotate(180deg) !important;
+        height: 90px !important;
+        min-height: 90px !important;
+        font-size: 8px !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .num-col-header {
+        height: 90px !important;
+        font-size: 8px !important;
+    }
+
+    .num-col {
+        width: 25px !important;
+        min-width: 25px !important;
+        max-width: 25px !important;
+        font-size: 8px !important;
+    }
+
+    .name-col-header, .name-col {
+        width: 200px !important;
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+
+    .obs-col-header, .obs-col {
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
+    }
+
+    .acta-input {
+        border: none !important;
+        background: transparent !important;
+        font-size: 8px !important;
+    }
+
+    .acta-input.auto-field {
+        background: #e8f5e9 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .acta-info-input {
+        border-bottom: 1px solid #000 !important;
+        background: transparent !important;
+    }
+
+    .acta-footer-input {
+        border-bottom: 1px solid #000 !important;
+        background: transparent !important;
+    }
+
+    .acta-title {
+        font-size: 12px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .acta-info-row {
+        font-size: 10px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .acta-footer {
+        margin-top: 20px !important;
+        font-size: 10px !important;
+    }
+}

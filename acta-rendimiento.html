@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acta de Rendimiento - Fin de Año Escolar</title>
+    <link rel="stylesheet" href="acta-rendimiento.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ENCABEZADO DE CONTROLES (NO SE IMPRIME) -->
+        <div class="controls-header">
+            <div class="header-title">
+                <h1>📋 Acta de Rendimiento</h1>
+                <div class="header-info">
+                    <span class="badge" id="schoolYearDisplay">2025-2026</span>
+                    <span class="badge badge-grade" id="gradeDisplay">3er Grado</span>
+                    <span class="badge badge-section" id="sectionDisplay">Sección A</span>
+                    <span class="badge badge-tanda" id="tandaDisplay">Matutina</span>
+                </div>
+            </div>
+            <div class="controls-buttons">
+                <button class="btn btn-primary" onclick="syncActaData()">🔄 Sincronizar</button>
+                <button class="btn btn-success" onclick="printPage()">🖨️ Imprimir</button>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ Borrar Datos</button>
+            </div>
+        </div>
+
+        <!-- NAVEGACIÓN SUPERIOR (NO SE IMPRIME) -->
+        <div class="nav-container">
+            <button class="nav-btn" id="prevBtnTop" onclick="changePage(-1)">◀ Anterior</button>
+            <span class="page-indicator">
+                Hoja: <span class="page-current-display">1</span> de <span class="page-total-display">2</span>
+            </span>
+            <button class="nav-btn" id="nextBtnTop" onclick="changePage(1)">Siguiente ▶</button>
+        </div>
+
+        <!-- CONTENEDOR DINÁMICO DEL ACTA (Generado por JS) -->
+        <div id="actaContainer"></div>
+
+        <!-- NAVEGACIÓN INFERIOR (NO SE IMPRIME) -->
+        <div class="nav-container" style="margin-top: 15px;">
+            <button class="nav-btn" id="prevBtnBottom" onclick="changePage(-1)">◀ Anterior</button>
+            <span class="page-indicator">
+                Hoja: <span class="page-current-display">1</span> de <span class="page-total-display">2</span>
+            </span>
+            <button class="nav-btn" id="nextBtnBottom" onclick="changePage(1)">Siguiente ▶</button>
+        </div>
+
+        <!-- FOOTER (NO SE IMPRIME) -->
+        <div class="footer">
+            <span class="watermark">Ministerio de Educación • República Dominicana</span>
+            <span class="page-number page-number-display">Página 1 de 2</span>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div class="modal-icon" id="modalIcon">⚠️</div>
+            <h3 id="modalTitle">Confirmar</h3>
+            <p id="modalMessage">¿Está seguro de que desea borrar todos los datos?</p>
+            <div class="modal-buttons">
+                <button id="modalConfirmBtn" class="btn-danger-modal">Sí, borrar</button>
+                <button id="modalCancelBtn" onclick="closeModal()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="acta-rendimiento.js"></script>
+</body>
+</html>
