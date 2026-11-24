@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Búsqueda Rápida de Estudiantes</title>
+    <style>
+        /* ============================================================
+           ESTILOS CSS - BÚSQUEDA RÁPIDA CON SELECTOR DE GRADOS
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 30px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+            padding: 30px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 span {
+            background: #1a3a6b;
+            color: white;
+            font-size: 14px;
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        .badge-docente {
+            background: #e8f0f8;
+            color: #1a3a6b;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid #c0d4e8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-docente .docente-nombre {
+            color: #2a6a4a;
+            font-weight: 700;
+        }
+
+        /* ============================================================
+           BADGE DE ASIGNACIÓN - ESTILO IDÉNTICO A REGISTRO-EVALUACION
+           ============================================================ */
+        .badge-asignacion-busqueda {
+            background: #002D62;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #C8102E;
+            font-family: 'Times New Roman', Times, serif;
+            box-shadow: 0 4px 15px rgba(0, 45, 98, 0.2);
+            width: 100%;
+        }
+
+        .badge-asignacion-busqueda button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 12px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .badge-asignacion-busqueda button:hover {
+            background: #5a6268;
+            transform: scale(1.02);
+        }
+
+        /* ============================================================
+           SELECTOR DE GRADOS - ESTILO IDÉNTICO A REGISTRO-EVALUACION
+           ============================================================ */
+        .selector-grados-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+            padding: 8px 12px;
+            background: #fffde7;
+            border-radius: 10px;
+            border: 2px solid #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .selector-grados-wrapper label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f57f17;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .selector-grados-wrapper select {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 14px;
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .selector-grados-wrapper select:focus {
+            border-color: #f57f17;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+        }
+
+        .selector-grados-wrapper select option.todas-opcion {
+            background: #e8f5e9;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .badge-asignaciones-count {
+            background: #1a3a6b;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            background: #f8f9fc;
+            padding: 18px 20px;
+            border-radius: 12px;
+            border: 1px solid #e4e8ef;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box .icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8a9aaa;
+            font-size: 18px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 12px 12px 44px;
+            border: 2px solid #d0d8e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.15);
+        }
+
+        .search-box input::placeholder {
+            color: #aab4c4;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters select {
+            padding: 10px 14px;
+            border: 2px solid #d0d8e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            min-width: 130px;
+        }
+
+        .filters select:focus {
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.15);
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1a3a6b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0f2a4f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(26, 58, 107, 0.3);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #1a3a6b;
+            border: 2px solid #1a3a6b;
+        }
+
+        .btn-outline:hover {
+            background: #1a3a6b;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        .search-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #eef2f7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .search-stats .count {
+            font-weight: 600;
+            color: #1a2a4a;
+        }
+
+        .search-stats .count span {
+            color: #1a3a6b;
+            font-size: 18px;
+        }
+
+        .search-stats .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e4e8ef;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        thead th .sort-icon {
+            margin-left: 6px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        thead th .sort-icon:hover {
+            opacity: 1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eef2f7;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fc;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            color: #1a2a4a;
+            vertical-align: middle;
+        }
+
+        .highlight {
+            background: #ffeb3b;
+            padding: 0 2px;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8a9aaa;
+        }
+
+        .no-results .emoji {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .no-results h3 {
+            color: #1a2a4a;
+            margin-bottom: 6px;
+        }
+
+        .no-results p {
+            font-size: 14px;
+        }
+
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-primary {
+            background: #e8f0fe;
+            color: #1a3a6b;
+        }
+
+        .celda-vacia-dato {
+            color: #c0c8d0;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .sin-docente {
+            text-align: center;
+            padding: 3rem;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 16px;
+            color: #856404;
+        }
+
+        .sin-docente h2 {
+            margin-bottom: 1rem;
+            color: #856404;
+        }
+
+        .sin-docente p {
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+        }
+
+        .info-docente-activo {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-docente-activo .info-item {
+            font-size: 13px;
+            color: #155724;
+        }
+
+        .info-docente-activo .info-item strong {
+            color: #0d3d1a;
+        }
+
+        .mensaje-transicion {
+            text-align: center;
+            padding: 2rem;
+            color: #1a3a6b;
+            font-size: 16px;
+        }
+
+        /* DEBUG - mostrar info de asignaciones */
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            display: none;
+            width: 100%;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            .container { padding: 18px; }
+            .header h1 { font-size: 18px; }
+            .search-container { flex-direction: column; padding: 14px; }
+            .filters { flex-direction: column; width: 100%; }
+            .filters select { width: 100%; min-width: unset; }
+            .search-stats { flex-direction: column; text-align: center; }
+            .search-stats .actions { flex-wrap: wrap; justify-content: center; }
+            thead th, tbody td { padding: 10px 12px; font-size: 12px; }
+            .btn { font-size: 12px; padding: 8px 16px; width: 100%; justify-content: center; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .selector-grados-wrapper { flex-direction: column; align-items: stretch; }
+            .selector-grados-wrapper select { min-width: unset; }
+            .info-docente-activo { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            thead th, tbody td { padding: 8px 10px; font-size: 11px; }
+            .search-box input { font-size: 13px; padding: 10px 10px 10px 38px; }
+            .btn { font-size: 11px; padding: 6px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+
+        <!-- ENCABEZADO -->
+        <div class="header">
+            <h1>
+                🔍 Búsqueda Rápida
+                <span>Estudiantes</span>
+            </h1>
+            <div class="badge-docente" id="badgeDocente">
+                👨‍🏫 Docente: <span class="docente-nombre" id="nombreDocenteActivo">Verificando...</span>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="exportarResultados()">
+                    📊 Exportar CSV
+                </button>
+                <button class="btn btn-outline" onclick="limpiarBusqueda()">
+                    🧹 Limpiar
+                </button>
+            </div>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div id="contenidoPrincipal">
+
+            <!-- ============================================================
+            BADGE DE ASIGNACIÓN - ESTILO IDÉNTICO A REGISTRO-EVALUACION
+            ============================================================ -->
+            <div class="badge-asignacion-busqueda" id="badgeAsignacionBusqueda">
+                📚 Asignación: 
+                <span style="color: #FFD700;" id="badgeGrado">Cargando...</span>
+                <span style="color: #fff; opacity: 0.4; margin: 0 6px;">|</span>
+                <span style="color: #4FC3F7;" id="badgeSeccion">-</span>
+                <span style="color: #fff; opacity: 0.4; margin: 0 6px;">|</span>
+                <span style="color: #81C784;" id="badgeTanda">-</span>
+                <button onclick="cambiarGradoDesdeBusqueda()">🔄 Cambiar</button>
+            </div>
+
+            <!-- DEBUG - mostrar información de asignaciones -->
+            <div class="debug-info" id="debugInfo">
+                <strong>🔍 DEBUG - Asignaciones detectadas:</strong>
+                <span id="debugContenido">Cargando...</span>
+            </div>
+
+            <!-- BARRA DE BÚSQUEDA CON SELECTOR DE GRADOS -->
+            <div class="search-container">
+
+                <!-- SELECTOR DE GRADOS -->
+                <div class="selector-grados-wrapper" id="selectorGradosWrapper" style="display:none;">
+                    <label for="selectorGrados">📚 Seleccionar grado:</label>
+                    <select id="selectorGrados" onchange="cambiarGradoSeleccionado()">
+                        <option value="">-- Cargando grados --</option>
+                    </select>
+                    <span class="badge-asignaciones-count" id="badgeAsignacionesCount">0 asignaciones</span>
+                </div>
+
+                <!-- CAJA DE BÚSQUEDA -->
+                <div class="search-box">
+                    <span class="icon">🔎</span>
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Buscar por nombre, apellido, ID o cualquier palabra..."
+                        oninput="buscarEstudiantes()"
+                        autofocus
+                    >
+                </div>
+
+                <!-- FILTROS -->
+                <div class="filters">
+                    <select id="filterGrade" onchange="buscarEstudiantes()">
+                        <option value="">Todos los grados</option>
+                        <option value="PRIMER GRADO">1er Grado</option>
+                        <option value="SEGUNDO GRADO">2do Grado</option>
+                        <option value="TERCER GRADO">3er Grado</option>
+                        <option value="CUARTO GRADO">4to Grado</option>
+                        <option value="QUINTO GRADO">5to Grado</option>
+                        <option value="SEXTO GRADO">6to Grado</option>
+                    </select>
+                    <select id="filterSection" onchange="buscarEstudiantes()">
+                        <option value="">Todas las secciones</option>
+                        <option value="A">Sección A</option>
+                        <option value="B">Sección B</option>
+                        <option value="C">Sección C</option>
+                        <option value="D">Sección D</option>
+                        <option value="F">Sección F</option>
+                    </select>
+                    <select id="filterStatus" onchange="buscarEstudiantes()">
+                        <option value="">Todos los estados</option>
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                        <option value="graduated">Graduado</option>
+                        <option value="transferred">Trasladado</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="buscarEstudiantes()">
+                        🔍 Buscar
+                    </button>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS -->
+            <div class="search-stats">
+                <div class="count">
+                    📋 <span id="resultCount">0</span> estudiantes encontrados
+                    <span id="searchInfo" style="color:#8a9aaa; font-weight:normal; margin-left:10px;"></span>
+                    <span id="gradoSeleccionadoInfo" style="color:#1a3a6b; font-weight:600; margin-left:10px;"></span>
+                </div>
+                <div class="actions">
+                    <button class="btn btn-sm btn-outline" onclick="ordenarPor('nombre')">⬆️ Nombre</button>
+                    <button class="btn btn-sm btn-outline" onclick="ordenarPor('apellido')">⬆️ Apellido</button>
+                    <button class="btn btn-sm btn-outline" onclick="ordenarPor('id')">⬆️ ID</button>
+                    <button class="btn btn-sm btn-outline" onclick="ordenarPor('edad')">⬆️ Edad</button>
+                </div>
+            </div>
+
+            <!-- TABLA -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th># <span class="sort-icon" onclick="ordenarPor('orden')">↕</span></th>
+                            <th>ID Estudiante <span class="sort-icon" onclick="ordenarPor('id')">↕</span></th>
+                            <th>Nombre(s) <span class="sort-icon" onclick="ordenarPor('nombre')">↕</span></th>
+                            <th>Apellido(s) <span class="sort-icon" onclick="ordenarPor('apellido')">↕</span></th>
+                            <th>Grado <span class="sort-icon" onclick="ordenarPor('grado')">↕</span></th>
+                            <th>Sección <span class="sort-icon" onclick="ordenarPor('seccion')">↕</span></th>
+                            <th>Fecha Nac. <span class="sort-icon" onclick="ordenarPor('fechaNac')">↕</span></th>
+                            <th>Edad <span class="sort-icon" onclick="ordenarPor('edad')">↕</span></th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr>
+                            <td colspan="10">
+                                <div class="mensaje-transicion">
+                                    ⏳ Cargando estudiantes...
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="loadingIndicator" style="display:none; text-align:center; padding:20px; color:#1a3a6b;">
+                ⏳ Buscando estudiantes...
+            </div>
+        </div>
+
+        <!-- MENSAJE SI NO HAY DOCENTE ACTIVO -->
+        <div id="mensajeSinDocente" style="display: none;" class="sin-docente">
+            <h2>⚠️ No hay docente activo</h2>
+            <p>El campo "Docente" en el Boletín está vacío.</p>
+            <p>Debe seleccionar un grado en el Registro de Evaluación para activar un docente.</p>
+            <br>
+            <button class="btn btn-primary" onclick="window.location.href='REGISTRO-EVALUACION.html'">
+                📚 Ir al Registro de Evaluación
+            </button>
+        </div>
+
+        <!-- MENSAJE SI DOCENTE SIN ASIGNACIONES -->
+        <div id="mensajeSinAsignaciones" style="display: none;" class="sin-docente" style="background:#fff3cd; border-color:#ffc107; color:#856404;">
+            <h2>📭 Docente sin asignaciones</h2>
+            <p>El docente <strong id="docenteSinAsignacionesNombre">-</strong> no tiene grados asignados.</p>
+            <p>Contacte al administrador para que le asigne grados, secciones y tandas.</p>
+            <br>
+            <button class="btn btn-primary" onclick="window.location.href='admin.html'">
+                ⚙️ Ir al Panel de Administración
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 📌 BÚSQUEDA RÁPIDA - CON SELECTOR DE GRADOS (ESTILO REGISTRO-EVALUACION)
+        // ✅ Detecta docente activo desde datosSincronizados
+        // ✅ Lee minerd_asignaciones_completas para saber cuántos grados tiene
+        // ✅ Si tiene 1 grado → muestra directamente
+        // ✅ Si tiene 2+ grados → muestra selector con opciones
+        // ✅ Filtra por GRADO + SECCIÓN + TANDA
+        // ✅ Badge de asignación IDÉNTICO a REGISTRO-EVALUACION
+        // ================================================================
+
+        // Variables globales
+        let estudiantesData = [];
+        let todosLosRegistros = [];
+        let resultadosActuales = [];
+        let terminoBusqueda = '';
+        let campoOrden = 'orden';
+        let ordenAscendente = true;
+        let docenteActivo = null;
+        let asignacionesDocente = [];
+        let gradoSeleccionado = null;
+        let modoTodosGrados = true;
+        let currentGrado = 'Primer Grado';
+        let currentSeccion = 'A';
+        let currentTanda = 'Matutina';
+
+        // ================================================================
+        // ✅ APLICAR DATOS SINCRONIZADOS (IDÉNTICO A REGISTRO-EVALUACION)
+        // ================================================================
+        function aplicarDatosSincronizados() {
+            try {
+                const datosSync = localStorage.getItem('datosSincronizados');
+                if (!datosSync) {
+                    console.log('ℹ️ No hay datos sincronizados');
+                    return false;
+                }
+
+                const datos = JSON.parse(datosSync);
+                console.log('📥 Datos sincronizados recibidos:', datos);
+
+                // Extraer datos
+                const nombreDocente = (datos.docente || '').trim();
+                if (nombreDocente) {
+                    docenteActivo = {
+                        nombre: nombreDocente,
+                        grado: (datos.grado || '').trim(),
+                        seccion: (datos.seccion || 'A').trim(),
+                        tanda: (datos.tanda || 'Matutina').trim(),
+                        centroEducativo: datos.centroEducativo || '',
+                        anioEscolar: datos.anioEscolar || ''
+                    };
+                }
+
+                if (datos.grado) {
+                    currentGrado = datos.grado;
+                }
+                if (datos.seccion) {
+                    currentSeccion = datos.seccion;
+                }
+                if (datos.tanda) {
+                    currentTanda = datos.tanda;
+                    sessionStorage.setItem('tandaSeleccionada', currentTanda);
+                }
+
+                // Actualizar badge
+                actualizarBadgeAsignacion();
+
+                return true;
+            } catch (e) {
+                console.error('❌ Error aplicando datos sincronizados:', e);
+                return false;
+            }
+        }
+
+        // ================================================================
+        // ✅ ACTUALIZAR BADGE DE ASIGNACIÓN
+        // ================================================================
+        function actualizarBadgeAsignacion() {
+            const badgeGrado = document.getElementById('badgeGrado');
+            const badgeSeccion = document.getElementById('badgeSeccion');
+            const badgeTanda = document.getElementById('badgeTanda');
+
+            if (badgeGrado) badgeGrado.textContent = currentGrado || 'Cargando...';
+            if (badgeSeccion) badgeSeccion.textContent = currentSeccion || '-';
+            if (badgeTanda) badgeTanda.textContent = currentTanda || '-';
+        }
+
+        // ================================================================
+        // ✅ CAMBIAR GRADO (IDÉNTICO A REGISTRO-EVALUACION)
+        // ================================================================
+        function cambiarGradoDesdeBusqueda() {
+            if (confirm('¿Desea cambiar de grado? Se guardarán los datos actuales.')) {
+                if (typeof AuthSystem !== 'undefined') {
+                    const sesion = AuthSystem.obtenerSesion();
+                    if (sesion && sesion.cedula) {
+                        AuthSystem.eliminarGradoSeleccionado(sesion.cedula);
+                        sessionStorage.removeItem('gradoSeleccionado');
+                        sessionStorage.removeItem('seccionSeleccionada');
+                        sessionStorage.removeItem('tandaSeleccionada');
+                    }
+                }
+                window.top.location.href = 'login.html?action=select_grado';
+            }
+        }
+
+        // ================================================================
+        // ✅ OBTENER CONTRASEÑAS DE DOCENTES
+        // ================================================================
+        function obtenerContrasenasDocentes() {
+            try {
+                const data = localStorage.getItem('minerd_contrasenas_docentes');
+                if (!data) return [];
+                return JSON.parse(data);
+            } catch (e) {
+                console.error('❌ Error obteniendo contraseñas:', e);
+                return [];
+            }
+        }
+
+        // ================================================================
+        // ✅ OBTENER CÓDIGOS DE DOCENTES
+        // ================================================================
+        function obtenerCodigosDocentes() {
+            try {
+                const data = localStorage.getItem('minerd_codigos_docentes');
+                if (!data) return [];
+                return JSON.parse(data);
+            } catch (e) {
+                console.error('❌ Error obteniendo códigos:', e);
+                return [];
+            }
+        }
+
+        // ================================================================
+        // ✅ OBTENER ASIGNACIONES DEL DOCENTE
+        // ================================================================
+        function obtenerAsignacionesDocente(nombreDocente) {
+            try {
+                const key = 'minerd_asignaciones_completas';
+                const data = localStorage.getItem(key);
+
+                console.log('🔍 Buscando asignaciones para:', nombreDocente);
+
+                if (!data) {
+                    console.log('ℹ️ No hay asignaciones completas en localStorage');
+                    mostrarDebug('❌ No hay datos en minerd_asignaciones_completas');
+                    return [];
+                }
+
+                const todas = JSON.parse(data);
+                if (!Array.isArray(todas) || todas.length === 0) {
+                    console.log('ℹ️ minerd_asignaciones_completas está vacío');
+                    mostrarDebug('❌ minerd_asignaciones_completas está vacío');
+                    return [];
+                }
+
+                console.log('📋 Total de docentes con asignaciones:', todas.length);
+                mostrarDebug(`📋 Total de docentes con asignaciones: ${todas.length}`);
+
+                const nombreBuscar = nombreDocente.trim().toUpperCase();
+
+                // ESTRATEGIA 1: Buscar por nombre exacto
+                let encontrado = todas.find(item => {
+                    const nombreItem = (item.nombre || '').trim().toUpperCase();
+                    return nombreItem === nombreBuscar;
+                });
+
+                if (encontrado) {
+                    console.log('✅ Encontrado por nombre exacto:', encontrado);
+                    mostrarDebug(`✅ Encontrado por nombre exacto: ${encontrado.nombre}`);
+                    return encontrado.asignaciones || [];
+                }
+
+                // ESTRATEGIA 2: Buscar por nombre parcial
+                encontrado = todas.find(item => {
+                    const nombreItem = (item.nombre || '').trim().toUpperCase();
+                    return nombreItem.includes(nombreBuscar) || nombreBuscar.includes(nombreItem);
+                });
+
+                if (encontrado) {
+                    console.log('✅ Encontrado por nombre parcial:', encontrado);
+                    mostrarDebug(`✅ Encontrado por nombre parcial: ${encontrado.nombre}`);
+                    return encontrado.asignaciones || [];
+                }
+
+                // ESTRATEGIA 3: Buscar por cédula
+                const contrasenas = obtenerContrasenasDocentes();
+                const codigos = obtenerCodigosDocentes();
+
+                let cedulaDocente = null;
+
+                const enContrasenas = contrasenas.find(c => {
+                    const nombreC = (c.nombre || '').trim().toUpperCase();
+                    return nombreC === nombreBuscar || nombreC.includes(nombreBuscar) || nombreBuscar.includes(nombreC);
+                });
+
+                if (enContrasenas) {
+                    cedulaDocente = enContrasenas.cedula;
+                    console.log('🔑 Cédula encontrada en contraseñas:', cedulaDocente);
+                }
+
+                if (!cedulaDocente) {
+                    const enCodigos = codigos.find(c => {
+                        const nombreC = (c.nombre || '').trim().toUpperCase();
+                        return nombreC === nombreBuscar || nombreC.includes(nombreBuscar) || nombreBuscar.includes(nombreC);
+                    });
+                    if (enCodigos) {
+                        cedulaDocente = enCodigos.cedula;
+                        console.log('🔑 Cédula encontrada en códigos:', cedulaDocente);
+                    }
+                }
+
+                if (cedulaDocente) {
+                    encontrado = todas.find(item => item.cedula === cedulaDocente);
+                    if (encontrado) {
+                        console.log('✅ Encontrado por cédula:', encontrado);
+                        mostrarDebug(`✅ Encontrado por cédula: ${encontrado.cedula} - ${encontrado.nombre}`);
+                        return encontrado.asignaciones || [];
+                    }
+                }
+
+                const nombresDisponibles = todas.map(item => item.nombre || 'Sin nombre').join(', ');
+                console.log('📋 Docentes disponibles en el sistema:', nombresDisponibles);
+                mostrarDebug(`📋 Docentes disponibles: ${nombresDisponibles}`);
+
+                console.log('❌ No se encontraron asignaciones para el docente:', nombreDocente);
+                mostrarDebug(`❌ No se encontraron asignaciones para: "${nombreDocente}"`);
+                return [];
+            } catch (e) {
+                console.error('❌ Error obteniendo asignaciones del docente:', e);
+                mostrarDebug(`❌ Error: ${e.message}`);
+                return [];
+            }
+        }
+
+        // ================================================================
+        // ✅ MOSTRAR DEBUG
+        // ================================================================
+        function mostrarDebug(mensaje) {
+            const debugEl = document.getElementById('debugContenido');
+            if (debugEl) {
+                debugEl.innerHTML = mensaje;
+            }
+            const debugContainer = document.getElementById('debugInfo');
+            if (debugContainer) {
+                debugContainer.style.display = 'block';
+            }
+            console.log('🐞 DEBUG:', mensaje);
+        }
+
+        // ================================================================
+        // ✅ LIMPIAR DATOS
+        // ================================================================
+        function limpiarDatosCompletos() {
+            estudiantesData = [];
+            todosLosRegistros = [];
+            resultadosActuales = [];
+            terminoBusqueda = '';
+            gradoSeleccionado = null;
+            modoTodosGrados = true;
+
+            document.getElementById('resultsBody').innerHTML = `
+                <tr>
+                    <td colspan="10">
+                        <div class="mensaje-transicion">
+                            ⏳ Cargando estudiantes...
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            document.getElementById('resultCount').textContent = '0';
+            document.getElementById('searchInfo').textContent = '';
+            document.getElementById('gradoSeleccionadoInfo').textContent = '';
+
+            const select = document.getElementById('selectorGrados');
+            if (select) {
+                select.innerHTML = '<option value="">-- Cargando grados --</option>';
+            }
+
+            document.getElementById('selectorGradosWrapper').style.display = 'none';
+            document.getElementById('badgeAsignacionesCount').textContent = '0 asignaciones';
+
+            console.log('🧹 Datos limpiados completamente');
+        }
+
+        // ================================================================
+        // ✅ VERIFICAR Y MOSTRAR ESTADO DEL DOCENTE
+        // ================================================================
+        function verificarYMostrarDocente() {
+            // Primero aplicar datos sincronizados
+            aplicarDatosSincronizados();
+
+            const contenidoPrincipal = document.getElementById('contenidoPrincipal');
+            const mensajeSinDocente = document.getElementById('mensajeSinDocente');
+            const mensajeSinAsignaciones = document.getElementById('mensajeSinAsignaciones');
+            const nombreDocenteEl = document.getElementById('nombreDocenteActivo');
+
+            mensajeSinDocente.style.display = 'none';
+            mensajeSinAsignaciones.style.display = 'none';
+
+            if (!docenteActivo) {
+                contenidoPrincipal.style.display = 'none';
+                mensajeSinDocente.style.display = 'block';
+                nombreDocenteEl.textContent = 'Sin docente activo';
+                nombreDocenteEl.style.color = '#dc3545';
+                limpiarDatosCompletos();
+                mostrarDebug('⚠️ No hay docente activo');
+                return false;
+            }
+
+            contenidoPrincipal.style.display = 'block';
+            nombreDocenteEl.textContent = docenteActivo.nombre;
+            nombreDocenteEl.style.color = '#2a6a4a';
+
+            // Obtener asignaciones del docente
+            const nuevasAsignaciones = obtenerAsignacionesDocente(docenteActivo.nombre);
+
+            const asignacionesCambiaron = JSON.stringify(asignacionesDocente) !== JSON.stringify(nuevasAsignaciones);
+
+            if (asignacionesCambiaron) {
+                asignacionesDocente = nuevasAsignaciones;
+                console.log('🔄 Asignaciones cambiaron. Recargando...');
+                limpiarDatosCompletos();
+            } else {
+                asignacionesDocente = nuevasAsignaciones;
+            }
+
+            if (asignacionesDocente.length > 0) {
+                const listaAsignaciones = asignacionesDocente.map((a, i) =>
+                    `${i+1}. ${a.grado || 'Sin grado'} - Sec. ${a.seccion || '?'} - ${a.tanda || '?'}`
+                ).join('\n');
+                mostrarDebug(`✅ ${asignacionesDocente.length} asignaciones encontradas:\n${listaAsignaciones}`);
+            } else {
+                mostrarDebug(`❌ El docente "${docenteActivo.nombre}" NO tiene asignaciones en minerd_asignaciones_completas`);
+            }
+
+            if (asignacionesDocente.length === 0) {
+                contenidoPrincipal.style.display = 'none';
+                mensajeSinAsignaciones.style.display = 'block';
+                document.getElementById('docenteSinAsignacionesNombre').textContent = docenteActivo.nombre;
+                return false;
+            }
+
+            // Actualizar badge
+            actualizarBadgeAsignacion();
+
+            inicializarSelectorGrados();
+
+            return true;
+        }
+
+        // ================================================================
+        // ✅ INICIALIZAR SELECTOR DE GRADOS
+        // ================================================================
+        function inicializarSelectorGrados() {
+            const wrapper = document.getElementById('selectorGradosWrapper');
+            const select = document.getElementById('selectorGrados');
+            const badgeCount = document.getElementById('badgeAsignacionesCount');
+
+            if (!wrapper || !select) return;
+
+            select.innerHTML = '';
+
+            if (asignacionesDocente.length === 0) {
+                wrapper.style.display = 'none';
+                badgeCount.textContent = '0 asignaciones';
+                return;
+            }
+
+            if (asignacionesDocente.length === 1) {
+                wrapper.style.display = 'none';
+                const unica = asignacionesDocente[0];
+                gradoSeleccionado = {
+                    grado: unica.grado || '',
+                    seccion: unica.seccion || '',
+                    tanda: unica.tanda || ''
+                };
+                modoTodosGrados = false;
+                actualizarInfoGradoSeleccionado();
+                badgeCount.textContent = '1 asignación';
+                cargarDatosDesdeFormulario();
+                return;
+            }
+
+            wrapper.style.display = 'flex';
+
+            const optionTodos = document.createElement('option');
+            optionTodos.value = 'todos';
+            optionTodos.textContent = '📚 TODOS LOS GRADOS (' + asignacionesDocente.length + ' asignaciones)';
+            optionTodos.className = 'todas-opcion';
+            optionTodos.selected = true;
+            select.appendChild(optionTodos);
+
+            asignacionesDocente.forEach((asig, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                const textoGrado = asig.grado || 'Sin grado';
+                const textoSeccion = asig.seccion ? ' - Sec. ' + asig.seccion : '';
+                const textoTanda = asig.tanda ? ' - ' + asig.tanda : '';
+                option.textContent = textoGrado + textoSeccion + textoTanda;
+                option.className = 'grado-opcion';
+                option.dataset.grado = asig.grado || '';
+                option.dataset.seccion = asig.seccion || '';
+                option.dataset.tanda = asig.tanda || '';
+                select.appendChild(option);
+            });
+
+            badgeCount.textContent = asignacionesDocente.length + ' asignaciones';
+
+            select.value = 'todos';
+            modoTodosGrados = true;
+            gradoSeleccionado = null;
+            actualizarInfoGradoSeleccionado();
+
+            cargarDatosDesdeFormulario();
+        }
+
+        // ================================================================
+        // ✅ CAMBIAR GRADO SELECCIONADO
+        // ================================================================
+        function cambiarGradoSeleccionado() {
+            const select = document.getElementById('selectorGrados');
+            if (!select) return;
+
+            const valor = select.value;
+
+            if (valor === 'todos') {
+                modoTodosGrados = true;
+                gradoSeleccionado = null;
+                document.getElementById('gradoSeleccionadoInfo').textContent = '📚 TODOS LOS GRADOS';
+                document.getElementById('gradoSeleccionadoInfo').style.color = '#2e7d32';
+
+                // Actualizar badge
+                currentGrado = 'TODOS';
+                currentSeccion = '-';
+                currentTanda = '-';
+                actualizarBadgeAsignacion();
+            } else {
+                const option = select.options[select.selectedIndex];
+                const grado = option.dataset.grado || '';
+                const seccion = option.dataset.seccion || '';
+                const tanda = option.dataset.tanda || '';
+
+                modoTodosGrados = false;
+                gradoSeleccionado = { grado, seccion, tanda };
+
+                // Actualizar variables actuales
+                currentGrado = grado || 'Sin grado';
+                currentSeccion = seccion || '-';
+                currentTanda = tanda || '-';
+                actualizarBadgeAsignacion();
+
+                let textoInfo = grado;
+                if (seccion) textoInfo += ' - Sec. ' + seccion;
+                if (tanda) textoInfo += ' - ' + tanda;
+                document.getElementById('gradoSeleccionadoInfo').textContent = '📚 ' + textoInfo;
+                document.getElementById('gradoSeleccionadoInfo').style.color = '#1a3a6b';
+            }
+
+            cargarDatosDesdeFormulario();
+        }
+
+        // ================================================================
+        // ✅ ACTUALIZAR INFO DE GRADO SELECCIONADO
+        // ================================================================
+        function actualizarInfoGradoSeleccionado() {
+            const infoEl = document.getElementById('gradoSeleccionadoInfo');
+            if (!infoEl) return;
+
+            if (modoTodosGrados || !gradoSeleccionado) {
+                infoEl.textContent = '📚 TODOS LOS GRADOS';
+                infoEl.style.color = '#2e7d32';
+            } else {
+                let texto = gradoSeleccionado.grado || '';
+                if (gradoSeleccionado.seccion) texto += ' - Sec. ' + gradoSeleccionado.seccion;
+                if (gradoSeleccionado.tanda) texto += ' - ' + gradoSeleccionado.tanda;
+                infoEl.textContent = '📚 ' + texto;
+                infoEl.style.color = '#1a3a6b';
+            }
+        }
+
+        // ================================================================
+        // ✅ VERIFICAR SI UN ESTUDIANTE PERTENECE AL DOCENTE
+        // ================================================================
+        function estudiantePerteneceADocente(estudiante) {
+            const gradoReg = (estudiante.grado || '').trim().toUpperCase();
+            const seccionReg = (estudiante.seccion || '').trim().toUpperCase();
+            const tandaReg = (estudiante.tanda || '').trim().toUpperCase();
+
+            if (!gradoReg) return false;
+
+            return asignacionesDocente.some(asig => {
+                const gradoAsig = (asig.grado || '').trim().toUpperCase();
+                const seccionAsig = (asig.seccion || '').trim().toUpperCase();
+                const tandaAsig = (asig.tanda || '').trim().toUpperCase();
+
+                return gradoReg === gradoAsig &&
+                       seccionReg === seccionAsig &&
+                       tandaReg === tandaAsig;
+            });
+        }
+
+        // ================================================================
+        // 📌 CARGAR DATOS DESDE EL FORMULARIO
+        // ================================================================
+        function cargarDatosDesdeFormulario() {
+            try {
+                const stored = localStorage.getItem('registrosSigerd');
+                if (stored) {
+                    todosLosRegistros = JSON.parse(stored);
+                    if (!Array.isArray(todosLosRegistros)) {
+                        todosLosRegistros = [];
+                    }
+                } else {
+                    todosLosRegistros = [];
+                }
+
+                estudiantesData = filtrarEstudiantesPorDocenteYGrado(todosLosRegistros);
+
+                console.log(`📋 Total registros en storage: ${todosLosRegistros.length}`);
+                console.log(`🔒 Estudiantes del docente: ${estudiantesData.length}`);
+                if (modoTodosGrados) {
+                    console.log(`📚 Modo: TODOS LOS GRADOS (${asignacionesDocente.length} asignaciones)`);
+                } else if (gradoSeleccionado) {
+                    console.log(`📚 Grado seleccionado: ${gradoSeleccionado.grado} - Sec. ${gradoSeleccionado.seccion} - ${gradoSeleccionado.tanda}`);
+                }
+                buscarEstudiantes();
+                return true;
+            } catch (e) {
+                console.error('❌ Error cargando datos:', e);
+                mostrarMensaje('❌ Error cargando datos', 'error');
+                return false;
+            }
+        }
+
+        // ================================================================
+        // ✅ FILTRAR ESTUDIANTES POR DOCENTE + GRADO SELECCIONADO
+        // ================================================================
+        function filtrarEstudiantesPorDocenteYGrado(registros) {
+            if (!docenteActivo || asignacionesDocente.length === 0) {
+                return [];
+            }
+
+            const estudiantesDelDocente = registros.filter(reg => {
+                return estudiantePerteneceADocente(reg);
+            });
+
+            if (modoTodosGrados) {
+                return estudiantesDelDocente;
+            }
+
+            if (!gradoSeleccionado) {
+                return estudiantesDelDocente;
+            }
+
+            const gradoSeleccionadoUpper = (gradoSeleccionado.grado || '').trim().toUpperCase();
+            const seccionSeleccionadaUpper = (gradoSeleccionado.seccion || '').trim().toUpperCase();
+            const tandaSeleccionadaUpper = (gradoSeleccionado.tanda || '').trim().toUpperCase();
+
+            return estudiantesDelDocente.filter(reg => {
+                const gradoReg = (reg.grado || '').trim().toUpperCase();
+                const seccionReg = (reg.seccion || '').trim().toUpperCase();
+                const tandaReg = (reg.tanda || '').trim().toUpperCase();
+
+                return gradoReg === gradoSeleccionadoUpper &&
+                       seccionReg === seccionSeleccionadaUpper &&
+                       tandaReg === tandaSeleccionadaUpper;
+            });
+        }
+
+        // ================================================================
+        // 📌 FUNCIONES DE BÚSQUEDA
+        // ================================================================
+        function buscarEstudiantes() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+
+            setTimeout(function() {
+                const input = document.getElementById('searchInput');
+                const filterGrade = document.getElementById('filterGrade');
+                const filterSection = document.getElementById('filterSection');
+                const filterStatus = document.getElementById('filterStatus');
+
+                terminoBusqueda = input.value.trim().toUpperCase();
+                const gradoFiltro = filterGrade.value;
+                const seccionFiltro = filterSection.value;
+                const estadoFiltro = filterStatus.value;
+
+                let resultados = estudiantesData.filter(function(est) {
+                    const textoCompleto = ((est.nombre || '') + ' ' + (est.apellido || '') + ' ' + (est.id || '')).toUpperCase();
+                    const coincideTexto = textoCompleto.includes(terminoBusqueda);
+
+                    const gradoEst = (est.grado || '').trim().toUpperCase();
+                    const coincideGrado = gradoFiltro === '' || gradoEst === gradoFiltro;
+
+                    const seccionEst = (est.seccion || '').trim().toUpperCase();
+                    const coincideSeccion = seccionFiltro === '' || seccionEst === seccionFiltro;
+
+                    const coincideEstado = true;
+
+                    return coincideTexto && coincideGrado && coincideSeccion && coincideEstado;
+                });
+
+                resultados = ordenarResultados(resultados, campoOrden, ordenAscendente);
+                resultados = resultados.map(function(est) {
+                    const edad = calcularEdad(est.fechaNac);
+                    return { ...est, edad: edad };
+                });
+
+                resultadosActuales = resultados;
+                mostrarResultados(resultados, terminoBusqueda);
+
+                const countSpan = document.getElementById('resultCount');
+                const searchInfo = document.getElementById('searchInfo');
+                countSpan.textContent = resultados.length;
+
+                let infoTexto = '';
+                if (terminoBusqueda) {
+                    infoTexto = `🔎 "${terminoBusqueda}" (${resultados.length} resultados)`;
+                } else if (estudiantesData.length > 0) {
+                    if (modoTodosGrados) {
+                        infoTexto = `📚 Mostrando estudiantes de TODOS los grados del docente (${estudiantesData.length} total)`;
+                    } else if (gradoSeleccionado) {
+                        let gradoTexto = gradoSeleccionado.grado || '';
+                        if (gradoSeleccionado.seccion) gradoTexto += ` - Sec. ${gradoSeleccionado.seccion}`;
+                        if (gradoSeleccionado.tanda) gradoTexto += ` - ${gradoSeleccionado.tanda}`;
+                        infoTexto = `📚 Mostrando estudiantes de: ${gradoTexto} (${estudiantesData.length} total)`;
+                    } else {
+                        infoTexto = `📋 Mostrando todos los estudiantes del docente (${estudiantesData.length} total)`;
+                    }
+                } else {
+                    if (asignacionesDocente.length === 0) {
+                        infoTexto = `📋 El docente no tiene grados asignados`;
+                    } else {
+                        infoTexto = `📋 Sin estudiantes para este docente`;
+                    }
+                }
+                searchInfo.textContent = infoTexto;
+
+                document.getElementById('loadingIndicator').style.display = 'none';
+            }, 200);
+        }
+
+        function mostrarResultados(resultados, termino) {
+            const tbody = document.getElementById('resultsBody');
+
+            if (estudiantesData.length === 0) {
+                let mensaje = 'No hay estudiantes para este docente';
+                if (asignacionesDocente.length === 0) {
+                    mensaje = 'El docente no tiene grados asignados. Contacte al administrador.';
+                } else if (!modoTodosGrados && gradoSeleccionado) {
+                    let gradoText = gradoSeleccionado.grado || '';
+                    if (gradoSeleccionado.seccion) gradoText += ` - Sec. ${gradoSeleccionado.seccion}`;
+                    if (gradoSeleccionado.tanda) gradoText += ` - ${gradoSeleccionado.tanda}`;
+                    mensaje = `No hay estudiantes para: ${gradoText}`;
+                }
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10">
+                            <div class="no-results">
+                                <span class="emoji">📂</span>
+                                <h3>${mensaje}</h3>
+                                <p>Registre estudiantes en el Formulario para este grado, sección y tanda.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            if (resultados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10">
+                            <div class="no-results">
+                                <span class="emoji">🔍</span>
+                                <h3>No se encontraron estudiantes</h3>
+                                <p>Intenta con otros términos de búsqueda o ajusta los filtros.</p>
+                                <br>
+                                <button class="btn btn-primary btn-sm" onclick="limpiarBusqueda()">
+                                    🧹 Limpiar búsqueda
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            resultados.forEach(function(est, index) {
+                const nombreResaltado = resaltarTexto(est.nombre || '', termino);
+                const apellidoResaltado = resaltarTexto(est.apellido || '', termino);
+                const idResaltado = resaltarTexto(est.id || '', termino);
+
+                const gradoTexto = est.grado || '-';
+                const seccionTexto = est.seccion || '-';
+
+                html += `
+                    <tr>
+                        <td><strong>${index + 1}</strong></td>
+                        <td><strong>${idResaltado}</strong></td>
+                        <td>${nombreResaltado}</td>
+                        <td>${apellidoResaltado}</td>
+                        <td>${gradoTexto}</td>
+                        <td><span class="badge badge-primary">Sección ${seccionTexto}</span></td>
+                        <td>${est.fechaNac || '-'}</td>
+                        <td><strong>${est.edad || '-'}</strong> años</td>
+                        <td class="celda-vacia-dato">—</td>
+                        <td class="celda-vacia-dato">—</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function resaltarTexto(texto, termino) {
+            if (!termino || termino === '') return texto;
+            const regex = new RegExp('(' + termino.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            return texto.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        function calcularEdad(fechaNac) {
+            if (!fechaNac) return '-';
+            try {
+                const partes = fechaNac.split('/');
+                if (partes.length !== 3) return '-';
+                const dia = parseInt(partes[0]);
+                const mes = parseInt(partes[1]) - 1;
+                const anio = parseInt(partes[2]);
+                const fechaNacimiento = new Date(anio, mes, dia);
+                const fechaActual = new Date();
+                let edad = fechaActual.getFullYear() - fechaNacimiento.getFullYear();
+                const m = fechaActual.getMonth() - fechaNacimiento.getMonth();
+                if (m < 0 || (m === 0 && fechaActual.getDate() < fechaNacimiento.getDate())) {
+                    edad--;
+                }
+                return edad >= 0 ? edad : '-';
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        function ordenarPor(campo) {
+            if (campoOrden === campo) {
+                ordenAscendente = !ordenAscendente;
+            } else {
+                campoOrden = campo;
+                ordenAscendente = true;
+            }
+            buscarEstudiantes();
+        }
+
+        function ordenarResultados(resultados, campo, ascendente) {
+            const copia = [...resultados];
+            copia.sort(function(a, b) {
+                let valA, valB;
+
+                switch (campo) {
+                    case 'orden':
+                        return ascendente ? (parseInt(a.orden) || 0) - (parseInt(b.orden) || 0) : (parseInt(b.orden) || 0) - (parseInt(a.orden) || 0);
+                    case 'nombre':
+                        valA = a.nombre || '';
+                        valB = b.nombre || '';
+                        break;
+                    case 'apellido':
+                        valA = a.apellido || '';
+                        valB = b.apellido || '';
+                        break;
+                    case 'id':
+                        valA = a.id || '';
+                        valB = b.id || '';
+                        break;
+                    case 'grado':
+                        valA = a.grado || '';
+                        valB = b.grado || '';
+                        break;
+                    case 'seccion':
+                        valA = a.seccion || '';
+                        valB = b.seccion || '';
+                        break;
+                    case 'fechaNac':
+                        valA = a.fechaNac || '';
+                        valB = b.fechaNac || '';
+                        break;
+                    case 'edad':
+                        const edadA = parseInt(String(a.edad || '').match(/\d+/)?.[0] || 0);
+                        const edadB = parseInt(String(b.edad || '').match(/\d+/)?.[0] || 0);
+                        return ascendente ? edadA - edadB : edadB - edadA;
+                    default:
+                        return 0;
+                }
+
+                if (typeof valA === 'string') {
+                    valA = valA.toUpperCase();
+                    valB = valB.toUpperCase();
+                    return ascendente ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                }
+
+                return ascendente ? valA - valB : valB - valA;
+            });
+            return copia;
+        }
+
+        function limpiarBusqueda() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterGrade').value = '';
+            document.getElementById('filterSection').value = '';
+            document.getElementById('filterStatus').value = '';
+            terminoBusqueda = '';
+            campoOrden = 'orden';
+            ordenAscendente = true;
+            buscarEstudiantes();
+        }
+
+        // ================================================================
+        // 📊 EXPORTAR CSV
+        // ================================================================
+        function exportarResultados() {
+            if (resultadosActuales.length === 0) {
+                alert('No hay resultados para exportar.');
+                return;
+            }
+
+            let csv = '\uFEFF';
+            csv += 'N° Orden;ID Estudiante;Nombre(s);Apellido(s);Grado;Sección;Tanda;Fecha Nacimiento;Edad\n';
+
+            resultadosActuales.forEach(function(est, index) {
+                csv += `${index + 1};${est.id || ''};${est.nombre || ''};${est.apellido || ''};${est.grado || ''};${est.seccion || ''};${est.tanda || ''};${est.fechaNac || ''};${est.edad || '-'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = `Busqueda_Estudiantes_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            mostrarMensaje('✅ CSV exportado correctamente (' + resultadosActuales.length + ' estudiantes)');
+        }
+
+        // ================================================================
+        // 📌 MENSAJES FLOTANTES
+        // ================================================================
+        function mostrarMensaje(texto, tipo) {
+            const anterior = document.querySelector('.mensaje-flotante');
+            if (anterior) anterior.remove();
+
+            const colores = {
+                'exito': { bg: '#28a745', border: '#1e7e34' },
+                'error': { bg: '#dc3545', border: '#b02a37' },
+                'warning': { bg: '#ffc107', border: '#e0a800' },
+                'info': { bg: '#17a2b8', border: '#138496' }
+            };
+
+            const estilo = colores[tipo] || colores['exito'];
+
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje-flotante';
+            mensaje.textContent = texto;
+            mensaje.style.cssText = `
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%) translateY(100px);
+                background: ${estilo.bg};
+                color: white;
+                padding: 14px 28px;
+                border-radius: 10px;
+                font-size: 15px;
+                font-weight: 600;
+                z-index: 9999;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                transition: all 0.5s ease;
+                opacity: 0;
+                font-family: 'Segoe UI', sans-serif;
+                max-width: 90%;
+                text-align: center;
+                border: 3px solid ${estilo.border};
+            `;
+            document.body.appendChild(mensaje);
+
+            setTimeout(function() {
+                mensaje.style.transform = 'translateX(-50%) translateY(0)';
+                mensaje.style.opacity = '1';
+            }, 100);
+
+            setTimeout(function() {
+                mensaje.style.transform = 'translateX(-50%) translateY(100px)';
+                mensaje.style.opacity = '0';
+                setTimeout(function() {
+                    if (mensaje.parentNode) mensaje.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // ================================================================
+        // 🔄 FUNCIÓN DE RECARGA FORZADA
+        // ================================================================
+        function recargarCompleto() {
+            console.log('🔄 Recargando completamente...');
+            const resultado = verificarYMostrarDocente();
+            if (resultado) {
+                cargarDatosDesdeFormulario();
+            }
+        }
+
+        // ================================================================
+        // 📌 INICIALIZACIÓN
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 BÚSQUEDA RÁPIDA - Inicializada con SELECTOR DE GRADOS');
+            console.log('📌 Usando mismo sistema de detección que REGISTRO-EVALUACION');
+            console.log('📌 Lectura de datosSincronizados y minerd_asignaciones_completas');
+
+            mostrarDebug('🔄 Inicializando...');
+
+            if (!verificarYMostrarDocente()) {
+                console.log('⚠️ No hay docente activo. Esperando...');
+                setInterval(function() {
+                    if (verificarYMostrarDocente()) {
+                        cargarDatosDesdeFormulario();
+                    }
+                }, 2000);
+                return;
+            }
+
+            cargarDatosDesdeFormulario();
+
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'f')) {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                    document.getElementById('searchInput').select();
+                }
+                if (e.key === 'Escape') {
+                    const input = document.getElementById('searchInput');
+                    if (input === document.activeElement) {
+                        limpiarBusqueda();
+                        input.blur();
+                    }
+                }
+            });
+
+            window.addEventListener('storage', function(e) {
+                console.log(`🔄 Evento storage: ${e.key}`);
+
+                if (e.key === 'datosSincronizados') {
+                    console.log('🔄 datosSincronizados cambió, re-verificando docente...');
+                    recargarCompleto();
+                }
+
+                if (e.key === 'minerd_asignaciones_completas') {
+                    console.log('🔄 minerd_asignaciones_completas cambió, recargando asignaciones...');
+                    recargarCompleto();
+                }
+
+                if (e.key === 'registrosSigerd') {
+                    console.log('🔄 registrosSigerd cambió, recargando datos...');
+                    if (docenteActivo) {
+                        cargarDatosDesdeFormulario();
+                    } else {
+                        recargarCompleto();
+                    }
+                }
+
+                if (e.key === 'minerd_contrasenas_docentes' || e.key === 'minerd_codigos_docentes') {
+                    console.log(`🔄 ${e.key} cambió, re-verificando...`);
+                    recargarCompleto();
+                }
+            });
+
+            setInterval(function() {
+                // Verificar si el docente sigue siendo el mismo
+                const datosSync = localStorage.getItem('datosSincronizados');
+                if (datosSync) {
+                    try {
+                        const datos = JSON.parse(datosSync);
+                        const nombreActual = (datos.docente || '').trim();
+                        const nombreGuardado = docenteActivo ? docenteActivo.nombre : null;
+
+                        if (nombreActual !== nombreGuardado) {
+                            console.log('🔄 Cambio de docente detectado por intervalo');
+                            recargarCompleto();
+                        }
+                    } catch (e) { /* Ignorar */ }
+                }
+            }, 5000);
+
+            console.log('⌨️ Atajos: Ctrl+K para buscar, Escape para limpiar');
+            console.log('📚 Selector de grados: muestra TODOS los grados del docente o uno específico');
+            console.log('🔒 Aislamiento por docente activo + grado seleccionado');
+            console.log('🔄 Detección automática de cambio de docente');
+            console.log('🐞 Debug visible en la parte superior');
+        });
+
+        // ================================================================
+        // 📌 EXPOSICIÓN GLOBAL
+        // ================================================================
+        window.buscarEstudiantes = buscarEstudiantes;
+        window.limpiarBusqueda = limpiarBusqueda;
+        window.exportarResultados = exportarResultados;
+        window.ordenarPor = ordenarPor;
+        window.mostrarMensaje = mostrarMensaje;
+        window.cambiarGradoSeleccionado = cambiarGradoSeleccionado;
+        window.verificarYMostrarDocente = verificarYMostrarDocente;
+        window.cargarDatosDesdeFormulario = cargarDatosDesdeFormulario;
+        window.recargarCompleto = recargarCompleto;
+        window.mostrarDebug = mostrarDebug;
+        window.cambiarGradoDesdeBusqueda = cambiarGradoDesdeBusqueda;
+        window.actualizarBadgeAsignacion = actualizarBadgeAsignacion;
+    </script>
+
+</body>
+</html>
