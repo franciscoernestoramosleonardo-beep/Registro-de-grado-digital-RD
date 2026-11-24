@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🎯 Ajustes Curriculares</title>
+    <style>
+        /* ============================================
+           ESTILOS BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: #1a2a4a;
+            padding: 16px 24px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-info {
+            color: #FFD700;
+            font-size: 13px;
+            background: rgba(255, 215, 0, 0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 1px solid #FFD700;
+        }
+
+        .contador {
+            color: #a0b0c0;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px 14px;
+            border-radius: 30px;
+        }
+
+        /* ============================================
+           FILTROS
+           ============================================ */
+        .filtros {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            align-items: center;
+        }
+
+        .filtros label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a2a4a;
+        }
+
+        .filtros input,
+        .filtros select {
+            padding: 6px 12px;
+            border: 1px solid #d0d8e0;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #fafbfc;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .filtros input:focus,
+        .filtros select:focus {
+            outline: none;
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.12);
+        }
+
+        .filtros .btn-actualizar {
+            padding: 6px 18px;
+            background: #1a2a4a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        .filtros .btn-actualizar:hover {
+            background: #2a3a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 42, 74, 0.25);
+        }
+
+        .filtros .btn-nuevo {
+            padding: 6px 18px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .filtros .btn-nuevo:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* ============================================
+           TABLA DE ESTUDIANTES
+           ============================================ */
+        .tabla-container {
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+            border: 1px solid #e8ecf1;
+        }
+
+        .tabla-container .tabla-scroll {
+            overflow-x: auto;
+            padding: 4px;
+        }
+
+        .tabla-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .tabla-container th {
+            background: #1a2a4a;
+            color: #ffffff;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .tabla-container td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        .tabla-container tr:hover td {
+            background: #f8fafc;
+        }
+
+        .tabla-container .estado-badge {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .tabla-container .estado-badge.activo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tabla-container .estado-badge.vencido {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tabla-container .estado-badge.pendiente {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tabla-container .estado-badge.aprobado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .tabla-container .estado-badge.rechazado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tabla-container .tipo-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 1px 2px;
+        }
+
+        .tabla-container .tipo-badge.acceso { background: #3498DB; color: white; }
+        .tabla-container .tipo-badge.metodologico { background: #2ECC71; color: white; }
+        .tabla-container .tipo-badge.evaluacion { background: #E67E22; color: white; }
+        .tabla-container .tipo-badge.contenidos { background: #9B59B6; color: white; }
+
+        .tabla-container .btn-ver {
+            padding: 4px 14px;
+            background: #1a3a6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .tabla-container .btn-ver:hover {
+            background: #2a5a8b;
+            transform: scale(1.05);
+        }
+
+        .tabla-container .sin-datos {
+            text-align: center;
+            padding: 30px;
+            color: #8a9aaa;
+            font-size: 14px;
+        }
+
+        /* ============================================
+           FORMULARIO DE AJUSTES CURRICULARES
+           ============================================ */
+        .formulario-container {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8ecf1;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .formulario-container.visible {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formulario-container .form-titulo {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a2a4a;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1a3a6b;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .formulario-container .form-titulo .badge-estado {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+
+        .formulario-container .form-titulo .badge-estado.nuevo {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .formulario-container .form-titulo .badge-estado.editando {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .formulario-container .seccion {
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .formulario-container .seccion:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .formulario-container .seccion-titulo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .formulario-container .seccion-titulo .badge-seccion {
+            font-size: 10px;
+            background: #e8ecf1;
+            color: #4a5a7a;
+            padding: 1px 10px;
+            border-radius: 12px;
+            font-weight: 400;
+        }
+
+        .formulario-container .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 20px;
+        }
+
+        .formulario-container .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px 20px;
+        }
+
+        .formulario-container .campo {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .formulario-container .campo label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2a3a5a;
+        }
+
+        .formulario-container .campo label .required {
+            color: #dc3545;
+            margin-left: 2px;
+        }
+
+        .formulario-container .campo input,
+        .formulario-container .campo select,
+        .formulario-container .campo textarea {
+            padding: 7px 12px;
+            border: 1px solid #d0d8e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: #fafbfc;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .formulario-container .campo input:focus,
+        .formulario-container .campo select:focus,
+        .formulario-container .campo textarea:focus {
+            outline: none;
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26, 58, 107, 0.12);
+            background: #ffffff;
+        }
+
+        .formulario-container .campo input[readonly] {
+            background: #e8ecf1;
+            color: #4a5a7a;
+            cursor: not-allowed;
+        }
+
+        .formulario-container .campo textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .formulario-container .campo-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            padding: 6px 0;
+        }
+
+        .formulario-container .campo-checkboxes label {
+            font-size: 13px;
+            font-weight: 400;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .formulario-container .campo-checkboxes label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #1a3a6b;
+            cursor: pointer;
+        }
+
+        .formulario-container .campo-checkboxes label input[type="checkbox"]:checked {
+            accent-color: #1a3a6b;
+        }
+
+        /* ============================================
+           HISTORIAL DE AJUSTES
+           ============================================ */
+        .historial-container {
+            border: 1px solid #d0d8e0;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .historial-container .historial-scroll {
+            overflow-x: auto;
+        }
+
+        .historial-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .historial-container th {
+            background: #1a2a4a;
+            color: #ffffff;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .historial-container td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #f0f2f5;
+            vertical-align: middle;
+        }
+
+        .historial-container tr:hover td {
+            background: #f8fafc;
+        }
+
+        .historial-container .sin-ajustes {
+            text-align: center;
+            padding: 20px;
+            color: #8a9aaa;
+            font-size: 13px;
+        }
+
+        .historial-container .btn-eliminar-ajuste {
+            padding: 2px 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s ease;
+        }
+
+        .historial-container .btn-eliminar-ajuste:hover {
+            background: #c82333;
+        }
+
+        .historial-container .btn-editar-ajuste {
+            padding: 2px 10px;
+            background: #ffc107;
+            color: #1a2a4a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s ease;
+            margin-right: 4px;
+        }
+
+        .historial-container .btn-editar-ajuste:hover {
+            background: #e0a800;
+        }
+
+        .historial-container .estado-ajuste-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .historial-container .estado-ajuste-badge.aprobado { background: #d4edda; color: #155724; }
+        .historial-container .estado-ajuste-badge.pendiente { background: #fff3cd; color: #856404; }
+        .historial-container .estado-ajuste-badge.rechazado { background: #f8d7da; color: #721c24; }
+
+        .historial-container .vigencia-badge {
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .historial-container .vigencia-badge.activo { background: #d4edda; color: #155724; }
+        .historial-container .vigencia-badge.vencido { background: #f8d7da; color: #721c24; }
+
+        /* ============================================
+           BOTONES DEL FORMULARIO
+           ============================================ */
+        .form-acciones {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 2px solid #e8ecf1;
+            flex-wrap: wrap;
+        }
+
+        .form-acciones button {
+            padding: 8px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-acciones .btn-guardar {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        .form-acciones .btn-guardar:hover {
+            background: #2a3a5a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(26, 42, 74, 0.3);
+        }
+
+        .form-acciones .btn-actualizar {
+            background: #FFD700;
+            color: #1a2a4a;
+            display: none;
+        }
+
+        .form-acciones .btn-actualizar:hover {
+            background: #e6c200;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .form-acciones .btn-cancelar {
+            background: #6c757d;
+            color: white;
+            display: none;
+        }
+
+        .form-acciones .btn-cancelar:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .form-acciones .btn-limpiar {
+            background: #dc3545;
+            color: white;
+        }
+
+        .form-acciones .btn-limpiar:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .form-acciones .btn-volver {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .form-acciones .btn-volver:hover {
+            background: #d0d8e0;
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           TOAST MENSAJE
+           ============================================ */
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            opacity: 0;
+            transform: translateX(-50%) translateY(16px);
+            pointer-events: none;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        .toast-mensaje.visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1024px) {
+            .formulario-container .grid-2,
+            .formulario-container .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .filtros { flex-direction: column; align-items: stretch; }
+            .filtros .btn-actualizar,
+            .filtros .btn-nuevo { margin-left: 0; }
+            .formulario-container { padding: 16px 18px; }
+            .formulario-container .grid-2,
+            .formulario-container .grid-3 { grid-template-columns: 1fr; }
+            .tabla-container table { font-size: 11px; }
+            .tabla-container th,
+            .tabla-container td { padding: 6px 8px; }
+            .form-acciones { flex-direction: column; }
+            .form-acciones button { width: 100%; }
+            .toast-mensaje { font-size: 13px; padding: 10px 20px; white-space: normal; max-width: 90%; }
+        }
+
+        @media (max-width: 480px) {
+            .tabla-container table { font-size: 10px; }
+            .tabla-container th,
+            .tabla-container td { padding: 4px 6px; }
+            .historial-container table { font-size: 10px; }
+            .historial-container th,
+            .historial-container td { padding: 4px 6px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ============================================
+        HEADER
+        ============================================ -->
+        <div class="header">
+            <h1>🎯 Ajustes Curriculares</h1>
+            <div>
+                <span class="header-info" id="gradoDisplay">🎓 Cargando...</span>
+                <span class="contador" id="totalDisplay">👥 0 estudiantes</span>
+            </div>
+        </div>
+
+        <!-- ============================================
+        FILTROS
+        ============================================ -->
+        <div class="filtros">
+            <label for="filtroGrado">🎓 Grado:</label>
+            <select id="filtroGrado">
+                <option value="">Todos los grados</option>
+                <option value="PREPRIMARIO">Preprimario</option>
+                <option value="PRIMER GRADO">Primer Grado</option>
+                <option value="SEGUNDO GRADO">Segundo Grado</option>
+                <option value="TERCER GRADO">Tercer Grado</option>
+                <option value="CUARTO GRADO">Cuarto Grado</option>
+                <option value="QUINTO GRADO">Quinto Grado</option>
+                <option value="SEXTO GRADO">Sexto Grado</option>
+            </select>
+
+            <label for="filtroSeccion">📚 Sección:</label>
+            <select id="filtroSeccion">
+                <option value="">Todas</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+            </select>
+
+            <label for="filtroBusqueda">🔍 Buscar:</label>
+            <input type="text" id="filtroBusqueda" placeholder="Nombre o apellido..." />
+
+            <label for="filtroEstado">📌 Estado:</label>
+            <select id="filtroEstado">
+                <option value="">Todos</option>
+                <option value="ACTIVO">Activo</option>
+                <option value="VENCIDO">Vencido</option>
+                <option value="PENDIENTE">Pendiente</option>
+                <option value="APROBADO">Aprobado</option>
+                <option value="RECHAZADO">Rechazado</option>
+            </select>
+
+            <button class="btn-actualizar" id="btnActualizar">🔄 Actualizar</button>
+            <button class="btn-nuevo" id="btnNuevo">➕ Nuevo</button>
+
+            <span class="contador" id="contadorEstudiantes">Mostrando 0</span>
+        </div>
+
+        <!-- ============================================
+        TABLA DE ESTUDIANTES
+        ============================================ -->
+        <div class="tabla-container" id="tablaContainer">
+            <div class="tabla-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th style="width:80px;">ID</th>
+                            <th>Nombre</th>
+                            <th style="width:100px;">Grado</th>
+                            <th style="width:80px;">Sección</th>
+                            <th style="width:130px;">Área</th>
+                            <th style="width:110px;">Tipo Ajuste</th>
+                            <th style="width:100px;">Estado</th>
+                            <th style="width:90px;">Vigencia</th>
+                            <th style="width:80px;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr>
+                            <td colspan="10" class="sin-datos">📭 No hay estudiantes registrados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================
+        FORMULARIO DE AJUSTES CURRICULARES
+        ============================================ -->
+        <div class="formulario-container" id="formularioContainer">
+
+            <!-- TÍTULO DEL FORMULARIO -->
+            <div class="form-titulo">
+                <span>🎯 Registrar Ajuste Curricular</span>
+                <span>
+                    <span class="badge-estado nuevo" id="badgeEstado">📌 Nuevo</span>
+                    <span style="font-size:13px; color:#4a5a7a; margin-left:10px;" id="infoEstudiante">Estudiante: --</span>
+                </span>
+            </div>
+
+            <!-- ==========================================
+            SECCIÓN 1: DATOS DEL ESTUDIANTE (Auto-cargados)
+            ========================================== -->
+            <div class="seccion">
+                <div class="seccion-titulo">👤 Datos del Estudiante <span class="badge-seccion">Auto-cargados</span></div>
+                <div class="grid-3">
+                    <div class="campo">
+                        <label>ID del Estudiante</label>
+                        <input type="text" id="estudianteId" readonly />
+                    </div>
+                    <div class="campo">
+                        <label>Nombre</label>
+                        <input type="text" id="estudianteNombre" readonly />
+                    </div>
+                    <div class="campo">
+                        <label>Apellido</label>
+                        <input type="text" id="estudianteApellido" readonly />
+                    </div>
+                    <div class="campo">
+                        <label>Grado</label>
+                        <input type="text" id="estudianteGrado" readonly />
+                    </div>
+                    <div class="campo">
+                        <label>Sección</label>
+                        <input type="text" id="estudianteSeccion" readonly />
+                    </div>
+                    <div class="campo">
+                        <label>Tanda</label>
+                        <input type="text" id="estudianteTanda" readonly />
+                    </div>
+                    <div class="campo" style="grid-column: span 2;">
+                        <label>Diagnóstico NEAE (si existe)</label>
+                        <input type="text" id="diagnosticoNEAE" readonly placeholder="Sin diagnóstico registrado" />
+                    </div>
+                    <div class="campo">
+                        <label>Nivel de apoyo NEAE</label>
+                        <input type="text" id="nivelApoyoNEAE" readonly placeholder="No registrado" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+            SECCIÓN 2: REGISTRAR AJUSTE
+            ========================================== -->
+            <div class="seccion">
+                <div class="seccion-titulo">📋 Registrar Ajuste <span class="badge-seccion">Obligatorio</span></div>
+                <div class="grid-2">
+                    <div class="campo">
+                        <label>Área curricular <span class="required">*</span></label>
+                        <select id="areaCurricular">
+                            <option value="">Seleccionar...</option>
+                            <option value="MATEMATICAS">Matemáticas</option>
+                            <option value="LENGUA_ESPANOLA">Lengua Española</option>
+                            <option value="CIENCIAS_SOCIALES">Ciencias Sociales</option>
+                            <option value="CIENCIAS_NATURALES">Ciencias Naturales</option>
+                            <option value="INGLES">Inglés</option>
+                            <option value="EDUCACION_FISICA">Educación Física</option>
+                            <option value="ARTISTICA">Artística</option>
+                            <option value="RELIGION">Religión</option>
+                            <option value="OTRA">Otra</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Tipo de ajuste <span class="required">*</span></label>
+                        <select id="tipoAjuste">
+                            <option value="">Seleccionar...</option>
+                            <option value="ACCESO">Acceso (Físico/Material)</option>
+                            <option value="METODOLOGICO">Metodológico (Enseñanza)</option>
+                            <option value="EVALUACION">Evaluación (Calificación)</option>
+                            <option value="CONTENIDOS">Contenidos (Curricular Significativo)</option>
+                        </select>
+                    </div>
+                    <div class="campo" style="grid-column: span 2;">
+                        <label>Descripción del ajuste <span class="required">*</span></label>
+                        <textarea id="descripcionAjuste" rows="3" placeholder="Describa detalladamente el ajuste curricular..."></textarea>
+                    </div>
+                    <div class="campo">
+                        <label>Nivel de ajuste <span class="required">*</span></label>
+                        <select id="nivelAjuste">
+                            <option value="">Seleccionar...</option>
+                            <option value="NO_SIGNIFICATIVO">🟢 No significativo (Docente puede aplicar)</option>
+                            <option value="SIGNIFICATIVO">🟡 Significativo (Requiere aprobación)</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Estado de aprobación</label>
+                        <select id="estadoAprobacion">
+                            <option value="PENDIENTE">⏳ Pendiente</option>
+                            <option value="APROBADO">✅ Aprobado</option>
+                            <option value="RECHAZADO">❌ Rechazado</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label>Aprobado por</label>
+                        <input type="text" id="aprobadoPor" placeholder="Nombre y cargo de quien aprueba" />
+                    </div>
+                    <div class="campo">
+                        <label>Fecha de inicio <span class="required">*</span></label>
+                        <input type="date" id="fechaInicio" />
+                    </div>
+                    <div class="campo">
+                        <label>Fecha de fin <span class="required">*</span></label>
+                        <input type="date" id="fechaFin" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+            SECCIÓN 3: SEGUIMIENTO
+            ========================================== -->
+            <div class="seccion">
+                <div class="seccion-titulo">📝 Seguimiento <span class="badge-seccion">Evaluación del ajuste</span></div>
+                <div class="grid-2">
+                    <div class="campo" style="grid-column: span 2;">
+                        <label>Observaciones</label>
+                        <textarea id="observaciones" rows="3" placeholder="Observaciones sobre la efectividad del ajuste..."></textarea>
+                    </div>
+                    <div class="campo" style="grid-column: span 2;">
+                        <label>Efectividad del ajuste</label>
+                        <select id="efectividad">
+                            <option value="">Seleccionar...</option>
+                            <option value="ALTA">🟢 Alta - Muy efectivo</option>
+                            <option value="MEDIA">🟡 Media - Parcialmente efectivo</option>
+                            <option value="BAJA">🔴 Baja - Poco efectivo</option>
+                            <option value="EN_EVALUACION">🔄 En evaluación</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+            SECCIÓN 4: HISTORIAL DE AJUSTES
+            ========================================== -->
+            <div class="seccion">
+                <div class="seccion-titulo">📜 Historial de Ajustes <span class="badge-seccion">Registros previos</span></div>
+                <div class="historial-container">
+                    <div class="historial-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width:100px;">Inicio</th>
+                                    <th style="width:100px;">Fin</th>
+                                    <th style="width:120px;">Área</th>
+                                    <th style="width:100px;">Tipo</th>
+                                    <th>Descripción</th>
+                                    <th style="width:100px;">Estado</th>
+                                    <th style="width:80px;">Vigencia</th>
+                                    <th style="width:100px;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historialBody">
+                                <tr>
+                                    <td colspan="8" class="sin-ajustes">📭 No hay ajustes registrados</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================
+            BOTONES DEL FORMULARIO
+            ========================================== -->
+            <div class="form-acciones">
+                <button class="btn-guardar" id="btnGuardar">💾 Guardar Ajuste</button>
+                <button class="btn-actualizar" id="btnActualizarForm">✏️ Actualizar</button>
+                <button class="btn-cancelar" id="btnCancelar">❌ Cancelar</button>
+                <button class="btn-limpiar" id="btnLimpiar">🧹 Limpiar</button>
+                <button class="btn-volver" id="btnVolver">↩️ Volver a la lista</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ============================================
+    TOAST MENSAJE
+    ============================================ -->
+    <div id="toastMensaje" class="toast-mensaje">📌 Mensaje</div>
+
+    <!-- ============================================
+    SCRIPT PRINCIPAL
+    ============================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================
+            // 1. REFERENCIAS A DOM
+            // ============================================
+            const tablaBody = document.getElementById('tablaBody');
+            const historialBody = document.getElementById('historialBody');
+            const totalDisplay = document.getElementById('totalDisplay');
+            const contadorEstudiantes = document.getElementById('contadorEstudiantes');
+            const gradoDisplay = document.getElementById('gradoDisplay');
+
+            const filtroGrado = document.getElementById('filtroGrado');
+            const filtroSeccion = document.getElementById('filtroSeccion');
+            const filtroBusqueda = document.getElementById('filtroBusqueda');
+            const filtroEstado = document.getElementById('filtroEstado');
+            const btnActualizar = document.getElementById('btnActualizar');
+            const btnNuevo = document.getElementById('btnNuevo');
+
+            const formularioContainer = document.getElementById('formularioContainer');
+            const badgeEstado = document.getElementById('badgeEstado');
+            const infoEstudiante = document.getElementById('infoEstudiante');
+
+            // Campos del estudiante
+            const estudianteId = document.getElementById('estudianteId');
+            const estudianteNombre = document.getElementById('estudianteNombre');
+            const estudianteApellido = document.getElementById('estudianteApellido');
+            const estudianteGrado = document.getElementById('estudianteGrado');
+            const estudianteSeccion = document.getElementById('estudianteSeccion');
+            const estudianteTanda = document.getElementById('estudianteTanda');
+            const diagnosticoNEAE = document.getElementById('diagnosticoNEAE');
+            const nivelApoyoNEAE = document.getElementById('nivelApoyoNEAE');
+
+            // Campos del ajuste
+            const areaCurricular = document.getElementById('areaCurricular');
+            const tipoAjuste = document.getElementById('tipoAjuste');
+            const descripcionAjuste = document.getElementById('descripcionAjuste');
+            const nivelAjuste = document.getElementById('nivelAjuste');
+            const estadoAprobacion = document.getElementById('estadoAprobacion');
+            const aprobadoPor = document.getElementById('aprobadoPor');
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFin');
+            const observaciones = document.getElementById('observaciones');
+            const efectividad = document.getElementById('efectividad');
+
+            // Botones del formulario
+            const btnGuardar = document.getElementById('btnGuardar');
+            const btnActualizarForm = document.getElementById('btnActualizarForm');
+            const btnCancelar = document.getElementById('btnCancelar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const btnVolver = document.getElementById('btnVolver');
+
+            // Toast
+            const toast = document.getElementById('toastMensaje');
+
+            // ============================================
+            // 2. ESTADO
+            // ============================================
+            let todosLosRegistros = [];
+            let ajustes = [];
+            let modoEdicion = false;
+            let uidEdicion = null;
+            let estudianteSeleccionado = null;
+            let ajusteEditando = null;
+
+            // ============================================
+            // 3. UTILIDADES
+            // ============================================
+            function esc(valor) {
+                if (!valor && valor !== 0) return '';
+                return String(valor)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            function normalizarTexto(texto) {
+                if (!texto) return '';
+                return texto.toUpperCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            }
+
+            function generarUID() {
+                return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+            }
+
+            function obtenerGrupoActual() {
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const gradoUrl = urlParams.get('grado');
+                    if (gradoUrl) return { grado: decodeURIComponent(gradoUrl), seccion: '', tanda: '' };
+
+                    const fuentes = [
+                        localStorage.getItem('datosSincronizados'),
+                        localStorage.getItem('registroGradoData'),
+                        localStorage.getItem('minerd_grado_completo')
+                    ];
+                    for (const fuente of fuentes) {
+                        if (fuente) {
+                            try {
+                                const datos = JSON.parse(fuente);
+                                if (datos && datos.grado) {
+                                    return { grado: datos.grado || '', seccion: datos.seccion || '', tanda: datos.tanda || '' };
+                                }
+                            } catch (e) { continue; }
+                        }
+                    }
+
+                    if (typeof AuthSystem !== 'undefined') {
+                        const sesion = AuthSystem.obtenerSesion();
+                        if (sesion && sesion.cedula) {
+                            const gradoGuardado = AuthSystem.obtenerGradoSeleccionado(sesion.cedula);
+                            if (gradoGuardado) return { grado: gradoGuardado, seccion: '', tanda: '' };
+                        }
+                    }
+
+                    return { grado: '', seccion: '', tanda: '' };
+                } catch (e) {
+                    return { grado: '', seccion: '', tanda: '' };
+                }
+            }
+
+            // NUEVA FUNCIÓN: Normaliza el nombre del grado para que coincida con los values del select
+            function normalizarGradoParaFiltro(grado) {
+                if (!grado) return '';
+                const g = grado.toUpperCase().trim();
+                if (g.includes('PREPRIMARIO') || g.includes('INICIAL')) return 'PREPRIMARIO';
+                if (g.includes('PRIMER') || g.includes('1ER') || g.includes('1°') || g === '1') return 'PRIMER GRADO';
+                if (g.includes('SEGUNDO') || g.includes('2DO') || g.includes('2°') || g === '2') return 'SEGUNDO GRADO';
+                if (g.includes('TERCER') || g.includes('3ER') || g.includes('3°') || g === '3') return 'TERCER GRADO';
+                if (g.includes('CUARTO') || g.includes('4TO') || g.includes('4°') || g === '4') return 'CUARTO GRADO';
+                if (g.includes('QUINTO') || g.includes('5TO') || g.includes('5°') || g === '5') return 'QUINTO GRADO';
+                if (g.includes('SEXTO') || g.includes('6TO') || g.includes('6°') || g === '6') return 'SEXTO GRADO';
+                return g;
+            }
+
+            function obtenerRegistros() {
+                try {
+                    const stored = localStorage.getItem('registrosSigerd');
+                    if (stored) {
+                        const registros = JSON.parse(stored);
+                        return Array.isArray(registros) ? registros : [];
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error cargando registros:', e);
+                }
+                return [];
+            }
+
+            function obtenerDatosNEAE() {
+                try {
+                    const stored = localStorage.getItem('datosNEAE');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        return data || {};
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error cargando datos NEAE:', e);
+                }
+                return {};
+            }
+
+            function obtenerAjustesCurriculares() {
+                try {
+                    const stored = localStorage.getItem('ajustesCurriculares');
+                    if (stored) {
+                        const data = JSON.parse(stored);
+                        return data || {};
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error cargando ajustes curriculares:', e);
+                }
+                return {};
+            }
+
+            function guardarAjustesCurriculares(data) {
+                try {
+                    localStorage.setItem('ajustesCurriculares', JSON.stringify(data));
+                    return true;
+                } catch (e) {
+                    console.error('❌ Error guardando ajustes curriculares:', e);
+                    mostrarToast('❌ Error al guardar los ajustes', 'error');
+                    return false;
+                }
+            }
+
+            function mostrarToast(mensaje, tipo) {
+                toast.textContent = mensaje || '📌 Mensaje';
+                toast.style.background = tipo === 'error' ? '#dc3545' :
+                    tipo === 'success' ? '#28a745' :
+                    tipo === 'warning' ? '#ffc107' : '#1a2a4a';
+                toast.style.color = tipo === 'warning' ? '#1a2a4a' : '#ffffff';
+                toast.classList.add('visible');
+                clearTimeout(toast._timer);
+                toast._timer = setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 3000);
+            }
+
+            function getTipoClase(tipo) {
+                const map = {
+                    'ACCESO': 'acceso',
+                    'METODOLOGICO': 'metodologico',
+                    'EVALUACION': 'evaluacion',
+                    'CONTENIDOS': 'contenidos'
+                };
+                return map[tipo] || '';
+            }
+
+            function getTipoLabel(tipo) {
+                const map = {
+                    'ACCESO': 'Acceso',
+                    'METODOLOGICO': 'Metodológico',
+                    'EVALUACION': 'Evaluación',
+                    'CONTENIDOS': 'Contenidos'
+                };
+                return map[tipo] || tipo;
+            }
+
+            function getAreaLabel(area) {
+                const map = {
+                    'MATEMATICAS': 'Matemáticas',
+                    'LENGUA_ESPANOLA': 'Lengua Española',
+                    'CIENCIAS_SOCIALES': 'Ciencias Sociales',
+                    'CIENCIAS_NATURALES': 'Ciencias Naturales',
+                    'INGLES': 'Inglés',
+                    'EDUCACION_FISICA': 'Educación Física',
+                    'ARTISTICA': 'Artística',
+                    'RELIGION': 'Religión',
+                    'OTRA': 'Otra'
+                };
+                return map[area] || area;
+            }
+
+            function getNivelLabel(nivel) {
+                const map = {
+                    'NO_SIGNIFICATIVO': '🟢 No significativo',
+                    'SIGNIFICATIVO': '🟡 Significativo'
+                };
+                return map[nivel] || nivel;
+            }
+
+            function estaVigente(fechaInicio, fechaFin) {
+                const hoy = new Date();
+                const inicio = new Date(fechaInicio);
+                const fin = new Date(fechaFin);
+                return hoy >= inicio && hoy <= fin;
+            }
+
+            // ============================================
+            // 4. RENDERIZAR TABLA
+            // ============================================
+            function renderizarTabla() {
+                todosLosRegistros = obtenerRegistros();
+                const ajustesData = obtenerAjustesCurriculares();
+                const datosNEAE = obtenerDatosNEAE();
+
+                const grupoActual = obtenerGrupoActual();
+                if (grupoActual.grado) {
+                    gradoDisplay.textContent = `🎓 ${grupoActual.grado} ${grupoActual.seccion ? '- Sección ' + grupoActual.seccion : ''}`;
+                } else {
+                    gradoDisplay.textContent = '🎓 Todos los grados';
+                }
+
+                const gradoFiltro = filtroGrado.value.trim().toUpperCase();
+                const seccionFiltro = filtroSeccion.value.trim().toUpperCase();
+                const busqueda = filtroBusqueda.value.trim().toLowerCase();
+                const estadoFiltro = filtroEstado.value;
+
+                let registrosFiltrados = todosLosRegistros;
+
+                if (gradoFiltro) {
+                    registrosFiltrados = registrosFiltrados.filter(r => {
+                        const gradoReg = (r.grado || '').trim().toUpperCase();
+                        return gradoReg === gradoFiltro;
+                    });
+                }
+
+                if (seccionFiltro) {
+                    registrosFiltrados = registrosFiltrados.filter(r => {
+                        const seccionReg = (r.seccion || '').trim().toUpperCase();
+                        return seccionReg === seccionFiltro;
+                    });
+                }
+
+                if (busqueda) {
+                    const busqNorm = normalizarTexto(busqueda);
+                    registrosFiltrados = registrosFiltrados.filter(r => {
+                        const nombre = (r.nombre || '').toUpperCase();
+                        const apellido = (r.apellido || '').toUpperCase();
+                        const id = (r.id || '').toUpperCase();
+                        return nombre.includes(busqNorm) || apellido.includes(busqNorm) || id.includes(busqNorm);
+                    });
+                }
+
+                registrosFiltrados.sort((a, b) => (parseInt(a.orden) || 0) - (parseInt(b.orden) || 0));
+
+                totalDisplay.textContent = `👥 ${registrosFiltrados.length} estudiantes`;
+                contadorEstudiantes.textContent = `Mostrando ${registrosFiltrados.length}`;
+
+                tablaBody.innerHTML = '';
+
+                if (registrosFiltrados.length === 0) {
+                    tablaBody.innerHTML =
+                        `<tr><td colspan="10" class="sin-datos">📭 No hay estudiantes que coincidan con los filtros</td></tr>`;
+                    return;
+                }
+
+                registrosFiltrados.forEach((reg, index) => {
+                    const uid = reg.uid || '';
+                    const ajustesLista = ajustesData[uid] || [];
+                    const neae = datosNEAE[uid] || null;
+
+                    let mostrar = false;
+                    let ultimoAjuste = null;
+
+                    if (ajustesLista.length > 0) {
+                        ultimoAjuste = ajustesLista[ajustesLista.length - 1];
+                        mostrar = true;
+
+                        if (estadoFiltro) {
+                            if (estadoFiltro === 'ACTIVO') {
+                                mostrar = estaVigente(ultimoAjuste.fechaInicio, ultimoAjuste.fechaFin);
+                            } else if (estadoFiltro === 'VENCIDO') {
+                                mostrar = !estaVigente(ultimoAjuste.fechaInicio, ultimoAjuste.fechaFin);
+                            } else {
+                                mostrar = ultimoAjuste.estadoAprobacion === estadoFiltro;
+                            }
+                        }
+                    }
+
+                    if (!mostrar && ajustesLista.length === 0) {
+                        if (!estadoFiltro) {
+                            mostrar = true;
+                        }
+                    }
+
+                    if (!mostrar) {
+                        const tr = document.createElement('tr');
+                        tr.style.display = 'none';
+                        tablaBody.appendChild(tr);
+                        return;
+                    }
+
+                    const nombreCompleto = `${reg.nombre || ''} ${reg.apellido || ''}`.trim() || 'Sin nombre';
+
+                    let areaHTML = '-';
+                    let tipoHTML = '-';
+                    let estadoHTML = 'Sin ajustes';
+                    let estadoClase = 'pendiente';
+                    let vigenciaHTML = '-';
+                    let vigenciaClase = '';
+
+                    if (ultimoAjuste) {
+                        areaHTML = getAreaLabel(ultimoAjuste.area);
+                        const tipoClase = getTipoClase(ultimoAjuste.tipo);
+                        tipoHTML = `<span class="tipo-badge ${tipoClase}">${getTipoLabel(ultimoAjuste.tipo)}</span>`;
+
+                        const estadoAprob = ultimoAjuste.estadoAprobacion || 'PENDIENTE';
+                        const estadoMap = {
+                            'APROBADO': { texto: '✅ Aprobado', clase: 'aprobado' },
+                            'PENDIENTE': { texto: '⏳ Pendiente', clase: 'pendiente' },
+                            'RECHAZADO': { texto: '❌ Rechazado', clase: 'rechazado' }
+                        };
+                        const est = estadoMap[estadoAprob] || estadoMap['PENDIENTE'];
+                        estadoHTML = `<span class="estado-badge ${est.clase}">${est.texto}</span>`;
+
+                        const vigente = estaVigente(ultimoAjuste.fechaInicio, ultimoAjuste.fechaFin);
+                        vigenciaHTML = vigente ?
+                            '<span class="vigencia-badge activo">✅ Activo</span>' :
+                            '<span class="vigencia-badge vencido">❌ Vencido</span>';
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${esc(reg.id || '-')}</td>
+                        <td><strong>${esc(nombreCompleto)}</strong></td>
+                        <td>${esc(reg.grado || '-')}</td>
+                        <td>${esc(reg.seccion || '-')}</td>
+                        <td>${areaHTML}</td>
+                        <td>${tipoHTML}</td>
+                        <td>${estadoHTML}</td>
+                        <td>${vigenciaHTML}</td>
+                        <td><button class="btn-ver" data-uid="${uid}">📋 Ver</button></td>
+                    `;
+                    tablaBody.appendChild(tr);
+                });
+
+                document.querySelectorAll('.btn-ver').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const uid = this.getAttribute('data-uid');
+                        const estudiante = todosLosRegistros.find(r => r.uid === uid);
+                        if (estudiante) {
+                            cargarEstudiante(estudiante);
+                        }
+                    });
+                });
+            }
+
+            // ============================================
+            // 5. RENDERIZAR HISTORIAL
+            // ============================================
+            function renderizarHistorial() {
+                if (ajustes.length === 0) {
+                    historialBody.innerHTML =
+                        `<tr><td colspan="8" class="sin-ajustes">📭 No hay ajustes registrados</td></tr>`;
+                    return;
+                }
+
+                const ajustesOrdenados = [...ajustes].sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio));
+
+                let html = '';
+                ajustesOrdenados.forEach((ajuste, index) => {
+                    const vigente = estaVigente(ajuste.fechaInicio, ajuste.fechaFin);
+                    const estadoAprob = ajuste.estadoAprobacion || 'PENDIENTE';
+                    const estadoMap = {
+                        'APROBADO': { texto: 'Aprobado', clase: 'aprobado' },
+                        'PENDIENTE': { texto: 'Pendiente', clase: 'pendiente' },
+                        'RECHAZADO': { texto: 'Rechazado', clase: 'rechazado' }
+                    };
+                    const est = estadoMap[estadoAprob] || estadoMap['PENDIENTE'];
+
+                    html += `
+                        <tr>
+                            <td>${esc(ajuste.fechaInicio)}</td>
+                            <td>${esc(ajuste.fechaFin)}</td>
+                            <td>${getAreaLabel(ajuste.area)}</td>
+                            <td><span class="tipo-badge ${getTipoClase(ajuste.tipo)}">${getTipoLabel(ajuste.tipo)}</span></td>
+                            <td>${esc(ajuste.descripcion)}</td>
+                            <td><span class="estado-ajuste-badge ${est.clase}">${est.texto}</span></td>
+                            <td><span class="vigencia-badge ${vigente ? 'activo' : 'vencido'}">${vigente ? '✅ Activo' : '❌ Vencido'}</span></td>
+                            <td>
+                                <button class="btn-editar-ajuste" data-index="${index}">✏️</button>
+                                <button class="btn-eliminar-ajuste" data-index="${index}">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                historialBody.innerHTML = html;
+
+                document.querySelectorAll('.btn-eliminar-ajuste').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        if (!isNaN(index) && confirm('¿Eliminar este ajuste del historial?')) {
+                            ajustes.splice(index, 1);
+                            renderizarHistorial();
+                            mostrarToast('🗑️ Ajuste eliminado', 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.btn-editar-ajuste').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        if (!isNaN(index) && index < ajustes.length) {
+                            editarAjuste(index);
+                        }
+                    });
+                });
+            }
+
+            // ============================================
+            // 6. EDITAR AJUSTE
+            // ============================================
+            function editarAjuste(index) {
+                const ajuste = ajustes[index];
+                if (!ajuste) return;
+
+                ajusteEditando = index;
+                areaCurricular.value = ajuste.area || '';
+                tipoAjuste.value = ajuste.tipo || '';
+                descripcionAjuste.value = ajuste.descripcion || '';
+                nivelAjuste.value = ajuste.nivel || '';
+                estadoAprobacion.value = ajuste.estadoAprobacion || 'PENDIENTE';
+                aprobadoPor.value = ajuste.aprobadoPor || '';
+                fechaInicio.value = ajuste.fechaInicio || '';
+                fechaFin.value = ajuste.fechaFin || '';
+                observaciones.value = ajuste.observaciones || '';
+                efectividad.value = ajuste.efectividad || '';
+
+                btnGuardar.style.display = 'none';
+                btnActualizarForm.style.display = 'inline-block';
+                btnCancelar.style.display = 'inline-block';
+                btnLimpiar.style.display = 'none';
+                btnVolver.style.display = 'inline-block';
+
+                badgeEstado.textContent = '✏️ Editando Ajuste';
+                badgeEstado.className = 'badge-estado editando';
+
+                mostrarToast('✏️ Editando ajuste curricular', 'warning');
+                formularioContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // ============================================
+            // 7. CARGAR ESTUDIANTE
+            // ============================================
+            function cargarEstudiante(estudiante) {
+                estudianteSeleccionado = estudiante;
+                const uid = estudiante.uid || '';
+                const ajustesData = obtenerAjustesCurriculares();
+                const datosNEAE = obtenerDatosNEAE();
+                const neae = datosNEAE[uid] || null;
+
+                estudianteId.value = estudiante.id || '';
+                estudianteNombre.value = estudiante.nombre || '';
+                estudianteApellido.value = estudiante.apellido || '';
+                estudianteGrado.value = estudiante.grado || '';
+                estudianteSeccion.value = estudiante.seccion || '';
+                estudianteTanda.value = estudiante.tanda || '';
+
+                if (neae) {
+                    const categorias = [];
+                    if (neae.discapacidades && neae.discapacidades.length > 0) {
+                        categorias.push(...neae.discapacidades);
+                    }
+                    if (neae.trastornos && neae.trastornos.length > 0) {
+                        categorias.push(...neae.trastornos);
+                    }
+                    diagnosticoNEAE.value = categorias.length > 0 ? categorias.join(', ') : 'Sin diagnóstico';
+                    nivelApoyoNEAE.value = neae.nivelApoyo || 'No registrado';
+                } else {
+                    diagnosticoNEAE.value = 'Sin diagnóstico NEAE registrado';
+                    nivelApoyoNEAE.value = 'No registrado';
+                }
+
+                infoEstudiante.textContent = `Estudiante: ${estudiante.nombre || ''} ${estudiante.apellido || ''}`;
+
+                ajustes = ajustesData[uid] || [];
+                renderizarHistorial();
+
+                modoEdicion = false;
+                uidEdicion = uid;
+                ajusteEditando = null;
+
+                badgeEstado.textContent = '📌 Nuevo Ajuste';
+                badgeEstado.className = 'badge-estado nuevo';
+
+                areaCurricular.value = '';
+                tipoAjuste.value = '';
+                descripcionAjuste.value = '';
+                nivelAjuste.value = '';
+                estadoAprobacion.value = 'PENDIENTE';
+                aprobadoPor.value = '';
+                fechaInicio.value = '';
+                fechaFin.value = '';
+                observaciones.value = '';
+                efectividad.value = '';
+
+                btnGuardar.style.display = 'inline-block';
+                btnActualizarForm.style.display = 'none';
+                btnCancelar.style.display = 'none';
+                btnLimpiar.style.display = 'inline-block';
+                btnVolver.style.display = 'inline-block';
+
+                formularioContainer.classList.add('visible');
+                formularioContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                mostrarToast(`📋 Estudiante cargado: ${estudiante.nombre} ${estudiante.apellido}`, 'success');
+            }
+
+            // ============================================
+            // 8. LIMPIAR FORMULARIO
+            // ============================================
+            function limpiarFormulario() {
+                areaCurricular.value = '';
+                tipoAjuste.value = '';
+                descripcionAjuste.value = '';
+                nivelAjuste.value = '';
+                estadoAprobacion.value = 'PENDIENTE';
+                aprobadoPor.value = '';
+                fechaInicio.value = '';
+                fechaFin.value = '';
+                observaciones.value = '';
+                efectividad.value = '';
+
+                estudianteId.value = '';
+                estudianteNombre.value = '';
+                estudianteApellido.value = '';
+                estudianteGrado.value = '';
+                estudianteSeccion.value = '';
+                estudianteTanda.value = '';
+                diagnosticoNEAE.value = '';
+                nivelApoyoNEAE.value = '';
+                infoEstudiante.textContent = 'Estudiante: --';
+
+                ajustes = [];
+                renderizarHistorial();
+
+                modoEdicion = false;
+                uidEdicion = null;
+                estudianteSeleccionado = null;
+                ajusteEditando = null;
+
+                badgeEstado.textContent = '📌 Nuevo';
+                badgeEstado.className = 'badge-estado nuevo';
+
+                btnGuardar.style.display = 'inline-block';
+                btnActualizarForm.style.display = 'none';
+                btnCancelar.style.display = 'none';
+                btnLimpiar.style.display = 'inline-block';
+                btnVolver.style.display = 'none';
+            }
+
+            // ============================================
+            // 9. VALIDAR FORMULARIO
+            // ============================================
+            function validarFormulario() {
+                if (!estudianteSeleccionado) {
+                    mostrarToast('❌ No hay un estudiante seleccionado.', 'error');
+                    return false;
+                }
+
+                const camposRequeridos = [
+                    { campo: areaCurricular, nombre: 'Área curricular' },
+                    { campo: tipoAjuste, nombre: 'Tipo de ajuste' },
+                    { campo: descripcionAjuste, nombre: 'Descripción del ajuste' },
+                    { campo: nivelAjuste, nombre: 'Nivel de ajuste' },
+                    { campo: fechaInicio, nombre: 'Fecha de inicio' },
+                    { campo: fechaFin, nombre: 'Fecha de fin' }
+                ];
+
+                for (const item of camposRequeridos) {
+                    if (!item.campo.value || item.campo.value === '') {
+                        mostrarToast(`❌ El campo "${item.nombre}" es obligatorio.`, 'error');
+                        item.campo.focus();
+                        return false;
+                    }
+                }
+
+                const inicio = new Date(fechaInicio.value);
+                const fin = new Date(fechaFin.value);
+                if (fin < inicio) {
+                    mostrarToast('❌ La fecha de fin no puede ser anterior a la fecha de inicio.', 'error');
+                    fechaFin.focus();
+                    return false;
+                }
+
+                return true;
+            }
+
+            // ============================================
+            // 10. GUARDAR AJUSTE
+            // ============================================
+            function guardarAjuste() {
+                if (!validarFormulario()) return;
+
+                const uid = estudianteSeleccionado.uid || generarUID();
+                const ajustesData = obtenerAjustesCurriculares();
+
+                const nuevoAjuste = {
+                    id: generarUID(),
+                    area: areaCurricular.value,
+                    tipo: tipoAjuste.value,
+                    descripcion: descripcionAjuste.value,
+                    nivel: nivelAjuste.value,
+                    estadoAprobacion: estadoAprobacion.value,
+                    aprobadoPor: aprobadoPor.value,
+                    fechaInicio: fechaInicio.value,
+                    fechaFin: fechaFin.value,
+                    observaciones: observaciones.value,
+                    efectividad: efectividad.value,
+                    fechaRegistro: new Date().toISOString()
+                };
+
+                let ajustesLista = ajustesData[uid] || [];
+                ajustesLista.push(nuevoAjuste);
+                ajustesData[uid] = ajustesLista;
+
+                if (guardarAjustesCurriculares(ajustesData)) {
+                    mostrarToast('✅ Ajuste curricular guardado exitosamente.', 'success');
+                    renderizarTabla();
+                    ajustes = ajustesLista;
+                    renderizarHistorial();
+                    areaCurricular.value = '';
+                    tipoAjuste.value = '';
+                    descripcionAjuste.value = '';
+                    nivelAjuste.value = '';
+                    estadoAprobacion.value = 'PENDIENTE';
+                    aprobadoPor.value = '';
+                    fechaInicio.value = '';
+                    fechaFin.value = '';
+                    observaciones.value = '';
+                    efectividad.value = '';
+                    badgeEstado.textContent = '📌 Nuevo Ajuste';
+                    badgeEstado.className = 'badge-estado nuevo';
+                    btnGuardar.style.display = 'inline-block';
+                    btnActualizarForm.style.display = 'none';
+                    btnCancelar.style.display = 'none';
+                    btnLimpiar.style.display = 'inline-block';
+                    mostrarToast('✅ Ajuste guardado. Puedes registrar otro.', 'success');
+                }
+            }
+
+            // ============================================
+            // 11. ACTUALIZAR AJUSTE
+            // ============================================
+            function actualizarAjuste() {
+                if (!validarFormulario()) return;
+                if (ajusteEditando === null || ajusteEditando === undefined) {
+                    mostrarToast('❌ No hay ajuste seleccionado para actualizar.', 'error');
+                    return;
+                }
+
+                const uid = uidEdicion;
+                const ajustesData = obtenerAjustesCurriculares();
+                let ajustesLista = ajustesData[uid] || [];
+
+                if (ajusteEditando >= ajustesLista.length) {
+                    mostrarToast('❌ El ajuste no existe.', 'error');
+                    return;
+                }
+
+                ajustesLista[ajusteEditando] = {
+                    ...ajustesLista[ajusteEditando],
+                    area: areaCurricular.value,
+                    tipo: tipoAjuste.value,
+                    descripcion: descripcionAjuste.value,
+                    nivel: nivelAjuste.value,
+                    estadoAprobacion: estadoAprobacion.value,
+                    aprobadoPor: aprobadoPor.value,
+                    fechaInicio: fechaInicio.value,
+                    fechaFin: fechaFin.value,
+                    observaciones: observaciones.value,
+                    efectividad: efectividad.value,
+                    fechaActualizacion: new Date().toISOString()
+                };
+
+                ajustesData[uid] = ajustesLista;
+                if (guardarAjustesCurriculares(ajustesData)) {
+                    mostrarToast('✅ Ajuste curricular actualizado exitosamente.', 'success');
+                    renderizarTabla();
+                    ajustes = ajustesLista;
+                    renderizarHistorial();
+                    ajusteEditando = null;
+                    areaCurricular.value = '';
+                    tipoAjuste.value = '';
+                    descripcionAjuste.value = '';
+                    nivelAjuste.value = '';
+                    estadoAprobacion.value = 'PENDIENTE';
+                    aprobadoPor.value = '';
+                    fechaInicio.value = '';
+                    fechaFin.value = '';
+                    observaciones.value = '';
+                    efectividad.value = '';
+                    badgeEstado.textContent = '📌 Nuevo Ajuste';
+                    badgeEstado.className = 'badge-estado nuevo';
+                    btnGuardar.style.display = 'inline-block';
+                    btnActualizarForm.style.display = 'none';
+                    btnCancelar.style.display = 'none';
+                    btnLimpiar.style.display = 'inline-block';
+                }
+            }
+
+            // ============================================
+            // 12. EVENTOS
+            // ============================================
+
+            btnActualizar.addEventListener('click', renderizarTabla);
+
+            btnNuevo.addEventListener('click', function() {
+                limpiarFormulario();
+                formularioContainer.classList.remove('visible');
+                const primeraFila = tablaBody.querySelector('tr:not(.sin-datos):not([style*="display: none"])');
+                if (primeraFila) {
+                    const btnVer = primeraFila.querySelector('.btn-ver');
+                    if (btnVer) btnVer.click();
+                } else {
+                    mostrarToast('⚠️ No hay estudiantes registrados. Primero agrega un estudiante.', 'warning');
+                }
+            });
+
+            btnGuardar.addEventListener('click', guardarAjuste);
+            btnActualizarForm.addEventListener('click', actualizarAjuste);
+            btnCancelar.addEventListener('click', function() {
+                ajusteEditando = null;
+                areaCurricular.value = '';
+                tipoAjuste.value = '';
+                descripcionAjuste.value = '';
+                nivelAjuste.value = '';
+                estadoAprobacion.value = 'PENDIENTE';
+                aprobadoPor.value = '';
+                fechaInicio.value = '';
+                fechaFin.value = '';
+                observaciones.value = '';
+                efectividad.value = '';
+                badgeEstado.textContent = '📌 Nuevo Ajuste';
+                badgeEstado.className = 'badge-estado nuevo';
+                btnGuardar.style.display = 'inline-block';
+                btnActualizarForm.style.display = 'none';
+                btnCancelar.style.display = 'none';
+                btnLimpiar.style.display = 'inline-block';
+                mostrarToast('↩️ Edición cancelada', 'warning');
+            });
+            btnLimpiar.addEventListener('click', function() {
+                if (confirm('¿Limpiar todos los campos del formulario?')) {
+                    areaCurricular.value = '';
+                    tipoAjuste.value = '';
+                    descripcionAjuste.value = '';
+                    nivelAjuste.value = '';
+                    estadoAprobacion.value = 'PENDIENTE';
+                    aprobadoPor.value = '';
+                    fechaInicio.value = '';
+                    fechaFin.value = '';
+                    observaciones.value = '';
+                    efectividad.value = '';
+                    ajusteEditando = null;
+                    badgeEstado.textContent = '📌 Nuevo Ajuste';
+                    badgeEstado.className = 'badge-estado nuevo';
+                    btnGuardar.style.display = 'inline-block';
+                    btnActualizarForm.style.display = 'none';
+                    btnCancelar.style.display = 'none';
+                    btnLimpiar.style.display = 'inline-block';
+                    mostrarToast('🧹 Formulario limpiado', 'warning');
+                }
+            });
+            btnVolver.addEventListener('click', function() {
+                limpiarFormulario();
+                formularioContainer.classList.remove('visible');
+                mostrarToast('↩️ Volviendo a la lista', 'info');
+            });
+
+            filtroBusqueda.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') renderizarTabla();
+            });
+
+            filtroGrado.addEventListener('change', renderizarTabla);
+            filtroSeccion.addEventListener('change', renderizarTabla);
+            filtroEstado.addEventListener('change', renderizarTabla);
+
+            document.addEventListener('formulariosActualizado', function() {
+                renderizarTabla();
+            });
+
+            // ============================================
+            // 13. INICIALIZAR
+            // ============================================
+            function inicializar() {
+                // 1. Obtener el grupo actual del docente
+                const grupoActual = obtenerGrupoActual();
+                
+                // 2. Pre-seleccionar el grado del docente en el filtro si existe
+                if (grupoActual && grupoActual.grado) {
+                    const gradoNormalizado = normalizarGradoParaFiltro(grupoActual.grado);
+                    const optionExiste = Array.from(filtroGrado.options).some(opt => opt.value === gradoNormalizado);
+                    if (optionExiste) {
+                        filtroGrado.value = gradoNormalizado;
+                    }
+                }
+
+                // 3. Pre-seleccionar la sección del docente en el filtro si existe
+                if (grupoActual && grupoActual.seccion) {
+                    const seccionNormalizada = grupoActual.seccion.toUpperCase().trim();
+                    const optionExisteSec = Array.from(filtroSeccion.options).some(opt => opt.value === seccionNormalizada);
+                    if (optionExisteSec) {
+                        filtroSeccion.value = seccionNormalizada;
+                    }
+                }
+
+                // 4. Renderizar la tabla (ahora usará los filtros pre-seleccionados)
+                renderizarTabla();
+                limpiarFormulario();
+                formularioContainer.classList.remove('visible');
+                console.log('✅ AJUSTES-CURRICULARES.html cargado correctamente');
+                console.log('🎯 Gestión de ajustes curriculares');
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', inicializar);
+            } else {
+                inicializar();
+            }
+
+            window.actualizarAjustesCurriculares = renderizarTabla;
+
+        })();
+    </script>
+
+</body>
+</html>
