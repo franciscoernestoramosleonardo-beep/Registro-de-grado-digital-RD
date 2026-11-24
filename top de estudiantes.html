@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Top de Estudiantes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ============================================
+           ESTILOS GLOBALES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            border-radius: 24px;
+            padding: 28px 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 40px rgba(26, 42, 74, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-left h1 span {
+            background: rgba(255, 215, 0, 0.2);
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #FFD700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .header-left p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-right .badge-grupo {
+            background: rgba(255,255,255,0.12);
+            padding: 6px 18px;
+            border-radius: 60px;
+            color: #FFD700;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+
+        .btn-actualizar {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-actualizar:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           ESTADÍSTICAS RÁPIDAS
+           ============================================ */
+        .stats-top {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .icono {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card .icono.oro { background: #fef9e7; color: #b7950b; }
+        .stat-card .icono.plata { background: #e8f0f8; color: #4a6a8a; }
+        .stat-card .icono.bronce { background: #fdebd0; color: #b9770e; }
+        .stat-card .icono.azul { background: #e8f0fe; color: #1a4a7a; }
+
+        .stat-card .info .numero {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a2a4a;
+            line-height: 1.2;
+        }
+
+        .stat-card .info .label {
+            font-size: 0.6rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================
+           FILTROS Y BÚSQUEDA
+           ============================================ */
+        .filtros-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .filtros-container label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filtros-container select,
+        .filtros-container input {
+            padding: 6px 14px;
+            border-radius: 60px;
+            border: 1.5px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            background: #f7fafc;
+            outline: none;
+            min-width: 130px;
+        }
+
+        .filtros-container select:focus,
+        .filtros-container input:focus {
+            border-color: #1a3a6b;
+            box-shadow: 0 0 0 3px rgba(26,58,107,0.1);
+        }
+
+        .btn-filtro {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-filtro.primario {
+            background: #1a3a6b;
+            color: white;
+        }
+
+        .btn-filtro.primario:hover {
+            background: #0f2a4f;
+            transform: translateY(-2px);
+        }
+
+        .btn-filtro.secundario {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .btn-filtro.secundario:hover {
+            background: #d0d8e0;
+        }
+
+        /* ============================================
+           TABLA DE ESTUDIANTES
+           ============================================ */
+        .tabla-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.5);
+            overflow: hidden;
+        }
+
+        .tabla-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tabla-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tabla-header h2 .badge {
+            background: #1a3a6b;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 12px;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+
+        .tabla-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #eef2f6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead {
+            background: #1a2a4a;
+            color: white;
+        }
+
+        thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        thead th .sort-icon {
+            margin-left: 4px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        thead th .sort-icon:hover {
+            opacity: 1;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eef2f6;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fc;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 10px 16px;
+            color: #1a2a4a;
+            vertical-align: middle;
+        }
+
+        /* ============================================
+           MEDALLAS Y DESTACADOS
+           ============================================ */
+        .medalla {
+            font-size: 1.2rem;
+            width: 32px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .medalla.oro { color: #f1c40f; }
+        .medalla.plata { color: #bdc3c7; }
+        .medalla.bronce { color: #e67e22; }
+
+        .posicion-numero {
+            font-weight: 700;
+            color: #6a8a9e;
+            font-size: 0.8rem;
+            width: 30px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .promedio-badge {
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .promedio-badge.excelente {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .promedio-badge.bueno {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .promedio-badge.regular {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .promedio-badge.riesgo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .promedio-badge.sin-notas {
+            background: #e8eef4;
+            color: #6a8a9e;
+        }
+
+        .nombre-estudiante {
+            font-weight: 600;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nombre-estudiante .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar.verde { background: #27ae60; }
+        .avatar.azul { background: #2980b9; }
+        .avatar.rosa { background: #e74c8b; }
+        .avatar.naranja { background: #e67e22; }
+        .avatar.morado { background: #8e44ad; }
+        .avatar.rojo { background: #c0392b; }
+        .avatar.gris { background: #7f8c8d; }
+
+        .estado-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+
+        .estado-badge.aprobado {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .estado-badge.riesgo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .estado-badge.incompleto {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .estado-badge.sin-notas {
+            background: #e8eef4;
+            color: #6a8a9e;
+        }
+
+        /* ============================================
+           ROW DESTACADOS (TOP 3)
+           ============================================ */
+        tbody tr.top-1 {
+            background: linear-gradient(90deg, #fef9e7, #ffffff);
+            border-left: 4px solid #f1c40f;
+        }
+
+        tbody tr.top-2 {
+            background: linear-gradient(90deg, #f0f4f8, #ffffff);
+            border-left: 4px solid #bdc3c7;
+        }
+
+        tbody tr.top-3 {
+            background: linear-gradient(90deg, #fdebd0, #ffffff);
+            border-left: 4px solid #e67e22;
+        }
+
+        tbody tr.top-1:hover,
+        tbody tr.top-2:hover,
+        tbody tr.top-3:hover {
+            filter: brightness(0.97);
+        }
+
+        /* ============================================
+           MENSAJE VACÍO
+           ============================================ */
+        .mensaje-vacio {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+
+        .mensaje-vacio .icono {
+            font-size: 4rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .mensaje-vacio h3 {
+            font-size: 1.2rem;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .mensaje-vacio p {
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+           TOAST
+           ============================================ */
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 99999;
+            font-weight: 500;
+            max-width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .toast-mensaje.ocultar {
+            animation: fadeOutDown 0.3s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes fadeOutDown {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left h1 {
+                font-size: 1.4rem;
+            }
+            .stats-top {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .filtros-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filtros-container select,
+            .filtros-container input {
+                width: 100%;
+            }
+            .tabla-container {
+                padding: 16px;
+            }
+            thead th, tbody td {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
+            .nombre-estudiante .avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-top {
+                grid-template-columns: 1fr;
+            }
+            .header-left h1 {
+                font-size: 1.1rem;
+            }
+            .tabla-wrapper {
+                overflow-x: auto;
+            }
+            table {
+                font-size: 0.65rem;
+                min-width: 600px;
+            }
+            thead th, tbody td {
+                padding: 6px 8px;
+            }
+            .promedio-badge {
+                font-size: 0.6rem;
+                padding: 2px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <h1>
+                    🏆 Top de Estudiantes
+                    <span id="badgeCantidad">Cargando...</span>
+                </h1>
+                <p><i class="fas fa-star" style="color:#FFD700;"></i> Ranking de rendimiento académico</p>
+            </div>
+            <div class="header-right">
+                <span class="badge-grupo" id="badgeGrupo">📚 Cargando...</span>
+                <button class="btn-actualizar" onclick="actualizarTop()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== ESTADÍSTICAS ===== -->
+        <div class="stats-top">
+            <div class="stat-card">
+                <div class="icono oro">🏆</div>
+                <div class="info">
+                    <div class="numero" id="totalEstudiantes">0</div>
+                    <div class="label">Total Estudiantes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono plata">📊</div>
+                <div class="info">
+                    <div class="numero" id="promedioGeneral">--</div>
+                    <div class="label">Promedio General</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono bronce">🎓</div>
+                <div class="info">
+                    <div class="numero" id="aprobados">0</div>
+                    <div class="label">Aprobados</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono azul">⚠️</div>
+                <div class="info">
+                    <div class="numero" id="enRiesgo">0</div>
+                    <div class="label">En Riesgo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FILTROS ===== -->
+        <div class="filtros-container">
+            <label>
+                <i class="fas fa-search"></i> Buscar:
+                <input type="text" id="buscarInput" placeholder="Nombre del estudiante..." oninput="filtrarTabla()">
+            </label>
+            <label>
+                <i class="fas fa-filter"></i> Estado:
+                <select id="filtroEstado" onchange="filtrarTabla()">
+                    <option value="todos">📋 Todos</option>
+                    <option value="aprobado">✅ Aprobados</option>
+                    <option value="riesgo">⚠️ En Riesgo</option>
+                    <option value="incompleto">📋 Incompletos</option>
+                    <option value="sin-notas">📭 Sin Notas</option>
+                </select>
+            </label>
+            <label>
+                <i class="fas fa-sort"></i> Ordenar por:
+                <select id="ordenarPor" onchange="ordenarTabla()">
+                    <option value="promedio">📊 Promedio (↓)</option>
+                    <option value="promedio-asc">📊 Promedio (↑)</option>
+                    <option value="nombre">🔤 Nombre (A-Z)</option>
+                    <option value="nombre-desc">🔤 Nombre (Z-A)</option>
+                </select>
+            </label>
+            <button class="btn-filtro secundario" onclick="limpiarFiltros()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+        </div>
+
+        <!-- ===== TABLA ===== -->
+        <div class="tabla-container">
+            <div class="tabla-header">
+                <h2>
+                    📋 Ranking de Estudiantes
+                    <span class="badge" id="contadorRanking">0</span>
+                </h2>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <span style="font-size:0.65rem;color:#6a8a9e;">
+                        🥇 Oro · 🥈 Plata · 🥉 Bronce
+                    </span>
+                </div>
+            </div>
+
+            <div class="tabla-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">#</th>
+                            <th style="width:40px;"></th>
+                            <th style="min-width:160px;">Estudiante</th>
+                            <th style="min-width:100px;">Grado</th>
+                            <th style="min-width:80px;">Sección</th>
+                            <th style="min-width:70px;text-align:center;">Promedio</th>
+                            <th style="min-width:90px;text-align:center;">Estado</th>
+                            <th style="min-width:70px;text-align:center;">Materias</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr>
+                            <td colspan="8">
+                                <div class="mensaje-vacio">
+                                    <div class="icono">⏳</div>
+                                    <h3>Cargando estudiantes...</h3>
+                                    <p>Espera un momento mientras se cargan los datos.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-mensaje" id="toastMensaje"></div>
+
+    <!-- ============================================
+    SCRIPT
+    ============================================ -->
+    <script>
+        /**
+         * 🏆 TOP DE ESTUDIANTES
+         * Muestra todos los estudiantes ordenados de mayor a menor calificación
+         */
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let estudiantesData = [];
+        let estudiantesFiltrados = [];
+        let currentGrade = 3;
+        let currentSeccion = 'A';
+        let currentTanda = 'Matutina';
+        let currentSchoolYear = '2025-2026';
+        let calificacionesData = {};
+        let toastTimeout = null;
+
+        // ============================================
+        // FUNCIONES DE OBTENCIÓN DE DATOS
+        // ============================================
+
+        function obtenerGradoDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('grado')) return decodeURIComponent(urlParams.get('grado'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.grado) return datos.grado;
+                    }
+                }
+                return 'Tercer Grado';
+            } catch (e) { return 'Tercer Grado'; }
+        }
+
+        function obtenerSeccionDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('seccion')) return decodeURIComponent(urlParams.get('seccion'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.seccion) return datos.seccion;
+                    }
+                }
+                return 'A';
+            } catch (e) { return 'A'; }
+        }
+
+        function obtenerTandaDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('tanda')) return decodeURIComponent(urlParams.get('tanda'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.tanda) return datos.tanda;
+                    }
+                }
+                return 'Matutina';
+            } catch (e) { return 'Matutina'; }
+        }
+
+        function obtenerGrupoActual() {
+            return {
+                grado: (obtenerGradoDesdePortada() || 'Tercer Grado').trim(),
+                seccion: (obtenerSeccionDesdePortada() || 'A').trim(),
+                tanda: (obtenerTandaDesdePortada() || 'Matutina').trim()
+            };
+        }
+
+        function convertirGradoANumero(gradoTexto) {
+            const mapa = {
+                'Primer Grado': 1, 'Segundo Grado': 2, 'Tercer Grado': 3,
+                'Cuarto Grado': 4, 'Quinto Grado': 5, 'Sexto Grado': 6,
+                '1ER GRADO': 1, '2DO GRADO': 2, '3ER GRADO': 3,
+                '4TO GRADO': 4, '5TO GRADO': 5, '6TO GRADO': 6,
+                '1er Grado': 1, '2do Grado': 2, '3er Grado': 3,
+                '4to Grado': 4, '5to Grado': 5, '6to Grado': 6,
+                '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6
+            };
+            const normalizado = String(gradoTexto).toUpperCase().trim();
+            return mapa[normalizado] || mapa[gradoTexto] || 3;
+        }
+
+        function getGradeText(grade) {
+            const textos = { 1: '1er', 2: '2do', 3: '3er', 4: '4to', 5: '5to', 6: '6to' };
+            return textos[grade] || '3er';
+        }
+
+        function getCurrentSchoolYear() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const beforeAugustFirst = (now.getMonth() < 7) || (now.getMonth() === 7 && now.getDate() < 1);
+            return beforeAugustFirst ? `${year - 1}-${year}` : `${year}-${year + 1}`;
+        }
+
+        function getStorageKeyRegistro() {
+            const gradeText = getGradeText(currentGrade);
+            return `registro_${gradeText}_sec${currentSeccion}_v25`;
+        }
+
+        // ============================================
+        // CARGAR DATOS
+        // ============================================
+
+        function cargarCalificaciones() {
+            try {
+                const storageKey = getStorageKeyRegistro();
+                const saved = localStorage.getItem(storageKey);
+                if (!saved) {
+                    calificacionesData = {};
+                    return {};
+                }
+                calificacionesData = JSON.parse(saved);
+                return calificacionesData;
+            } catch (e) {
+                calificacionesData = {};
+                return {};
+            }
+        }
+
+        function obtenerEstudiantesDesdeSigerd() {
+            try {
+                const stored = localStorage.getItem('registrosSigerd');
+                if (!stored) return [];
+
+                const registros = JSON.parse(stored);
+                if (!Array.isArray(registros) || registros.length === 0) return [];
+
+                const grupo = obtenerGrupoActual();
+                const gradoActual = grupo.grado.toUpperCase().trim();
+                const seccionActual = grupo.seccion.toUpperCase().trim();
+                const tandaActual = grupo.tanda.toUpperCase().trim();
+
+                const filtrados = registros.filter(r => {
+                    const gradoRegistro = (r.grado || '').toUpperCase().trim();
+                    const seccionRegistro = (r.seccion || '').toUpperCase().trim();
+                    const tandaRegistro = (r.tanda || '').toUpperCase().trim();
+                    if (!gradoRegistro) return false;
+                    return gradoRegistro === gradoActual &&
+                           seccionRegistro === seccionActual &&
+                           tandaRegistro === tandaActual;
+                });
+
+                filtrados.sort((a, b) => parseInt(a.orden) - parseInt(b.orden));
+                return filtrados;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // ============================================
+        // CALCULAR PROMEDIO
+        // ============================================
+
+        function calcularPromedioEstudiante(orden) {
+            const totalMaterias = (currentGrade >= 4) ? 8 : 7;
+            const prefix = `g${currentGrade}s${currentSeccion}`;
+            let sumaNotas = 0;
+            let materiasConNota = 0;
+
+            for (let m = 1; m <= totalMaterias; m++) {
+                const finalKey = `${prefix}m${m}r${orden}final`;
+                const nota = calificacionesData[finalKey];
+                if (nota !== undefined && nota !== '' && nota !== null) {
+                    const notaNum = parseFloat(nota);
+                    if (!isNaN(notaNum) && notaNum >= 0 && notaNum <= 100) {
+                        sumaNotas += notaNum;
+                        materiasConNota++;
+                    }
+                }
+            }
+
+            if (materiasConNota === 0) {
+                return { promedio: null, completas: false, materiasConNota: 0, totalMaterias: totalMaterias };
+            }
+
+            const promedio = Math.round(sumaNotas / materiasConNota);
+            const completas = materiasConNota === totalMaterias;
+
+            return { promedio, completas, materiasConNota, totalMaterias };
+        }
+
+        // ============================================
+        // FUNCIÓN PRINCIPAL
+        // ============================================
+
+        function cargarTopEstudiantes() {
+            const grupo = obtenerGrupoActual();
+            currentGrade = convertirGradoANumero(grupo.grado);
+            currentSeccion = grupo.seccion;
+            currentTanda = grupo.tanda;
+            currentSchoolYear = getCurrentSchoolYear();
+
+            // Actualizar badge
+            document.getElementById('badgeGrupo').textContent = `📚 ${grupo.grado} - Sección ${grupo.seccion} - ${grupo.tanda}`;
+
+            const estudiantes = obtenerEstudiantesDesdeSigerd();
+            cargarCalificaciones();
+
+            if (estudiantes.length === 0) {
+                document.getElementById('tablaBody').innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="mensaje-vacio">
+                                <div class="icono">📭</div>
+                                <h3>No hay estudiantes registrados</h3>
+                                <p>Registra estudiantes en el Formulario para verlos aquí.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                actualizarEstadisticas([]);
+                return;
+            }
+
+            const estudiantesConNotas = estudiantes.map((est, index) => {
+                const orden = index + 1;
+                const nombre = `${est.nombre || ''} ${est.apellido || ''}`.trim() || `Estudiante #${orden}`;
+                const resultado = calcularPromedioEstudiante(orden);
+
+                let estado = 'sin-notas';
+                let estadoTexto = '📭 Sin Notas';
+                let estadoClase = 'sin-notas';
+
+                if (resultado.completas && resultado.promedio !== null) {
+                    if (resultado.promedio >= 65) {
+                        estado = 'aprobado';
+                        estadoTexto = '✅ Aprobado';
+                        estadoClase = 'aprobado';
+                    } else {
+                        estado = 'riesgo';
+                        estadoTexto = '⚠️ En Riesgo';
+                        estadoClase = 'riesgo';
+                    }
+                } else if (resultado.materiasConNota > 0) {
+                    estado = 'incompleto';
+                    estadoTexto = '📋 Incompleto';
+                    estadoClase = 'incompleto';
+                }
+
+                // Color del avatar
+                const colores = ['verde', 'azul', 'rosa', 'naranja', 'morado', 'rojo', 'gris'];
+                const colorAvatar = colores[orden % colores.length];
+
+                return {
+                    orden: orden,
+                    nombre: nombre,
+                    grado: est.grado || grupo.grado,
+                    seccion: est.seccion || grupo.seccion,
+                    promedio: resultado.promedio,
+                    completas: resultado.completas,
+                    materiasConNota: resultado.materiasConNota,
+                    totalMaterias: resultado.totalMaterias,
+                    estado: estado,
+                    estadoTexto: estadoTexto,
+                    estadoClase: estadoClase,
+                    colorAvatar: colorAvatar,
+                    _original: est
+                };
+            });
+
+            // Ordenar por promedio (mayor a menor)
+            estudiantesConNotas.sort((a, b) => {
+                if (a.promedio === null && b.promedio === null) return 0;
+                if (a.promedio === null) return 1;
+                if (b.promedio === null) return -1;
+                return b.promedio - a.promedio;
+            });
+
+            estudiantesData = estudiantesConNotas;
+            estudiantesFiltrados = [...estudiantesData];
+
+            renderizarTabla(estudiantesFiltrados);
+            actualizarEstadisticas(estudiantesFiltrados);
+            document.getElementById('badgeCantidad').textContent = `🎯 ${estudiantesFiltrados.length} estudiantes`;
+            document.getElementById('contadorRanking').textContent = estudiantesFiltrados.length;
+
+            mostrarToast(`✅ ${estudiantesFiltrados.length} estudiantes cargados`);
+        }
+
+        // ============================================
+        // RENDERIZAR TABLA
+        // ============================================
+
+        function renderizarTabla(estudiantes) {
+            const tbody = document.getElementById('tablaBody');
+
+            if (estudiantes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="mensaje-vacio">
+                                <div class="icono">🔍</div>
+                                <h3>No hay resultados</h3>
+                                <p>Intenta con otros filtros de búsqueda.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            estudiantes.forEach((est, index) => {
+                const posicion = index + 1;
+
+                // Determinar medalla
+                let medalla = '';
+                let rowClass = '';
+                if (posicion === 1 && est.promedio !== null) {
+                    medalla = '<span class="medalla oro">🥇</span>';
+                    rowClass = 'top-1';
+                } else if (posicion === 2 && est.promedio !== null) {
+                    medalla = '<span class="medalla plata">🥈</span>';
+                    rowClass = 'top-2';
+                } else if (posicion === 3 && est.promedio !== null) {
+                    medalla = '<span class="medalla bronce">🥉</span>';
+                    rowClass = 'top-3';
+                } else {
+                    medalla = `<span class="posicion-numero">${posicion}</span>`;
+                }
+
+                // Clase del promedio
+                let promedioClase = 'sin-notas';
+                if (est.promedio !== null) {
+                    if (est.promedio >= 90) promedioClase = 'excelente';
+                    else if (est.promedio >= 75) promedioClase = 'bueno';
+                    else if (est.promedio >= 65) promedioClase = 'regular';
+                    else promedioClase = 'riesgo';
+                }
+
+                const iniciales = est.nombre.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+
+                const materiasTexto = est.completas ?
+                    `${est.totalMaterias}/${est.totalMaterias}` :
+                    `${est.materiasConNota}/${est.totalMaterias}`;
+
+                html += `
+                    <tr class="${rowClass}">
+                        <td style="text-align:center;">${medalla}</td>
+                        <td style="text-align:center;">${est.promedio !== null ? (posicion <= 3 ? '⭐' : '') : ''}</td>
+                        <td>
+                            <div class="nombre-estudiante">
+                                <div class="avatar ${est.colorAvatar}">${iniciales}</div>
+                                ${est.nombre}
+                            </div>
+                        </td>
+                        <td>${est.grado}</td>
+                        <td>Sección ${est.seccion}</td>
+                        <td style="text-align:center;">
+                            ${est.promedio !== null ?
+                                `<span class="promedio-badge ${promedioClase}">${est.promedio}</span>` :
+                                `<span class="promedio-badge sin-notas">--</span>`
+                            }
+                        </td>
+                        <td style="text-align:center;">
+                            <span class="estado-badge ${est.estadoClase}">${est.estadoTexto}</span>
+                        </td>
+                        <td style="text-align:center;">${materiasTexto}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // ============================================
+        // ACTUALIZAR ESTADÍSTICAS
+        // ============================================
+
+        function actualizarEstadisticas(estudiantes) {
+            const total = estudiantes.length;
+            const conPromedio = estudiantes.filter(e => e.promedio !== null);
+            const aprobados = conPromedio.filter(e => e.promedio >= 65);
+            const enRiesgo = conPromedio.filter(e => e.promedio < 65);
+
+            let suma = 0;
+            conPromedio.forEach(e => suma += e.promedio);
+            const promedioGeneral = conPromedio.length > 0 ? Math.round(suma / conPromedio.length) : 0;
+
+            document.getElementById('totalEstudiantes').textContent = total;
+            document.getElementById('promedioGeneral').textContent = conPromedio.length > 0 ? promedioGeneral : '--';
+            document.getElementById('aprobados').textContent = aprobados.length;
+            document.getElementById('enRiesgo').textContent = enRiesgo.length;
+        }
+
+        // ============================================
+        // FILTROS Y BÚSQUEDA
+        // ============================================
+
+        function filtrarTabla() {
+            const busqueda = document.getElementById('buscarInput').value.toLowerCase().trim();
+            const estadoFiltro = document.getElementById('filtroEstado').value;
+
+            estudiantesFiltrados = estudiantesData.filter(est => {
+                // Filtro por nombre
+                const coincideNombre = est.nombre.toLowerCase().includes(busqueda);
+
+                // Filtro por estado
+                let coincideEstado = true;
+                if (estadoFiltro !== 'todos') {
+                    coincideEstado = est.estado === estadoFiltro;
+                }
+
+                return coincideNombre && coincideEstado;
+            });
+
+            // Aplicar ordenamiento
+            const orden = document.getElementById('ordenarPor').value;
+            aplicarOrden(orden);
+
+            renderizarTabla(estudiantesFiltrados);
+            document.getElementById('contadorRanking').textContent = estudiantesFiltrados.length;
+        }
+
+        function ordenarTabla() {
+            const orden = document.getElementById('ordenarPor').value;
+            aplicarOrden(orden);
+            renderizarTabla(estudiantesFiltrados);
+        }
+
+        function aplicarOrden(orden) {
+            switch(orden) {
+                case 'promedio':
+                    estudiantesFiltrados.sort((a, b) => {
+                        if (a.promedio === null && b.promedio === null) return 0;
+                        if (a.promedio === null) return 1;
+                        if (b.promedio === null) return -1;
+                        return b.promedio - a.promedio;
+                    });
+                    break;
+                case 'promedio-asc':
+                    estudiantesFiltrados.sort((a, b) => {
+                        if (a.promedio === null && b.promedio === null) return 0;
+                        if (a.promedio === null) return 1;
+                        if (b.promedio === null) return -1;
+                        return a.promedio - b.promedio;
+                    });
+                    break;
+                case 'nombre':
+                    estudiantesFiltrados.sort((a, b) => a.nombre.localeCompare(b.nombre));
+                    break;
+                case 'nombre-desc':
+                    estudiantesFiltrados.sort((a, b) => b.nombre.localeCompare(a.nombre));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('buscarInput').value = '';
+            document.getElementById('filtroEstado').value = 'todos';
+            document.getElementById('ordenarPor').value = 'promedio';
+            estudiantesFiltrados = [...estudiantesData];
+            aplicarOrden('promedio');
+            renderizarTabla(estudiantesFiltrados);
+            document.getElementById('contadorRanking').textContent = estudiantesFiltrados.length;
+            mostrarToast('🔄 Filtros restablecidos');
+        }
+
+        // ============================================
+        // ACTUALIZAR TOP
+        // ============================================
+
+        function actualizarTop() {
+            const btn = document.querySelector('.btn-actualizar');
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+                btn.disabled = true;
+            }
+
+            setTimeout(() => {
+                cargarTopEstudiantes();
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+                    btn.disabled = false;
+                }
+                mostrarToast('🔄 Datos actualizados');
+            }, 500);
+        }
+
+        // ============================================
+        // TOAST
+        // ============================================
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toastMensaje');
+            if (!toast) return;
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toast.textContent = mensaje;
+            toast.className = 'toast-mensaje';
+            toast.style.display = 'block';
+            toastTimeout = setTimeout(() => {
+                toast.className = 'toast-mensaje ocultar';
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // ESCUCHAR CAMBIOS EN LOCALSTORAGE
+        // ============================================
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'registrosSigerd' ||
+                e.key === 'datosSincronizados' ||
+                (e.key && e.key.startsWith('registro_') && e.key.endsWith('_v25'))) {
+                console.log(`🔄 Cambio en ${e.key}, actualizando...`);
+                setTimeout(cargarTopEstudiantes, 500);
+            }
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏆 Top de Estudiantes - Inicializando...');
+            cargarTopEstudiantes();
+
+            // Auto-actualización cada 30 segundos
+            setInterval(() => {
+                console.log('🔄 Auto-actualización del Top');
+                cargarTopEstudiantes();
+            }, 30000);
+
+            // Tecla Escape para limpiar búsqueda
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const input = document.getElementById('buscarInput');
+                    if (document.activeElement === input) {
+                        limpiarFiltros();
+                        input.blur();
+                    }
+                }
+            });
+
+            console.log('✅ Top de Estudiantes cargado correctamente');
+        });
+
+        // ============================================
+        // EXPONER FUNCIONES
+        // ============================================
+
+        window.actualizarTop = actualizarTop;
+        window.filtrarTabla = filtrarTabla;
+        window.ordenarTabla = ordenarTabla;
+        window.limpiarFiltros = limpiarFiltros;
+        window.cargarTopEstudiantes = cargarTopEstudiantes;
+
+        console.log('🏆 Usa Ctrl+F o la barra de búsqueda para filtrar estudiantes');
+        console.log('📊 Los mejores promedios destacan con medallas 🥇🥈🥉');
+    </script>
+
+</body>
+</html>
