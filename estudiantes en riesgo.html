@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Estudiantes en Riesgo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ============================================
+           ESTILOS GLOBALES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 50%, #f1948a 100%);
+            border-radius: 24px;
+            padding: 28px 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 12px 40px rgba(192, 57, 43, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-left h1 span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 16px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: pulseBadge 2s infinite;
+        }
+
+        @keyframes pulseBadge {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+
+        .header-left p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-right .badge-grupo {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 18px;
+            border-radius: 60px;
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-actualizar {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-actualizar:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           ESTADÍSTICAS DE RIESGO
+           ============================================ */
+        .stats-riesgo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .icono {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .stat-card .icono.rojo { background: #fde8e8; color: #c0392b; }
+        .stat-card .icono.naranja { background: #fef9e7; color: #b7950b; }
+        .stat-card .icono.azul { background: #e8f0fe; color: #1a4a7a; }
+        .stat-card .icono.verde { background: #e8f8f0; color: #1a7a4a; }
+
+        .stat-card .info .numero {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a2a4a;
+            line-height: 1.2;
+        }
+
+        .stat-card .info .label {
+            font-size: 0.6rem;
+            color: #718096;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* ============================================
+           FILTROS
+           ============================================ */
+        .filtros-container {
+            background: white;
+            border-radius: 16px;
+            padding: 16px 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 20px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .filtros-container label {
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filtros-container select,
+        .filtros-container input {
+            padding: 6px 14px;
+            border-radius: 60px;
+            border: 1.5px solid #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            background: #f7fafc;
+            outline: none;
+            min-width: 120px;
+        }
+
+        .filtros-container select:focus,
+        .filtros-container input:focus {
+            border-color: #c0392b;
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+        }
+
+        .btn-filtro {
+            padding: 6px 18px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-filtro.primario {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-filtro.primario:hover {
+            background: #a93226;
+            transform: translateY(-2px);
+        }
+
+        .btn-filtro.secundario {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .btn-filtro.secundario:hover {
+            background: #d0d8e0;
+        }
+
+        .btn-filtro.whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        .btn-filtro.whatsapp:hover {
+            background: #1da851;
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           TABLA DE ESTUDIANTES EN RIESGO
+           ============================================ */
+        .tabla-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 24px 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.5);
+            overflow: hidden;
+        }
+
+        .tabla-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tabla-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tabla-header h2 .badge {
+            background: #c0392b;
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 12px;
+            border-radius: 60px;
+            font-weight: 600;
+            animation: pulseBadge 2s infinite;
+        }
+
+        .tabla-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #eef2f6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        thead {
+            background: #c0392b;
+            color: white;
+        }
+
+        thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eef2f6;
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #fdf2f2;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 10px 16px;
+            color: #1a2a4a;
+            vertical-align: middle;
+        }
+
+        /* ============================================
+           ESTILOS PARA RIESGO
+           ============================================ */
+        .nivel-riesgo {
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            display: inline-block;
+            text-align: center;
+            min-width: 70px;
+        }
+
+        .nivel-riesgo.critico {
+            background: #fde8e8;
+            color: #c0392b;
+            animation: pulseBadge 1.5s infinite;
+        }
+
+        .nivel-riesgo.alto {
+            background: #fef9e7;
+            color: #b7950b;
+        }
+
+        .nivel-riesgo.medio {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .nivel-riesgo.bajo {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .promedio-badge {
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            display: inline-block;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .promedio-badge.riesgo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .promedio-badge.critico {
+            background: #fde8e8;
+            color: #c0392b;
+            font-weight: 800;
+        }
+
+        .nombre-estudiante {
+            font-weight: 600;
+            color: #1a2a4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nombre-estudiante .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar.rojo { background: #c0392b; }
+        .avatar.naranja { background: #e67e22; }
+        .avatar.amarillo { background: #f1c40f; color: #333; }
+        .avatar.azul { background: #2980b9; }
+
+        .estado-badge {
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+
+        .estado-badge.riesgo {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .estado-badge.incompleto {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .btn-intervencion {
+            padding: 4px 12px;
+            border: none;
+            border-radius: 60px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-intervencion.primario {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-intervencion.primario:hover {
+            background: #a93226;
+            transform: scale(1.05);
+        }
+
+        .btn-intervencion.secundario {
+            background: #e8ecf1;
+            color: #1a2a4a;
+        }
+
+        .btn-intervencion.secundario:hover {
+            background: #d0d8e0;
+        }
+
+        /* ============================================
+           MENSAJE VACÍO
+           ============================================ */
+        .mensaje-vacio {
+            text-align: center;
+            padding: 50px 20px;
+            color: #718096;
+        }
+
+        .mensaje-vacio .icono {
+            font-size: 4rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .mensaje-vacio h3 {
+            font-size: 1.2rem;
+            color: #1a2a4a;
+            margin-bottom: 4px;
+        }
+
+        .mensaje-vacio p {
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+           TOAST
+           ============================================ */
+        .toast-mensaje {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2a4a;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            z-index: 99999;
+            font-weight: 500;
+            max-width: 90%;
+            text-align: center;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        .toast-mensaje.ocultar {
+            animation: fadeOutDown 0.3s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes fadeOutDown {
+            from { opacity: 1; transform: translateX(-50%) translateY(0); }
+            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-left h1 {
+                font-size: 1.4rem;
+            }
+            .stats-riesgo {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .filtros-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filtros-container select,
+            .filtros-container input {
+                width: 100%;
+            }
+            .tabla-container {
+                padding: 16px;
+            }
+            thead th, tbody td {
+                padding: 8px 10px;
+                font-size: 0.7rem;
+            }
+            .nombre-estudiante .avatar {
+                width: 24px;
+                height: 24px;
+                font-size: 0.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-riesgo {
+                grid-template-columns: 1fr;
+            }
+            .header-left h1 {
+                font-size: 1.1rem;
+            }
+            .tabla-wrapper {
+                overflow-x: auto;
+            }
+            table {
+                font-size: 0.65rem;
+                min-width: 500px;
+            }
+            thead th, tbody td {
+                padding: 6px 8px;
+            }
+            .nivel-riesgo {
+                font-size: 0.6rem;
+                padding: 2px 8px;
+                min-width: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="header-left">
+                <h1>
+                    ⚠️ Estudiantes en Riesgo
+                    <span id="badgeCantidad">Cargando...</span>
+                </h1>
+                <p><i class="fas fa-exclamation-triangle" style="color:#FFD700;"></i> Estudiantes con promedio menor a 65</p>
+            </div>
+            <div class="header-right">
+                <span class="badge-grupo" id="badgeGrupo">📚 Cargando...</span>
+                <button class="btn-actualizar" onclick="actualizarRiesgo()">
+                    <i class="fas fa-sync-alt"></i> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== ESTADÍSTICAS ===== -->
+        <div class="stats-riesgo">
+            <div class="stat-card">
+                <div class="icono rojo">⚠️</div>
+                <div class="info">
+                    <div class="numero" id="totalRiesgo">0</div>
+                    <div class="label">En Riesgo</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono naranja">🔴</div>
+                <div class="info">
+                    <div class="numero" id="critico">0</div>
+                    <div class="label">Crítico (≤ 50)</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono azul">📊</div>
+                <div class="info">
+                    <div class="numero" id="promedioRiesgo">--</div>
+                    <div class="label">Promedio del grupo</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icono verde">📋</div>
+                <div class="info">
+                    <div class="numero" id="incompletosRiesgo">0</div>
+                    <div class="label">Notas Incompletas</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== FILTROS ===== -->
+        <div class="filtros-container">
+            <label>
+                <i class="fas fa-search"></i> Buscar:
+                <input type="text" id="buscarInput" placeholder="Nombre del estudiante..." oninput="filtrarTabla()">
+            </label>
+            <label>
+                <i class="fas fa-filter"></i> Nivel:
+                <select id="filtroNivel" onchange="filtrarTabla()">
+                    <option value="todos">📋 Todos</option>
+                    <option value="critico">🔴 Crítico (≤ 50)</option>
+                    <option value="alto">🟠 Alto (51-55)</option>
+                    <option value="medio">🟡 Medio (56-60)</option>
+                    <option value="bajo">🟢 Bajo (61-64)</option>
+                </select>
+            </label>
+            <button class="btn-filtro secundario" onclick="limpiarFiltros()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+            <button class="btn-filtro whatsapp" onclick="enviarWhatsappMasivo()">
+                <i class="fab fa-whatsapp"></i> Enviar alertas
+            </button>
+        </div>
+
+        <!-- ===== TABLA ===== -->
+        <div class="tabla-container">
+            <div class="tabla-header">
+                <h2>
+                    📋 Lista de Estudiantes en Riesgo
+                    <span class="badge" id="contadorRiesgo">0</span>
+                </h2>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <span style="font-size:0.65rem;color:#6a8a9e;">
+                        🔴 Crítico · 🟠 Alto · 🟡 Medio · 🟢 Bajo
+                    </span>
+                </div>
+            </div>
+
+            <div class="tabla-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:40px;">#</th>
+                            <th style="min-width:160px;">Estudiante</th>
+                            <th style="min-width:100px;">Grado</th>
+                            <th style="min-width:70px;text-align:center;">Promedio</th>
+                            <th style="min-width:80px;text-align:center;">Nivel de Riesgo</th>
+                            <th style="min-width:70px;text-align:center;">Materias</th>
+                            <th style="min-width:120px;text-align:center;">Intervención</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaBody">
+                        <tr>
+                            <td colspan="7">
+                                <div class="mensaje-vacio">
+                                    <div class="icono">⏳</div>
+                                    <h3>Cargando estudiantes...</h3>
+                                    <p>Espera un momento mientras se cargan los datos.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast-mensaje" id="toastMensaje"></div>
+
+    <!-- ============================================
+    SCRIPT
+    ============================================ -->
+    <script>
+        /**
+         * ⚠️ ESTUDIANTES EN RIESGO
+         * Muestra exclusivamente estudiantes con promedio < 65
+         */
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let estudiantesData = [];
+        let estudiantesRiesgo = [];
+        let currentGrade = 3;
+        let currentSeccion = 'A';
+        let currentTanda = 'Matutina';
+        let currentSchoolYear = '2025-2026';
+        let calificacionesData = {};
+        let toastTimeout = null;
+
+        // ============================================
+        // FUNCIONES DE OBTENCIÓN DE DATOS
+        // ============================================
+
+        function obtenerGradoDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('grado')) return decodeURIComponent(urlParams.get('grado'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.grado) return datos.grado;
+                    }
+                }
+                return 'Tercer Grado';
+            } catch (e) { return 'Tercer Grado'; }
+        }
+
+        function obtenerSeccionDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('seccion')) return decodeURIComponent(urlParams.get('seccion'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.seccion) return datos.seccion;
+                    }
+                }
+                return 'A';
+            } catch (e) { return 'A'; }
+        }
+
+        function obtenerTandaDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('tanda')) return decodeURIComponent(urlParams.get('tanda'));
+                const keys = ['datosSincronizados', 'registroGradoData', 'minerd_grado_completo'];
+                for (const key of keys) {
+                    const item = localStorage.getItem(key);
+                    if (item) {
+                        const datos = JSON.parse(item);
+                        if (datos && datos.tanda) return datos.tanda;
+                    }
+                }
+                return 'Matutina';
+            } catch (e) { return 'Matutina'; }
+        }
+
+        function obtenerGrupoActual() {
+            return {
+                grado: (obtenerGradoDesdePortada() || 'Tercer Grado').trim(),
+                seccion: (obtenerSeccionDesdePortada() || 'A').trim(),
+                tanda: (obtenerTandaDesdePortada() || 'Matutina').trim()
+            };
+        }
+
+        function convertirGradoANumero(gradoTexto) {
+            const mapa = {
+                'Primer Grado': 1, 'Segundo Grado': 2, 'Tercer Grado': 3,
+                'Cuarto Grado': 4, 'Quinto Grado': 5, 'Sexto Grado': 6,
+                '1ER GRADO': 1, '2DO GRADO': 2, '3ER GRADO': 3,
+                '4TO GRADO': 4, '5TO GRADO': 5, '6TO GRADO': 6,
+                '1er Grado': 1, '2do Grado': 2, '3er Grado': 3,
+                '4to Grado': 4, '5to Grado': 5, '6to Grado': 6,
+                '1': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6
+            };
+            const normalizado = String(gradoTexto).toUpperCase().trim();
+            return mapa[normalizado] || mapa[gradoTexto] || 3;
+        }
+
+        function getGradeText(grade) {
+            const textos = { 1: '1er', 2: '2do', 3: '3er', 4: '4to', 5: '5to', 6: '6to' };
+            return textos[grade] || '3er';
+        }
+
+        function getCurrentSchoolYear() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const beforeAugustFirst = (now.getMonth() < 7) || (now.getMonth() === 7 && now.getDate() < 1);
+            return beforeAugustFirst ? `${year - 1}-${year}` : `${year}-${year + 1}`;
+        }
+
+        function getStorageKeyRegistro() {
+            const gradeText = getGradeText(currentGrade);
+            return `registro_${gradeText}_sec${currentSeccion}_v25`;
+        }
+
+        // ============================================
+        // CARGAR DATOS
+        // ============================================
+
+        function cargarCalificaciones() {
+            try {
+                const storageKey = getStorageKeyRegistro();
+                const saved = localStorage.getItem(storageKey);
+                if (!saved) {
+                    calificacionesData = {};
+                    return {};
+                }
+                calificacionesData = JSON.parse(saved);
+                return calificacionesData;
+            } catch (e) {
+                calificacionesData = {};
+                return {};
+            }
+        }
+
+        function obtenerEstudiantesDesdeSigerd() {
+            try {
+                const stored = localStorage.getItem('registrosSigerd');
+                if (!stored) return [];
+
+                const registros = JSON.parse(stored);
+                if (!Array.isArray(registros) || registros.length === 0) return [];
+
+                const grupo = obtenerGrupoActual();
+                const gradoActual = grupo.grado.toUpperCase().trim();
+                const seccionActual = grupo.seccion.toUpperCase().trim();
+                const tandaActual = grupo.tanda.toUpperCase().trim();
+
+                const filtrados = registros.filter(r => {
+                    const gradoRegistro = (r.grado || '').toUpperCase().trim();
+                    const seccionRegistro = (r.seccion || '').toUpperCase().trim();
+                    const tandaRegistro = (r.tanda || '').toUpperCase().trim();
+                    if (!gradoRegistro) return false;
+                    return gradoRegistro === gradoActual &&
+                           seccionRegistro === seccionActual &&
+                           tandaRegistro === tandaActual;
+                });
+
+                filtrados.sort((a, b) => parseInt(a.orden) - parseInt(b.orden));
+                return filtrados;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // ============================================
+        // CALCULAR PROMEDIO
+        // ============================================
+
+        function calcularPromedioEstudiante(orden) {
+            const totalMaterias = (currentGrade >= 4) ? 8 : 7;
+            const prefix = `g${currentGrade}s${currentSeccion}`;
+            let sumaNotas = 0;
+            let materiasConNota = 0;
+
+            for (let m = 1; m <= totalMaterias; m++) {
+                const finalKey = `${prefix}m${m}r${orden}final`;
+                const nota = calificacionesData[finalKey];
+                if (nota !== undefined && nota !== '' && nota !== null) {
+                    const notaNum = parseFloat(nota);
+                    if (!isNaN(notaNum) && notaNum >= 0 && notaNum <= 100) {
+                        sumaNotas += notaNum;
+                        materiasConNota++;
+                    }
+                }
+            }
+
+            if (materiasConNota === 0) {
+                return { promedio: null, completas: false, materiasConNota: 0, totalMaterias: totalMaterias };
+            }
+
+            const promedio = Math.round(sumaNotas / materiasConNota);
+            const completas = materiasConNota === totalMaterias;
+
+            return { promedio, completas, materiasConNota, totalMaterias };
+        }
+
+        // ============================================
+        // FUNCIÓN PRINCIPAL
+        // ============================================
+
+        function cargarEstudiantesRiesgo() {
+            const grupo = obtenerGrupoActual();
+            currentGrade = convertirGradoANumero(grupo.grado);
+            currentSeccion = grupo.seccion;
+            currentTanda = grupo.tanda;
+            currentSchoolYear = getCurrentSchoolYear();
+
+            document.getElementById('badgeGrupo').textContent = `📚 ${grupo.grado} - Sección ${grupo.seccion} - ${grupo.tanda}`;
+
+            const estudiantes = obtenerEstudiantesDesdeSigerd();
+            cargarCalificaciones();
+
+            if (estudiantes.length === 0) {
+                document.getElementById('tablaBody').innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="mensaje-vacio">
+                                <div class="icono">📭</div>
+                                <h3>No hay estudiantes registrados</h3>
+                                <p>Registra estudiantes en el Formulario para verlos aquí.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                actualizarEstadisticas([]);
+                return;
+            }
+
+            const todosEstudiantes = estudiantes.map((est, index) => {
+                const orden = index + 1;
+                const nombre = `${est.nombre || ''} ${est.apellido || ''}`.trim() || `Estudiante #${orden}`;
+                const resultado = calcularPromedioEstudiante(orden);
+
+                const colores = ['rojo', 'naranja', 'amarillo', 'azul'];
+                const colorAvatar = colores[orden % colores.length];
+
+                return {
+                    orden: orden,
+                    nombre: nombre,
+                    grado: est.grado || grupo.grado,
+                    seccion: est.seccion || grupo.seccion,
+                    promedio: resultado.promedio,
+                    completas: resultado.completas,
+                    materiasConNota: resultado.materiasConNota,
+                    totalMaterias: resultado.totalMaterias,
+                    colorAvatar: colorAvatar,
+                    _original: est,
+                    telefono: est.telefono || est.celular || est.emergenciaTelefono || null
+                };
+            });
+
+            // FILTRAR SOLO ESTUDIANTES EN RIESGO (promedio < 65)
+            estudiantesRiesgo = todosEstudiantes.filter(est => {
+                if (est.promedio === null) return false;
+                return est.promedio < 65;
+            });
+
+            // Ordenar de menor a mayor (los más críticos primero)
+            estudiantesRiesgo.sort((a, b) => a.promedio - b.promedio);
+
+            estudiantesData = estudiantesRiesgo;
+
+            renderizarTabla(estudiantesRiesgo);
+            actualizarEstadisticas(estudiantesRiesgo);
+            document.getElementById('badgeCantidad').textContent = `⚠️ ${estudiantesRiesgo.length} estudiantes`;
+            document.getElementById('contadorRiesgo').textContent = estudiantesRiesgo.length;
+
+            if (estudiantesRiesgo.length === 0) {
+                mostrarToast('✅ ¡Excelente! No hay estudiantes en riesgo en este grupo');
+            } else {
+                mostrarToast(`⚠️ ${estudiantesRiesgo.length} estudiantes en riesgo detectados`);
+            }
+        }
+
+        // ============================================
+        // RENDERIZAR TABLA
+        // ============================================
+
+        function renderizarTabla(estudiantes) {
+            const tbody = document.getElementById('tablaBody');
+
+            if (estudiantes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="mensaje-vacio">
+                                <div class="icono">🎉</div>
+                                <h3>¡No hay estudiantes en riesgo!</h3>
+                                <p>Todos los estudiantes tienen un promedio ≥ 65. ¡Excelente trabajo docente!</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            estudiantes.forEach((est, index) => {
+                const posicion = index + 1;
+                const promedio = est.promedio;
+
+                let nivel = '';
+                let nivelClase = '';
+                let nivelEmoji = '';
+
+                if (promedio <= 50) {
+                    nivel = 'Crítico';
+                    nivelClase = 'critico';
+                    nivelEmoji = '🔴';
+                } else if (promedio <= 55) {
+                    nivel = 'Alto';
+                    nivelClase = 'alto';
+                    nivelEmoji = '🟠';
+                } else if (promedio <= 60) {
+                    nivel = 'Medio';
+                    nivelClase = 'medio';
+                    nivelEmoji = '🟡';
+                } else {
+                    nivel = 'Bajo';
+                    nivelClase = 'bajo';
+                    nivelEmoji = '🟢';
+                }
+
+                const iniciales = est.nombre.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2);
+                const avatarClase = est.colorAvatar || 'azul';
+
+                const materiasTexto = est.completas ?
+                    `${est.totalMaterias}/${est.totalMaterias}` :
+                    `${est.materiasConNota}/${est.totalMaterias}`;
+
+                const tieneTelefono = est.telefono && String(est.telefono).replace(/\D/g, '').length >= 10;
+
+                html += `
+                    <tr>
+                        <td style="text-align:center;font-weight:700;color:#6a8a9e;">${posicion}</td>
+                        <td>
+                            <div class="nombre-estudiante">
+                                <div class="avatar ${avatarClase}">${iniciales}</div>
+                                ${est.nombre}
+                                ${tieneTelefono ? `<span style="font-size:0.6rem;color:#25D366;"><i class="fas fa-phone"></i></span>` : ''}
+                            </div>
+                        </td>
+                        <td>${est.grado}</td>
+                        <td style="text-align:center;">
+                            <span class="promedio-badge ${promedio <= 50 ? 'critico' : 'riesgo'}">${promedio}</span>
+                        </td>
+                        <td style="text-align:center;">
+                            <span class="nivel-riesgo ${nivelClase}">${nivelEmoji} ${nivel}</span>
+                        </td>
+                        <td style="text-align:center;">${materiasTexto}</td>
+                        <td style="text-align:center;">
+                            <button class="btn-intervencion primario" onclick="intervenir(${est.orden})" title="Ver detalles e intervenir">
+                                <i class="fas fa-hands-helping"></i> Intervenir
+                            </button>
+                            ${tieneTelefono ? `<button class="btn-intervencion secundario" onclick="enviarWhatsapp(${est.orden})" title="Enviar WhatsApp al tutor"><i class="fab fa-whatsapp"></i></button>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        // ============================================
+        // ACTUALIZAR ESTADÍSTICAS
+        // ============================================
+
+        function actualizarEstadisticas(estudiantes) {
+            const total = estudiantes.length;
+            const criticos = estudiantes.filter(e => e.promedio <= 50).length;
+            let suma = 0;
+            estudiantes.forEach(e => suma += e.promedio);
+            const promedio = total > 0 ? Math.round(suma / total) : 0;
+            const incompletos = estudiantes.filter(e => !e.completas).length;
+
+            document.getElementById('totalRiesgo').textContent = total;
+            document.getElementById('critico').textContent = criticos;
+            document.getElementById('promedioRiesgo').textContent = total > 0 ? promedio : '--';
+            document.getElementById('incompletosRiesgo').textContent = incompletos;
+        }
+
+        // ============================================
+        // FILTROS Y BÚSQUEDA
+        // ============================================
+
+        function filtrarTabla() {
+            const busqueda = document.getElementById('buscarInput').value.toLowerCase().trim();
+            const nivelFiltro = document.getElementById('filtroNivel').value;
+
+            let filtrados = estudiantesData.filter(est => {
+                const coincideNombre = est.nombre.toLowerCase().includes(busqueda);
+
+                let coincideNivel = true;
+                if (nivelFiltro !== 'todos') {
+                    const p = est.promedio;
+                    if (nivelFiltro === 'critico') coincideNivel = p <= 50;
+                    else if (nivelFiltro === 'alto') coincideNivel = p > 50 && p <= 55;
+                    else if (nivelFiltro === 'medio') coincideNivel = p > 55 && p <= 60;
+                    else if (nivelFiltro === 'bajo') coincideNivel = p > 60 && p < 65;
+                }
+
+                return coincideNombre && coincideNivel;
+            });
+
+            // Mantener orden de menor a mayor
+            filtrados.sort((a, b) => a.promedio - b.promedio);
+
+            renderizarTabla(filtrados);
+            document.getElementById('contadorRiesgo').textContent = filtrados.length;
+        }
+
+        function limpiarFiltros() {
+            document.getElementById('buscarInput').value = '';
+            document.getElementById('filtroNivel').value = 'todos';
+            renderizarTabla(estudiantesData);
+            document.getElementById('contadorRiesgo').textContent = estudiantesData.length;
+            mostrarToast('🔄 Filtros restablecidos');
+        }
+
+        // ============================================
+        // INTERVENCIONES
+        // ============================================
+
+        function intervenir(orden) {
+            const estudiante = estudiantesData.find(e => e.orden === orden);
+            if (!estudiante) return;
+
+            const mensaje = `
+⚠️ INTERVENCIÓN PEDAGÓGICA
+
+📋 Estudiante: ${estudiante.nombre}
+📊 Promedio: ${estudiante.promedio}%
+📚 Grado: ${estudiante.grado} - Sección ${estudiante.seccion}
+📝 Materias: ${estudiante.materiasConNota}/${estudiante.totalMaterias}
+
+✅ Acciones sugeridas:
+1. 📝 Revisión de evaluaciones con el estudiante
+2. 📖 Plan de refuerzo en áreas débiles
+3. 📞 Contactar al tutor/padre
+4. 📊 Seguimiento semanal de progreso
+
+¿Desea iniciar el plan de intervención?
+            `.trim();
+
+            if (confirm(mensaje)) {
+                mostrarToast(`✅ Plan de intervención iniciado para ${estudiante.nombre}`);
+            }
+        }
+
+        function enviarWhatsapp(orden) {
+            const estudiante = estudiantesData.find(e => e.orden === orden);
+            if (!estudiante) return;
+
+            let telefono = estudiante.telefono;
+            if (!telefono) {
+                // Buscar en el objeto original
+                const original = estudiante._original;
+                if (original) {
+                    telefono = original.telefono || original.celular || original.emergenciaTelefono || original.telefonoEmergencia || null;
+                }
+            }
+
+            if (!telefono) {
+                mostrarToast('⚠️ No hay número de teléfono registrado para este estudiante');
+                return;
+            }
+
+            const telefonoLimpio = String(telefono).replace(/\D/g, '');
+            if (telefonoLimpio.length < 10) {
+                mostrarToast('⚠️ Número de teléfono inválido');
+                return;
+            }
+
+            const mensaje = `⚠️ Alerta Académica\n\nEstimado padre/madre/tutor,\n\nEl estudiante ${estudiante.nombre} presenta un rendimiento académico que requiere atención. Su promedio actual es de ${estudiante.promedio}%.\n\nSugerimos:\n- Revisar las tareas y evaluaciones\n- Establecer horario de estudio\n- Contactar al docente para seguimiento\n\nAtentamente,\nCentro Educativo`;
+            const numero = telefonoLimpio.startsWith('1') ? telefonoLimpio : '1' + telefonoLimpio;
+            const url = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            mostrarToast(`💬 Enviando WhatsApp a tutor de ${estudiante.nombre}`);
+        }
+
+        function enviarWhatsappMasivo() {
+            const estudiantesConTelefono = estudiantesData.filter(e => {
+                let tel = e.telefono;
+                if (!tel && e._original) {
+                    tel = e._original.telefono || e._original.celular || e._original.emergenciaTelefono || null;
+                }
+                return tel && String(tel).replace(/\D/g, '').length >= 10;
+            });
+
+            if (estudiantesConTelefono.length === 0) {
+                mostrarToast('⚠️ No hay estudiantes con número de teléfono registrado');
+                return;
+            }
+
+            if (estudiantesConTelefono.length === 1) {
+                enviarWhatsapp(estudiantesConTelefono[0].orden);
+                return;
+            }
+
+            const mensaje = `⚠️ Alerta Académica\n\nEstimados padres/madres/tutores,\n\nLos siguientes estudiantes requieren atención académica especial:\n\n${estudiantesConTelefono.map(e => `- ${e.nombre}: ${e.promedio}%`).join('\n')}\n\nSugerimos coordinar con el docente para plan de refuerzo.\n\nAtentamente,\nCentro Educativo`;
+
+            const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            mostrarToast(`💬 Enviando alertas a ${estudiantesConTelefono.length} tutores`);
+        }
+
+        // ============================================
+        // ACTUALIZAR
+        // ============================================
+
+        function actualizarRiesgo() {
+            const btn = document.querySelector('.btn-actualizar');
+            if (btn) {
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
+                btn.disabled = true;
+            }
+
+            setTimeout(() => {
+                cargarEstudiantesRiesgo();
+                if (btn) {
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Actualizar';
+                    btn.disabled = false;
+                }
+                mostrarToast('🔄 Datos actualizados');
+            }, 500);
+        }
+
+        // ============================================
+        // TOAST
+        // ============================================
+
+        function mostrarToast(mensaje) {
+            const toast = document.getElementById('toastMensaje');
+            if (!toast) return;
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toast.textContent = mensaje;
+            toast.className = 'toast-mensaje';
+            toast.style.display = 'block';
+            toastTimeout = setTimeout(() => {
+                toast.className = 'toast-mensaje ocultar';
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, 4000);
+        }
+
+        // ============================================
+        // ESCUCHAR CAMBIOS
+        // ============================================
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'registrosSigerd' ||
+                e.key === 'datosSincronizados' ||
+                (e.key && e.key.startsWith('registro_') && e.key.endsWith('_v25'))) {
+                console.log(`🔄 Cambio en ${e.key}, actualizando...`);
+                setTimeout(cargarEstudiantesRiesgo, 500);
+            }
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('⚠️ Estudiantes en Riesgo - Inicializando...');
+            cargarEstudiantesRiesgo();
+
+            // Auto-actualización cada 30 segundos
+            setInterval(() => {
+                console.log('🔄 Auto-actualización de Riesgo');
+                cargarEstudiantesRiesgo();
+            }, 30000);
+
+            // Tecla Escape para limpiar búsqueda
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const input = document.getElementById('buscarInput');
+                    if (document.activeElement === input) {
+                        limpiarFiltros();
+                        input.blur();
+                    }
+                }
+            });
+
+            console.log('✅ Estudiantes en Riesgo cargado correctamente');
+        });
+
+        // ============================================
+        // EXPONER FUNCIONES
+        // ============================================
+
+        window.actualizarRiesgo = actualizarRiesgo;
+        window.filtrarTabla = filtrarTabla;
+        window.limpiarFiltros = limpiarFiltros;
+        window.cargarEstudiantesRiesgo = cargarEstudiantesRiesgo;
+        window.intervenir = intervenir;
+        window.enviarWhatsapp = enviarWhatsapp;
+        window.enviarWhatsappMasivo = enviarWhatsappMasivo;
+
+        console.log('⚠️ Estudiantes en riesgo - funciones disponibles:');
+        console.log('   - intervenir(orden) : Inicia plan de intervención');
+        console.log('   - enviarWhatsapp(orden) : Envía WhatsApp al tutor');
+        console.log('   - enviarWhatsappMasivo() : Envía alertas masivas');
+    </script>
+
+</body>
+</html>
