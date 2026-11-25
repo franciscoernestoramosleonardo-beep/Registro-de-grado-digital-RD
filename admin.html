@@ -3165,6 +3165,19 @@
         console.warn('⚠️ Firebase no disponible, usando solo modo local');
     }
 </script>
+
+<script type="module">
+    import './firebase-config.js';
+    import SyncFirebase from './sync-firebase.js';
+    
+    // Iniciar sincronización cuando cargue la página
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            SyncFirebase.iniciar();
+        }, 1000);
+    });
+</script>
+
 </body>
 
 </body>

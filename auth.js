@@ -1,7 +1,8 @@
 /* ============================================
 SISTEMA DE AUTENTICACIÓN - MINERD
 Registro de Grado - Nivel Primario
-VERSIÓN CORREGIDA - ACCESO MULTI-DISPOSITIVO
+VERSIÓN FINAL - ACCESO MULTI-DISPOSITIVO
++ SINCRONIZACIÓN CON FIREBASE
 ============================================ */
 const AuthSystem = {
     STORAGE_KEY: 'minerd_codigos_docentes',
@@ -99,6 +100,7 @@ const AuthSystem = {
 
     /* ============================================
       GESTIÓN DE CÓDIGOS EN LOCALSTORAGE
+      + RESPALDO AUTOMÁTICO EN FIREBASE
       ============================================ */
     obtenerCodigos() {
         const datos = localStorage.getItem(this.STORAGE_KEY);
@@ -106,6 +108,15 @@ const AuthSystem = {
     },
     guardarCodigos(codigos) {
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(codigos));
+        
+        // ✅ NUEVO: Respaldar en Firebase automáticamente
+        if (window.SyncFirebase && window.SyncFirebase.subirCodigo) {
+            codigos.forEach(c => {
+                window.SyncFirebase.subirCodigo(c).catch(err => {
+                    console.warn('⚠️ No se pudo respaldar código en Firebase:', err);
+                });
+            });
+        }
     },
     obtenerCorrelativo() {
         return parseInt(localStorage.getItem(this.CORRELATIVO_KEY) || '0');
@@ -119,6 +130,7 @@ const AuthSystem = {
 
     /* ============================================
       GESTIÓN DE CONTRASEÑAS DE DOCENTES
+      + RESPALDO AUTOMÁTICO EN FIREBASE
       ============================================ */
     obtenerContrasenas() {
         const datos = localStorage.getItem(this.CONTRASENAS_KEY);
@@ -127,6 +139,15 @@ const AuthSystem = {
     guardarContrasenas(contrasenas) {
         localStorage.setItem(this.CONTRASENAS_KEY, JSON.stringify(contrasenas));
         window.dispatchEvent(new Event('passwordChanged'));
+        
+        // ✅ NUEVO: Respaldar en Firebase automáticamente
+        if (window.SyncFirebase && window.SyncFirebase.subirContrasena) {
+            contrasenas.forEach(c => {
+                window.SyncFirebase.subirContrasena(c).catch(err => {
+                    console.warn('⚠️ No se pudo respaldar contraseña en Firebase:', err);
+                });
+            });
+        }
     },
     guardarContrasenaDocente(cedula, codigo, password, huellaEquipo, nombre) {
         const contrasenas = this.obtenerContrasenas();
@@ -190,6 +211,14 @@ const AuthSystem = {
         }
         contrasenas.splice(indice, 1);
         this.guardarContrasenas(contrasenas);
+        
+        // ✅ NUEVO: Eliminar de Firebase también
+        if (window.SyncFirebase && window.SyncFirebase.eliminarContrasena) {
+            window.SyncFirebase.eliminarContrasena(cedula).catch(err => {
+                console.warn('⚠️ No se pudo eliminar de Firebase:', err);
+            });
+        }
+        
         return { exito: true, mensaje: 'Contraseña eliminada. El docente deberá crear una nueva.' };
     },
 
@@ -482,6 +511,20 @@ const AuthSystem = {
             return { exito: false, mensaje: 'No se encontró al docente en el sistema' };
         }
 
+        // ✅ NUEVO: Eliminar cédula vieja de Firebase
+        if (window.SyncFirebase) {
+            if (window.SyncFirebase.eliminarContrasena) {
+                window.SyncFirebase.eliminarContrasena(cedulaViejaLimpia).catch(() => {});
+            }
+            if (window.SyncFirebase.eliminarCodigo) {
+                // Buscar códigos asociados a la cédula vieja y eliminarlos
+                const codigosViejos = this.obtenerCodigos().filter(c => c.cedula === cedulaViejaLimpia);
+                codigosViejos.forEach(c => {
+                    window.SyncFirebase.eliminarCodigo(c.codigo).catch(() => {});
+                });
+            }
+        }
+
         window.dispatchEvent(new Event('passwordChanged'));
         window.dispatchEvent(new CustomEvent('cedulaDocenteActualizada', {
             detail: { cedulaVieja: cedulaViejaLimpia, cedulaNueva: cedulaNuevaLimpia }
@@ -769,6 +812,14 @@ const AuthSystem = {
         }
         codigoEncontrado.estado = 'revocado';
         this.guardarCodigos(codigos);
+        
+        // ✅ NUEVO: Eliminar de Firebase
+        if (window.SyncFirebase && window.SyncFirebase.eliminarCodigo) {
+            window.SyncFirebase.eliminarCodigo(codigo).catch(err => {
+                console.warn('⚠️ No se pudo eliminar de Firebase:', err);
+            });
+        }
+        
         return { exito: true, mensaje: 'Código revocado exitosamente' };
     },
     eliminarCodigo(codigo) {
@@ -779,6 +830,14 @@ const AuthSystem = {
         }
         codigos.splice(indice, 1);
         this.guardarCodigos(codigos);
+        
+        // ✅ NUEVO: Eliminar de Firebase
+        if (window.SyncFirebase && window.SyncFirebase.eliminarCodigo) {
+            window.SyncFirebase.eliminarCodigo(codigo).catch(err => {
+                console.warn('⚠️ No se pudo eliminar de Firebase:', err);
+            });
+        }
+        
         return { exito: true, mensaje: 'Registro del docente eliminado permanentemente' };
     },
     obtenerEstadisticas() {
@@ -984,6 +1043,7 @@ const AuthSystem = {
 
     /* ============================================
       ASIGNACIONES COMPLETAS (GRADO + SECCIÓN + TANDA)
+      + RESPALDO AUTOMÁTICO EN FIREBASE
       ============================================ */
     obtenerAsignacionesCompletas() {
         try {
@@ -999,6 +1059,16 @@ const AuthSystem = {
         try {
             localStorage.setItem(this.ASIGNACIONES_COMPLETAS_KEY, JSON.stringify(asignaciones));
             this.sincronizarAsignacionesLegacy(asignaciones);
+            
+            // ✅ NUEVO: Respaldar en Firebase automáticamente
+            if (window.SyncFirebase && window.SyncFirebase.subirAsignacion) {
+                asignaciones.forEach(a => {
+                    window.SyncFirebase.subirAsignacion(a).catch(err => {
+                        console.warn('⚠️ No se pudo respaldar asignación en Firebase:', err);
+                    });
+                });
+            }
+            
             return { exito: true, mensaje: 'Asignaciones guardadas correctamente' };
         } catch (e) {
             console.error('Error guardando asignaciones completas:', e);
@@ -1144,7 +1214,7 @@ const AuthSystem = {
     obtenerDocentesConAsignacionesCompletas() {
         const asignaciones = this.obtenerAsignacionesCompletas();
         const contrasenas = this.obtenerContrasenas();
-        const codigos = this.obtenerCodigos();
+        const codigos = this.obternerCodigos ? this.obtenerCodigos() : [];
 
         const docentesMap = {};
 

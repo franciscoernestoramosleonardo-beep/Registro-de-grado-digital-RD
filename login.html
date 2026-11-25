@@ -1042,6 +1042,18 @@
 </script>
 </body>
 
+<script type="module">
+    import './firebase-config.js';
+    import SyncFirebase from './sync-firebase.js';
+    
+    // Iniciar sincronización cuando cargue la página
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            SyncFirebase.iniciar();
+        }, 1000);
+    });
+</script>
+
     <div style="text-align: center; margin-top: 20px; padding: 10px;">
         <a href="portada.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
     </div>
