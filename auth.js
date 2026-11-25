@@ -498,6 +498,7 @@ const AuthSystem = {
 
     /* ============================================
       ✅ VALIDAR ACCESO (DOCENTE) - SIN RESTRICCIÓN DE HUELLA
+      (Permite acceso desde cualquier dispositivo)
       ============================================ */
     validarAccesoPrimerVez(cedula, codigo) {
         const estadoDocente = this.obtenerEstadoDocente(cedula);
@@ -543,7 +544,9 @@ const AuthSystem = {
                 };
             }
 
-            // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL PARA PERMITIR CUALQUIER DISPOSITIVO
+            // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL
+            // Ahora el docente puede entrar desde cualquier dispositivo
+
             return {
                 exito: true,
                 accion: 'login_password',
@@ -595,6 +598,7 @@ const AuthSystem = {
 
     /* ============================================
       ✅ VALIDAR PASSWORD (DOCENTE) - SIN RESTRICCIÓN DE HUELLA
+      (Permite acceso desde cualquier dispositivo)
       ============================================ */
     validarPasswordDocente(cedula, password) {
         const estadoDocente = this.obtenerEstadoDocente(cedula);
@@ -625,6 +629,7 @@ const AuthSystem = {
         }
 
         // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL Y EL POPUP DE AUTORIZACIÓN
+        // Ahora el docente puede entrar desde cualquier dispositivo
 
         const codigos = this.obtenerCodigos();
         const codigoDocente = codigos.find(c => c.cedula === cedula);
@@ -715,8 +720,10 @@ const AuthSystem = {
     estaAutenticado() {
         return this.obtenerSesion() !== null;
     },
+
     /* ============================================
       ✅ VALIDAR SESIÓN ACTIVA - SIN RESTRICCIÓN DE HUELLA
+      (Permite mantener sesión en cualquier dispositivo)
       ============================================ */
     validarSesionActiva() {
         const session = this.obtenerSesion();
@@ -735,6 +742,7 @@ const AuthSystem = {
         }
 
         // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL EN LA SESIÓN
+        // Ahora la sesión se mantiene en cualquier dispositivo
 
         const estadoDocente = this.obtenerEstadoDocente(session.cedula);
         if (estadoDocente.existe && estadoDocente.estado === 'bloqueado') {
@@ -892,7 +900,7 @@ const AuthSystem = {
         if (!cedula || !grado) {
             return { exito: false, mensaje: 'Cédula y grado requeridos' };
         }
-        const asignaciones = this.obtenerAsignaciones();
+        const asignaciones = this.obternerAsignaciones();
         const existente = asignaciones.find(a => a.cedula === cedula);
         if (!existente) {
             return { exito: false, mensaje: 'Docente no encontrado' };
@@ -1134,7 +1142,7 @@ const AuthSystem = {
     },
 
     obtenerDocentesConAsignacionesCompletas() {
-        const asignaciones = this.obternerAsignacionesCompletas ? this.obtenerAsignacionesCompletas() : [];
+        const asignaciones = this.obtenerAsignacionesCompletas();
         const contrasenas = this.obtenerContrasenas();
         const codigos = this.obtenerCodigos();
 
