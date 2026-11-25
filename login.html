@@ -1030,6 +1030,18 @@
         })();
     </script>
 
+    <!-- Conectar con Firebase (Archivo Centralizado) -->
+<script type="module">
+    import { db, auth, firebaseDisponible } from './firebase-config.js';
+    
+    if (firebaseDisponible) {
+        console.log('✅ Sistema listo para sincronizar con la nube');
+    } else {
+        console.warn('⚠️ Firebase no disponible, usando solo modo local');
+    }
+</script>
+</body>
+
     <div style="text-align: center; margin-top: 20px; padding: 10px;">
         <a href="portada.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
     </div>

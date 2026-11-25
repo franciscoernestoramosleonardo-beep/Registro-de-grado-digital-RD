@@ -245,15 +245,17 @@
         document.addEventListener('DOMContentLoaded', verificarAccesoAdmin);
     </script>
 
-    <!-- Conectar con Firebase -->
+    <!-- Conectar con Firebase (Archivo Centralizado) -->
 <script type="module">
-  import { db, auth } from './firebase-config.js';
-  
-  // ✅ Ya tienes acceso a la base de datos desde aquí
-  window.db = db;
-  window.auth = auth;
+    import { db, auth, firebaseDisponible } from './firebase-config.js';
+    
+    if (firebaseDisponible) {
+        console.log('✅ Sistema listo para sincronizar con la nube');
+    } else {
+        console.warn('⚠️ Firebase no disponible, usando solo modo local');
+    }
 </script>
-
+</body>
 
 </body>
 </html>

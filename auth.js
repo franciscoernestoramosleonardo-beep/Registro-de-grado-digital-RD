@@ -900,7 +900,7 @@ const AuthSystem = {
         if (!cedula || !grado) {
             return { exito: false, mensaje: 'Cédula y grado requeridos' };
         }
-        const asignaciones = this.obternerAsignaciones();
+        const asignaciones = this.obtenerAsignaciones();
         const existente = asignaciones.find(a => a.cedula === cedula);
         if (!existente) {
             return { exito: false, mensaje: 'Docente no encontrado' };
