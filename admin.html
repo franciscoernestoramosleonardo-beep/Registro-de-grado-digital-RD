@@ -1235,7 +1235,7 @@
                 <h1>⚙️ Panel de Administración</h1>
                 <p>Generación y gestión de códigos de acceso para docentes</p>
             </div>
-            <a href="index.html" class="btn-volver-administrador">← Volver al Inicio</a>
+            <a href="index.html" class="btn-volver-admin">← Volver al Inicio</a>
         </div>
 
         <div class="stats-grid">
@@ -3154,5 +3154,35 @@
             }
         });
     </script>
+
+    <!-- FIREBASE - CONEXIÓN Y GUARDADO DE DOCENTES -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // TU CONFIGURACIÓN DE FIREBASE
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdU1P7wY0IDaWaYoQMbAi6nZmhjn3oFyY",
+    authDomain: "control-financiero-f5b48.firebaseapp.com",
+    projectId: "control-financiero-f5b48",
+    storageBucket: "control-financiero-f5b48.firebasestorage.app",
+    messagingSenderId: "1086739264551",
+    appId: "1:1086739264551:web:c45b976523547436494a02"
+  };
+
+  // INICIALIZAR
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Dejar disponible para el resto del código
+  window.db = db;
+  window.addDocente = async function(datos) {
+    return await addDoc(collection(db, "docentes"), datos);
+  };
+  window.getDocentes = async function() {
+    return await getDocs(collection(db, "docentes"));
+  };
+</script>
+
 </body>
 </html>
