@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Estudiantes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background: linear-gradient(135deg, #048cf4 0%, #d4e9fa 50%, #f10303 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .toolbar-listado {
+            width: 100%;
+            max-width: 8.5in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 12px 20px;
+            background: #1a2a4a;
+            border-radius: 8px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .toolbar-listado .info-grado {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 4px 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .toolbar-listado .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn-listado {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-listado:hover { transform: scale(1.03); opacity: 0.9; }
+        .btn-listado:active { transform: scale(0.97); }
+        .btn-imprimir { background: #0056b3; }
+        .btn-pdf { background: #dc3545; }
+        .btn-excel { background: #28a745; }
+        .btn-actualizar { background: #17a2b8; }
+
+        .hoja-listado {
+            width: 8.5in;
+            min-height: 11in;
+            height: auto;
+            background: #ffffff;
+            padding: 0.3in 0.25in;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+            border: 1px solid #d0d0d0;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .titulo-listado {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a2a4a;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            border-bottom: 3px solid #1a3a6b;
+            padding-bottom: 6px;
+        }
+
+        .subtitulo-listado {
+            font-size: 11px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .info-encabezado {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: bold;
+            color: #1a2a4a;
+            margin-bottom: 8px;
+            padding: 4px 8px;
+            background: #f0f4f8;
+            border-radius: 4px;
+            border: 1px solid #d0d8e0;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .info-encabezado span { padding: 0 6px; }
+
+        .tabla-container-listado { flex: 1; overflow: hidden; }
+
+        .tabla-listado {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10px;
+            table-layout: fixed;
+        }
+
+        .tabla-listado thead th {
+            background: #1a3a6b;
+            color: #ffffff;
+            border: 2px solid #1a2a4a;
+            padding: 6px 3px;
+            text-align: center !important;
+            font-weight: bold !important;
+            font-size: 11px !important;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+        }
+
+        .tabla-listado tbody td {
+            border: 1px solid #a0a0a0;
+            padding: 3px 4px;
+            text-align: center !important;
+            vertical-align: middle;
+            font-size: 10px;
+            color: #1a2a4a;
+            height: 24px;
+        }
+
+        .tabla-listado tbody tr:nth-child(even) { background: #f8f9fc; }
+        .tabla-listado tbody tr:hover { background: #e8f0fe; }
+
+        .col-orden-listado { width: 5%; min-width: 30px; text-align: center !important; font-weight: bold; }
+        .col-id-listado { width: 11%; min-width: 55px; text-align: center !important; }
+        .col-foto-listado { width: 6%; min-width: 35px; text-align: center !important; }
+        .col-nombre-listado { width: 20%; min-width: 90px; text-align: left !important; padding-left: 6px !important; }
+        .col-apellido-listado { width: 20%; min-width: 90px; text-align: left !important; padding-left: 6px !important; }
+        .col-fecha-listado { width: 14%; min-width: 65px; text-align: center !important; }
+        .col-edad-listado { width: 8%; min-width: 35px; text-align: center !important; font-weight: bold; }
+        .col-grado-listado { width: 16%; min-width: 80px; text-align: center !important; font-size: 9px; }
+
+        .foto-mini-listado {
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            object-fit: cover;
+            border: 1px solid #a0a0a0;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .foto-vacia-listado {
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
+            border: 1px dashed #a0a0a0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #b0c8d8;
+            background: #fafbfc;
+            margin: 0 auto;
+        }
+
+        .watermark-listado {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 9px;
+            color: #8a9aaa;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-top: 1px solid #d0d8e0;
+            padding-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .sin-datos-listado {
+            text-align: center !important;
+            padding: 40px 20px !important;
+            color: #999 !important;
+            font-size: 16px !important;
+            font-style: italic !important;
+            background: #fafbfc !important;
+        }
+
+        .sin-datos-listado .icono { font-size: 48px; display: block; margin-bottom: 10px; }
+        .sin-datos-listado .sub-texto { font-size: 13px; color: #b0b8c0; margin-top: 6px; }
+
+        .estado-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #28a745;
+            padding: 4px 10px;
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .estado-live .punto {
+            width: 8px; height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulso 2s infinite;
+        }
+        @keyframes pulso {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+
+        .mensaje-flotante-listado {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            text-align: center;
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .mensaje-flotante-listado.mostrar { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .mensaje-flotante-listado.exito { background: #d4edda; border: 3px solid #28a745; color: #155724; }
+        .mensaje-flotante-listado.error { background: #f8d7da; border: 3px solid #dc3545; color: #721c24; }
+        .mensaje-flotante-listado.warning { background: #fff3cd; border: 3px solid #ffc107; color: #856404; }
+        .mensaje-flotante-listado.info { background: #d1ecf1; border: 3px solid #17a2b8; color: #0c5460; }
+
+        @media screen and (max-width: 700px) {
+            .hoja-listado { width: 100%; min-height: auto; padding: 12px 10px; }
+            .tabla-listado { font-size: 8px; }
+            .tabla-listado thead th { font-size: 9px !important; padding: 4px 2px; }
+            .tabla-listado tbody td { font-size: 8px; padding: 2px 3px; height: 20px; }
+            .col-orden-listado { min-width: 25px; width: 4%; }
+            .col-id-listado { min-width: 45px; width: 10%; }
+            .col-foto-listado { min-width: 28px; width: 5%; }
+            .col-nombre-listado { min-width: 65px; width: 18%; }
+            .col-apellido-listado { min-width: 65px; width: 18%; }
+            .col-fecha-listado { min-width: 55px; width: 12%; }
+            .col-edad-listado { min-width: 30px; width: 8%; }
+            .col-grado-listado { min-width: 60px; width: 14%; }
+            .foto-mini-listado, .foto-vacia-listado { width: 18px; height: 18px; }
+            .toolbar-listado { padding: 10px 15px; gap: 8px; }
+            .toolbar-listado .info-grado { font-size: 11px; padding: 3px 10px; }
+            .btn-listado { font-size: 10px; padding: 5px 12px; }
+            .titulo-listado { font-size: 13px; }
+            .info-encabezado { font-size: 9px; }
+        }
+
+        @media screen and (max-width: 480px) {
+            .tabla-listado { font-size: 6px; }
+            .tabla-listado thead th { font-size: 7px !important; padding: 3px 1px; }
+            .tabla-listado tbody td { font-size: 6px; padding: 2px 2px; height: 18px; }
+            .btn-listado { font-size: 8px; padding: 4px 8px; }
+            .toolbar-listado .info-grado { font-size: 9px; padding: 2px 6px; }
+            .titulo-listado { font-size: 10px; }
+            .info-encabezado { font-size: 7px; }
+            .watermark-listado { font-size: 7px; }
+        }
+
+        @media print {
+            body { background: white !important; padding: 0 !important; margin: 0 !important; display: block !important; min-height: auto !important; gap: 0 !important; }
+            .toolbar-listado { display: none !important; }
+            .hoja-listado {
+                width: 100% !important; min-height: 100vh !important;
+                padding: 0.4in 0.3in !important; box-shadow: none !important;
+                border: none !important; border-radius: 0 !important;
+                background: white !important; margin: 0 !important;
+                display: block !important; page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .tabla-listado { font-size: 9px !important; width: 100% !important; }
+            .tabla-listado thead th {
+                background: #ffffff !important; color: #000000 !important;
+                border: 2px solid #000000 !important; font-size: 10px !important;
+                font-weight: 900 !important; padding: 4px 3px !important;
+                border-bottom: 3px solid #000000 !important;
+            }
+            .tabla-listado tbody td { border: 1px solid #666 !important; padding: 2px 3px !important; font-size: 9px !important; color: #000 !important; }
+            .tabla-listado tbody tr:nth-child(even) { background: #f5f5f5 !important; }
+            .mensaje-flotante-listado { display: none !important; }
+            .watermark-listado { font-size: 8px !important; color: #8a9aaa !important; border-top-color: #d0d8e0 !important; }
+            .sin-datos-listado { background: #ffffff !important; color: #999 !important; }
+            @page { size: letter portrait !important; margin: 0.3in !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar-listado">
+        <div class="info-grado">
+            📚 <span id="gradeDisplayListado">Cargando...</span> •
+            <span id="sectionDisplayListado">-</span> •
+            <span id="tandaDisplayListado">-</span> •
+            <span id="yearDisplayListado">-</span>
+            <span class="estado-live"><span class="punto"></span> En vivo</span>
+        </div>
+        <div class="btn-group">
+            <button class="btn-listado btn-actualizar" onclick="actualizarListado()">🔄 Actualizar</button>
+            <button class="btn-listado btn-imprimir" onclick="imprimirListado()">🖨️ Imprimir</button>
+            <button class="btn-listado btn-pdf" onclick="exportarPDF()">📄 PDF</button>
+            <button class="btn-listado btn-excel" onclick="exportarExcel()">📊 Excel</button>
+        </div>
+    </div>
+
+    <div class="hoja-listado" id="hojaListado">
+        <div class="titulo-listado">LISTADO DE ESTUDIANTES</div>
+        <div class="subtitulo-listado">Nivel Primario - Registro de Calificaciones</div>
+
+        <div class="info-encabezado">
+            <span>🏫 Centro Educativo: <strong id="centroDisplayListado">-</strong></span>
+            <span>📋 Código: <strong id="codigoDisplayListado">-</strong></span>
+            <span>📚 Grado: <strong id="gradoDisplayListado2">-</strong></span>
+            <span>📅 Año Escolar: <strong id="yearDisplayListado2">-</strong></span>
+        </div>
+
+        <div class="tabla-container-listado">
+            <table class="tabla-listado" id="tablaListado">
+                <thead>
+                    <tr>
+                        <th class="col-orden-listado">N°<br>Orden</th>
+                        <th class="col-id-listado">ID<br>Est.</th>
+                        <th class="col-foto-listado">Foto</th>
+                        <th class="col-nombre-listado">Nombre(s)</th>
+                        <th class="col-apellido-listado">Apellido(s)</th>
+                        <th class="col-grado-listado">Grado / Sección / Tanda</th>
+                        <th class="col-fecha-listado">Fecha de<br>Nacimiento</th>
+                        <th class="col-edad-listado">Edad</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaListadoBody"></tbody>
+            </table>
+        </div>
+
+        <div class="watermark-listado">Ministerio de Educación • República Dominicana</div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        let currentGrade = 3;
+        let currentSection = 'A';
+        let currentTanda = 'Matutina';
+        let currentYear = '2025-2026';
+        let currentCentro = '-';
+        let currentCodigo = '-';
+        let estudiantesFiltrados = [];
+
+        // ============================================
+        // ✅ DETECTAR GRADO, SECCIÓN Y TANDA (MISMO MÉTODO QUE EL FORMULARIO)
+        // ============================================
+
+        function obtenerGradoDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const gradoUrl = urlParams.get('grado');
+                if (gradoUrl) return decodeURIComponent(gradoUrl);
+
+                const datosSincronizados = localStorage.getItem('datosSincronizados');
+                if (datosSincronizados) {
+                    const datos = JSON.parse(datosSincronizados);
+                    if (datos && datos.grado) return datos.grado;
+                }
+
+                const registroGrado = localStorage.getItem('registroGradoData');
+                if (registroGrado) {
+                    const datos = JSON.parse(registroGrado);
+                    if (datos && datos.grado) return datos.grado;
+                }
+
+                if (typeof AuthSystem !== 'undefined') {
+                    const sesion = AuthSystem.obtenerSesion();
+                    if (sesion && sesion.cedula) {
+                        const gradoGuardado = AuthSystem.obtenerGradoSeleccionado(sesion.cedula);
+                        if (gradoGuardado) return gradoGuardado;
+                    }
+                }
+
+                const gradoCompleto = localStorage.getItem('minerd_grado_completo');
+                if (gradoCompleto) {
+                    const datos = JSON.parse(gradoCompleto);
+                    if (datos && datos.grado) return datos.grado;
+                }
+
+                return null;
+            } catch (e) {
+                console.warn('⚠️ Error obteniendo grado:', e);
+                return null;
+            }
+        }
+
+        function obtenerSeccionDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const seccionUrl = urlParams.get('seccion');
+                if (seccionUrl) return decodeURIComponent(seccionUrl);
+
+                const datosSincronizados = localStorage.getItem('datosSincronizados');
+                if (datosSincronizados) {
+                    const datos = JSON.parse(datosSincronizados);
+                    if (datos && datos.seccion) return datos.seccion;
+                }
+
+                const registroGrado = localStorage.getItem('registroGradoData');
+                if (registroGrado) {
+                    const datos = JSON.parse(registroGrado);
+                    if (datos && datos.seccion) return datos.seccion;
+                }
+
+                const gradoCompleto = localStorage.getItem('minerd_grado_completo');
+                if (gradoCompleto) {
+                    const datos = JSON.parse(gradoCompleto);
+                    if (datos && datos.seccion) return datos.seccion;
+                }
+
+                return null;
+            } catch (e) {
+                console.warn('⚠️ Error obteniendo sección:', e);
+                return null;
+            }
+        }
+
+        function obtenerTandaDesdePortada() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const tandaUrl = urlParams.get('tanda');
+                if (tandaUrl) return decodeURIComponent(tandaUrl);
+
+                const datosSincronizados = localStorage.getItem('datosSincronizados');
+                if (datosSincronizados) {
+                    const datos = JSON.parse(datosSincronizados);
+                    if (datos && datos.tanda) return datos.tanda;
+                }
+
+                const registroGrado = localStorage.getItem('registroGradoData');
+                if (registroGrado) {
+                    const datos = JSON.parse(registroGrado);
+                    if (datos && datos.tanda) return datos.tanda;
+                }
+
+                const gradoCompleto = localStorage.getItem('minerd_grado_completo');
+                if (gradoCompleto) {
+                    const datos = JSON.parse(gradoCompleto);
+                    if (datos && datos.tanda) return datos.tanda;
+                }
+
+                return null;
+            } catch (e) {
+                console.warn('⚠️ Error obteniendo tanda:', e);
+                return null;
+            }
+        }
+
+        // ✅ NUEVO: mismo formato que usa el formulario
+        function obtenerGrupoActual() {
+            const grado = obtenerGradoDesdePortada();
+            const seccion = obtenerSeccionDesdePortada();
+            const tanda = obtenerTandaDesdePortada();
+            return {
+                grado: (grado || 'Primer Grado').trim(),
+                seccion: (seccion || 'A').trim(),
+                tanda: (tanda || 'Matutina').trim()
+            };
+        }
+
+        function convertirGradoANumero(gradoTexto) {
+            const mapa = {
+                'Primer Grado': 1, 'Segundo Grado': 2, 'Tercer Grado': 3,
+                'Cuarto Grado': 4, 'Quinto Grado': 5, 'Sexto Grado': 6,
+                '1er Grado': 1, '2do Grado': 2, '3er Grado': 3,
+                '4to Grado': 4, '5to Grado': 5, '6to Grado': 6,
+                'PRIMER GRADO': 1, 'SEGUNDO GRADO': 2, 'TERCER GRADO': 3,
+                'CUARTO GRADO': 4, 'QUINTO GRADO': 5, 'SEXTO GRADO': 6
+            };
+            return mapa[gradoTexto] || 3;
+        }
+
+        function getGradeText(grade) {
+            const textos = { 1: '1er', 2: '2do', 3: '3er', 4: '4to', 5: '5to', 6: '6to' };
+            return textos[grade] || '3er';
+        }
+
+        function sincronizarDatos() {
+            try {
+                const grupo = obtenerGrupoActual();
+                currentGrade = convertirGradoANumero(grupo.grado);
+                currentSection = grupo.seccion;
+                currentTanda = grupo.tanda;
+
+                const datosSync = localStorage.getItem('datosSincronizados');
+                if (datosSync) {
+                    const datos = JSON.parse(datosSync);
+                    if (datos.anioEscolar) currentYear = datos.anioEscolar;
+                    if (datos.centroEducativo) currentCentro = datos.centroEducativo;
+                    if (datos.codigoCentro) currentCodigo = datos.codigoCentro;
+                }
+
+                actualizarInfoListado();
+                return true;
+            } catch (e) {
+                console.error('❌ Error sincronizando:', e);
+                return false;
+            }
+        }
+
+        function actualizarInfoListado() {
+            const gradoTexto = getGradeText(currentGrade) + ' Grado';
+
+            const gradeDisplay = document.getElementById('gradeDisplayListado');
+            const sectionDisplay = document.getElementById('sectionDisplayListado');
+            const tandaDisplay = document.getElementById('tandaDisplayListado');
+            const yearDisplay = document.getElementById('yearDisplayListado');
+            const centroDisplay = document.getElementById('centroDisplayListado');
+            const codigoDisplay = document.getElementById('codigoDisplayListado');
+            const gradoDisplay2 = document.getElementById('gradoDisplayListado2');
+            const yearDisplay2 = document.getElementById('yearDisplayListado2');
+
+            if (gradeDisplay) gradeDisplay.textContent = gradoTexto;
+            if (sectionDisplay) sectionDisplay.textContent = 'Sección ' + currentSection;
+            if (tandaDisplay) tandaDisplay.textContent = currentTanda;
+            if (yearDisplay) yearDisplay.textContent = currentYear;
+            if (centroDisplay) centroDisplay.textContent = currentCentro || '-';
+            if (codigoDisplay) codigoDisplay.textContent = currentCodigo || '-';
+            if (gradoDisplay2) gradoDisplay2.textContent = gradoTexto + ' - Sección ' + currentSection + ' - ' + currentTanda;
+            if (yearDisplay2) yearDisplay2.textContent = currentYear;
+        }
+
+        // ============================================
+        // ✅ FILTRADO EXACTO (CORREGIDO)
+        // ============================================
+
+        function cargarEstudiantes() {
+            try {
+                const stored = localStorage.getItem('registrosSigerd');
+                if (!stored) return [];
+                const registros = JSON.parse(stored);
+                if (!Array.isArray(registros) || registros.length === 0) return [];
+                return registros;
+            } catch (e) {
+                console.error('❌ Error cargando estudiantes:', e);
+                return [];
+            }
+        }
+
+        // ✅ CORREGIDO: filtrado EXACTO por grado + sección + tanda
+        // (antes mezclaba estudiantes de otras secciones)
+        function filtrarEstudiantes(registros) {
+            const grupo = obtenerGrupoActual();
+            const gradoActual = grupo.grado.toUpperCase().trim();
+            const seccionActual = grupo.seccion.toUpperCase().trim();
+            const tandaActual = grupo.tanda.toUpperCase().trim();
+
+            const filtrados = registros.filter(r => {
+                const gradoRegistro = (r.grado || '').toUpperCase().trim();
+                const seccionRegistro = (r.seccion || '').toUpperCase().trim();
+                const tandaRegistro = (r.tanda || '').toUpperCase().trim();
+
+                if (!gradoRegistro) return false;
+
+                // ✅ Comparación EXACTA, no "includes"
+                return gradoRegistro === gradoActual &&
+                       seccionRegistro === seccionActual &&
+                       tandaRegistro === tandaActual;
+            });
+
+            console.log(`📊 MOSTRANDO ${filtrados.length} registros para: ${grupo.grado}, Sección: ${grupo.seccion}, Tanda: ${grupo.tanda}`);
+            return filtrados;
+        }
+
+        function cargarDatosConOrden() {
+            let registros = cargarEstudiantes();
+            if (registros.length === 0) return [];
+
+            // ✅ FILTRADO EXACTO (ya no mezcla secciones)
+            registros = filtrarEstudiantes(registros);
+
+            let ordenAZ = false;
+            try {
+                const stored = localStorage.getItem('ordenAZActivo');
+                if (stored !== null) ordenAZ = JSON.parse(stored);
+            } catch (e) {}
+
+            if (ordenAZ) {
+                registros.sort((a, b) => {
+                    const nombreA = (a.nombre || '').toUpperCase();
+                    const nombreB = (b.nombre || '').toUpperCase();
+                    return nombreA.localeCompare(nombreB);
+                });
+            } else {
+                registros.sort((a, b) => (parseInt(a.orden) || 0) - (parseInt(b.orden) || 0));
+            }
+
+            estudiantesFiltrados = registros;
+            return registros;
+        }
+
+        // ✅ NUEVO: obtener foto por uid (igual que el formulario)
+        function obtenerFoto(uid) {
+            if (!uid) return null;
+            try {
+                const data = localStorage.getItem(`foto_${uid}`);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (parsed && parsed.base64) return parsed.base64;
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // ✅ Calcular edad (misma lógica que el formulario)
+        function calcularEdadDesdeFecha(fechaNac) {
+            if (!fechaNac || fechaNac === '-') return '-';
+            try {
+                const partes = fechaNac.split('/');
+                if (partes.length !== 3) return '-';
+                const dia = parseInt(partes[0]);
+                const mes = parseInt(partes[1]) - 1;
+                const anio = parseInt(partes[2]);
+                const fechaNacimiento = new Date(anio, mes, dia);
+                const fechaActual = new Date();
+                let edadCalc = fechaActual.getFullYear() - fechaNacimiento.getFullYear();
+                const m = fechaActual.getMonth() - fechaNacimiento.getMonth();
+                if (m < 0 || (m === 0 && fechaActual.getDate() < fechaNacimiento.getDate())) {
+                    edadCalc--;
+                }
+                if (edadCalc >= 0 && edadCalc <= 120) return edadCalc;
+                return '-';
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        // ============================================
+        // ✅ GENERAR LISTADO (CORREGIDO con foto)
+        // ============================================
+
+        function generarListado() {
+            const tbody = document.getElementById('tablaListadoBody');
+            if (!tbody) return;
+
+            const estudiantes = cargarDatosConOrden();
+
+            if (estudiantes.length === 0) {
+                const grupo = obtenerGrupoActual();
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="sin-datos-listado">
+                            <span class="icono">📭</span>
+                            No hay estudiantes para: <strong>${grupo.grado}, Sección ${grupo.seccion}, ${grupo.tanda}</strong>
+                            <div class="sub-texto">Registra estudiantes desde el formulario para verlos aquí.</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            estudiantes.forEach(function(est, index) {
+                const nombre = (est.nombre || '').toUpperCase();
+                const apellido = (est.apellido || '').toUpperCase();
+                // ✅ ID: usar el campo correcto que guarda el formulario
+                const idEstudiante = est.id || est.idEstudiante || '-';
+                const fechaNac = est.fechaNac || est.fechaNacimiento || '-';
+                const grado = est.grado || '-';
+                const seccion = est.seccion || '';
+                const tanda = est.tanda || '';
+
+                let gradoMostrar = grado;
+                if (seccion) gradoMostrar += ' - ' + seccion;
+                if (tanda) gradoMostrar += ' - ' + tanda;
+
+                const edad = calcularEdadDesdeFecha(fechaNac);
+
+                // ✅ FOTO: leer por uid
+                const fotoBase64 = obtenerFoto(est.uid);
+                const fotoHTML = fotoBase64
+                    ? `<img src="${fotoBase64}" class="foto-mini-listado" alt="Foto" />`
+                    : `<div class="foto-vacia-listado">📷</div>`;
+
+                html += `
+                    <tr>
+                        <td class="col-orden-listado">${index + 1}</td>
+                        <td class="col-id-listado">${idEstudiante}</td>
+                        <td class="col-foto-listado">${fotoHTML}</td>
+                        <td class="col-nombre-listado">${nombre}</td>
+                        <td class="col-apellido-listado">${apellido}</td>
+                        <td class="col-grado-listado">${gradoMostrar}</td>
+                        <td class="col-fecha-listado">${fechaNac}</td>
+                        <td class="col-edad-listado">${edad}</td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            console.log(`✅ Listado generado: ${estudiantes.length} estudiantes (filtrado exacto)`);
+        }
+
+        // ============================================
+        // BOTONES
+        // ============================================
+
+        window.actualizarListado = function() {
+            sincronizarDatos();
+            generarListado();
+            mostrarMensaje('🔄 Listado actualizado', 'info');
+        };
+
+        window.imprimirListado = function() {
+            window.print();
+        };
+
+        // ============================================
+        // PDF
+        // ============================================
+
+        window.exportarPDF = function() {
+            const btn = document.querySelector('.btn-pdf');
+            const elemento = document.getElementById('hojaListado');
+
+            if (!elemento) {
+                mostrarMensaje('❌ Error: no se encontró el documento', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Generando...';
+
+            const estiloFix = document.createElement('style');
+            estiloFix.id = 'pdf-fix';
+            estiloFix.textContent = `
+                .hoja-listado { width: 100% !important; max-width: 100% !important; min-height: auto !important; height: auto !important; padding: 20px 18px !important; margin: 0 !important; border: none !important; box-shadow: none !important; border-radius: 0 !important; background: white !important; overflow: visible !important; }
+                .tabla-listado { font-size: 9px !important; width: 100% !important; }
+                .tabla-listado thead th { font-size: 9px !important; padding: 4px 3px !important; }
+                .tabla-listado tbody td { font-size: 9px !important; padding: 2px 3px !important; height: 20px !important; }
+                .col-orden-listado { width: 5% !important; min-width: 28px !important; }
+                .col-id-listado { width: 10% !important; min-width: 55px !important; }
+                .col-foto-listado { width: 6% !important; min-width: 32px !important; }
+                .col-nombre-listado { width: 18% !important; min-width: 85px !important; }
+                .col-apellido-listado { width: 18% !important; min-width: 85px !important; }
+                .col-grado-listado { width: 15% !important; min-width: 75px !important; }
+                .col-fecha-listado { width: 13% !important; min-width: 60px !important; }
+                .col-edad-listado { width: 8% !important; min-width: 35px !important; }
+                .sin-datos-listado { padding: 30px 20px !important; font-size: 14px !important; }
+                .sin-datos-listado .icono { font-size: 32px !important; }
+                .watermark-listado { font-size: 8px !important; margin-top: 4px !important; padding-top: 4px !important; }
+                .info-encabezado { font-size: 9px !important; padding: 3px 6px !important; margin-bottom: 4px !important; }
+                .titulo-listado { font-size: 13px !important; padding-bottom: 4px !important; margin-bottom: 0px !important; }
+                .subtitulo-listado { font-size: 9px !important; margin-bottom: 4px !important; }
+                .tabla-container-listado { overflow: visible !important; flex: none !important; }
+                .tabla-listado tbody tr:nth-child(even) { background: #f5f5f5 !important; }
+                .hoja-listado * { max-width: 100% !important; }
+            `;
+            document.head.appendChild(estiloFix);
+
+            const images = elemento.querySelectorAll('img');
+            let pending = images.length;
+
+            function generarPDFFinal() {
+                if (typeof html2pdf === 'undefined') {
+                    mostrarMensaje('⚠️ Librería PDF no cargada. Usando impresión.', 'warning');
+                    window.print();
+                    btn.disabled = false;
+                    btn.textContent = '📄 PDF';
+                    estiloFix.remove();
+                    return;
+                }
+
+                const grupo = obtenerGrupoActual();
+                const opciones = {
+                    margin: [0.3, 0.3, 0.3, 0.3],
+                    filename: 'Listado_Estudiantes_' + grupo.grado.replace(/\s+/g, '_') + '_' + grupo.seccion + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', letterRendering: true, scrollY: 0, scrollX: 0 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait', compress: true, putOnlyUsedFonts: true },
+                    pagebreak: { mode: 'avoid-all' }
+                };
+
+                html2pdf().set(opciones).from(elemento).save()
+                    .then(function() {
+                        btn.disabled = false;
+                        btn.textContent = '📄 PDF';
+                        mostrarMensaje('✅ PDF generado correctamente', 'exito');
+                        estiloFix.remove();
+                    })
+                    .catch(function(err) {
+                        console.error('Error PDF:', err);
+                        mostrarMensaje('❌ Error al generar PDF: ' + err.message, 'error');
+                        btn.disabled = false;
+                        btn.textContent = '📄 PDF';
+                        estiloFix.remove();
+                    });
+            }
+
+            if (pending === 0) {
+                generarPDFFinal();
+            } else {
+                images.forEach(function(img) {
+                    if (img.complete) {
+                        pending--;
+                        if (pending === 0) generarPDFFinal();
+                    } else {
+                        img.addEventListener('load', function() { pending--; if (pending === 0) generarPDFFinal(); });
+                        img.addEventListener('error', function() { pending--; if (pending === 0) generarPDFFinal(); });
+                    }
+                });
+            }
+        };
+
+        // ============================================
+        // EXCEL
+        // ============================================
+
+        window.exportarExcel = function() {
+            if (estudiantesFiltrados.length === 0) {
+                mostrarMensaje('⚠️ No hay datos para exportar', 'warning');
+                return;
+            }
+
+            try {
+                let csv = '\uFEFF';
+                csv += 'N° Orden;ID;Nombre(s);Apellido(s);Grado;Sección;Tanda;Fecha de Nacimiento;Edad\n';
+
+                estudiantesFiltrados.forEach(function(est, index) {
+                    const nombre = (est.nombre || '').toUpperCase();
+                    const apellido = (est.apellido || '').toUpperCase();
+                    const idEstudiante = est.id || est.idEstudiante || '-';
+                    const fechaNac = est.fechaNac || est.fechaNacimiento || '-';
+                    const grado = est.grado || '-';
+                    const seccion = est.seccion || '';
+                    const tanda = est.tanda || '';
+                    const edad = calcularEdadDesdeFecha(fechaNac);
+
+                    csv += `${index + 1};${idEstudiante};${nombre};${apellido};${grado};${seccion};${tanda};${fechaNac};${edad}\n`;
+                });
+
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                const grupo = obtenerGrupoActual();
+                link.download = 'Listado_Estudiantes_' + grupo.grado.replace(/\s+/g, '_') + '_' + grupo.seccion + '.csv';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                mostrarMensaje('✅ Excel exportado (' + estudiantesFiltrados.length + ' estudiantes)', 'exito');
+            } catch (e) {
+                console.error('❌ Error exportando Excel:', e);
+                mostrarMensaje('❌ Error al exportar: ' + e.message, 'error');
+            }
+        };
+
+        // ============================================
+        // MENSAJE FLOTANTE
+        // ============================================
+
+        function mostrarMensaje(texto, tipo) {
+            const anterior = document.querySelector('.mensaje-flotante-listado');
+            if (anterior) anterior.remove();
+
+            const mensaje = document.createElement('div');
+            mensaje.className = 'mensaje-flotante-listado ' + tipo;
+            mensaje.textContent = texto;
+            document.body.appendChild(mensaje);
+
+            setTimeout(function() { mensaje.classList.add('mostrar'); }, 50);
+            setTimeout(function() {
+                mensaje.classList.remove('mostrar');
+                setTimeout(function() { if (mensaje.parentNode) mensaje.remove(); }, 500);
+            }, 3000);
+        }
+
+        // ============================================
+        // ✅ SINCRONIZACIÓN EN VIVO (NUEVO)
+        // ============================================
+
+        // Actualización entre pestañas (si editas en otra pestaña, aquí se refleja)
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'datosSincronizados' ||
+                e.key === 'registrosSigerd' ||
+                e.key === 'ordenAZActivo' ||
+                e.key === 'registroGradoData' ||
+                e.key === 'minerd_grado_completo' ||
+                (e.key && e.key.startsWith('foto_'))) {
+                setTimeout(function() {
+                    sincronizarDatos();
+                    generarListado();
+                }, 100);
+            }
+        });
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        function init() {
+            console.log('📋 LISTADO DE ESTUDIANTES - Inicializando...');
+            sincronizarDatos();
+            generarListado();
+
+            // ✅ Auto-refresh cada 2 segundos (antes era 5s)
+            setInterval(function() {
+                sincronizarDatos();
+                generarListado();
+            }, 2000);
+
+            console.log('✅ Listado cargado - Filtro EXACTO por grado+sección+tanda');
+            console.log('📡 Sincronización en vivo activada');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+
+</body>
+</html>
