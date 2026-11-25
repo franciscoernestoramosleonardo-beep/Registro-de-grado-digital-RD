@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <!-- Ícono de la aplicación y color del tema -->
+    
+    <!-- Ícono de la aplicación y color del tema -->
     <link rel="icon" href="registro.png" type="image/png">
     <link rel="apple-touch-icon" href="registro.png">
     <meta name="theme-color" content="#1e4a7a">
@@ -696,7 +697,6 @@
                 
                 AuthSystem.guardarGradoSeleccionado(cedula, grado);
                 
-                // CAMBIO A MINÚSCULA: portada.html
                 let url = 'portada.html?grado=' + encodeURIComponent(grado);
                 if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
                 if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
@@ -765,7 +765,6 @@
                         
                         AuthSystem.guardarGradoSeleccionado(cedula, grado);
                         
-                        // CAMBIO A MINÚSCULA: portada.html
                         let url = 'portada.html?grado=' + encodeURIComponent(grado);
                         if (seccion) url += '&seccion=' + encodeURIComponent(seccion);
                         if (tanda) url += '&tanda=' + encodeURIComponent(tanda);
@@ -878,7 +877,6 @@
                 }
                 
                 setTimeout(() => {
-                    // CAMBIO A MINÚSCULA: admin.html
                     window.location.href = 'admin.html';
                 }, 800);
                 return;
@@ -1007,7 +1005,6 @@
                 document.getElementById('bienvenidaGrande').style.display = 'none';
                 mostrarSelectorGrados(cedula, nombre);
             } else {
-                // CAMBIO A MINÚSCULA: portada.html
                 window.location.href = 'portada.html';
             }
         });
@@ -1034,7 +1031,6 @@
     </script>
 
     <div style="text-align: center; margin-top: 20px; padding: 10px;">
-        <!-- CAMBIO A MINÚSCULA: portada.html -->
         <a href="portada.html" style="color: #002D62; font-weight: 600; text-decoration: none;">← Volver al inicio</a>
     </div>
 </body>

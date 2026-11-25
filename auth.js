@@ -1,7 +1,7 @@
 /* ============================================
 SISTEMA DE AUTENTICACIÓN - MINERD
 Registro de Grado - Nivel Primario
-VERSIÓN CORREGIDA Y UNIFICADA
+VERSIÓN CORREGIDA - ACCESO MULTI-DISPOSITIVO
 ============================================ */
 const AuthSystem = {
     STORAGE_KEY: 'minerd_codigos_docentes',
@@ -497,7 +497,7 @@ const AuthSystem = {
     },
 
     /* ============================================
-      VALIDAR ACCESO (DOCENTE) - CON BLOQUEO Y HUELLA
+      ✅ VALIDAR ACCESO (DOCENTE) - SIN RESTRICCIÓN DE HUELLA
       ============================================ */
     validarAccesoPrimerVez(cedula, codigo) {
         const estadoDocente = this.obtenerEstadoDocente(cedula);
@@ -543,27 +543,7 @@ const AuthSystem = {
                 };
             }
 
-            const huellaActual = this.generarHuellaEquipo();
-            const huellasAutorizadas = this.obtenerHuellasUsuario(cedula);
-
-            if (huellasAutorizadas.length > 0 && !huellasAutorizadas.includes(huellaActual)) {
-                const autorizar = confirm(
-                    `⚠️ Este equipo no está autorizado para el usuario ${cedula}.\n\n` +
-                    `¿Desea autorizar este equipo para acceder?\n\n` +
-                    `(Si selecciona "Cancelar", el acceso será denegado)`
-                );
-
-                if (!autorizar) {
-                    return {
-                        exito: false,
-                        mensaje: '❌ Acceso denegado. Este equipo no está autorizado para su usuario.'
-                    };
-                }
-
-                this.agregarHuellaUsuario(cedula, huellaActual);
-                console.log(`✅ Equipo autorizado para ${cedula}: ${huellaActual}`);
-            }
-
+            // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL PARA PERMITIR CUALQUIER DISPOSITIVO
             return {
                 exito: true,
                 accion: 'login_password',
@@ -613,6 +593,9 @@ const AuthSystem = {
         return resultado;
     },
 
+    /* ============================================
+      ✅ VALIDAR PASSWORD (DOCENTE) - SIN RESTRICCIÓN DE HUELLA
+      ============================================ */
     validarPasswordDocente(cedula, password) {
         const estadoDocente = this.obtenerEstadoDocente(cedula);
         if (estadoDocente.existe && estadoDocente.estado === 'bloqueado') {
@@ -641,29 +624,11 @@ const AuthSystem = {
             return { exito: false, mensaje: 'Contraseña incorrecta' };
         }
 
-        const huellaActual = this.generarHuellaEquipo();
-        const huellasAutorizadas = this.obtenerHuellasUsuario(cedula);
-
-        if (huellasAutorizadas.length > 0 && !huellasAutorizadas.includes(huellaActual)) {
-            const autorizar = confirm(
-                `⚠️ Este equipo no está autorizado para el usuario ${cedula}.\n\n` +
-                `¿Desea autorizar este equipo para acceder?\n\n` +
-                `(Si selecciona "Cancelar", el acceso será denegado)`
-            );
-
-            if (!autorizar) {
-                return {
-                    exito: false,
-                    mensaje: '❌ Acceso denegado. Este equipo no está autorizado para su usuario.'
-                };
-            }
-
-            this.agregarHuellaUsuario(cedula, huellaActual);
-            console.log(`✅ Equipo autorizado para ${cedula}: ${huellaActual}`);
-        }
+        // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL Y EL POPUP DE AUTORIZACIÓN
 
         const codigos = this.obtenerCodigos();
         const codigoDocente = codigos.find(c => c.cedula === cedula);
+        const huellaActual = this.generarHuellaEquipo();
         const session = {
             cedula: cedula,
             codigo: codigoDocente ? codigoDocente.codigo : '',
@@ -750,6 +715,9 @@ const AuthSystem = {
     estaAutenticado() {
         return this.obtenerSesion() !== null;
     },
+    /* ============================================
+      ✅ VALIDAR SESIÓN ACTIVA - SIN RESTRICCIÓN DE HUELLA
+      ============================================ */
     validarSesionActiva() {
         const session = this.obtenerSesion();
         if (!session) {
@@ -766,13 +734,7 @@ const AuthSystem = {
             return { valido: false, motivo: 'Su código ha sido revocado.' };
         }
 
-        const huellaActual = this.generarHuellaEquipo();
-        const huellasAutorizadas = this.obtenerHuellasUsuario(session.cedula);
-
-        if (huellasAutorizadas.length > 0 && !huellasAutorizadas.includes(huellaActual)) {
-            this.cerrarSesion();
-            return { valido: false, motivo: 'Este equipo no está autorizado para su usuario.' };
-        }
+        // ✅ SE ELIMINÓ LA VALIDACIÓN DE HUELLA DIGITAL EN LA SESIÓN
 
         const estadoDocente = this.obtenerEstadoDocente(session.cedula);
         if (estadoDocente.existe && estadoDocente.estado === 'bloqueado') {
@@ -1172,7 +1134,7 @@ const AuthSystem = {
     },
 
     obtenerDocentesConAsignacionesCompletas() {
-        const asignaciones = this.obtenerAsignacionesCompletas();
+        const asignaciones = this.obternerAsignacionesCompletas ? this.obtenerAsignacionesCompletas() : [];
         const contrasenas = this.obtenerContrasenas();
         const codigos = this.obtenerCodigos();
 
