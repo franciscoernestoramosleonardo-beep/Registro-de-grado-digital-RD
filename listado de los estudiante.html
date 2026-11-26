@@ -5,6 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listado de Estudiantes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Firebase - Conexión en la nube -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+      import { getFirestore, collection, query, where, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+      // TU CONFIGURACIÓN DE FIREBASE
+      const firebaseConfig = {
+        apiKey: "AIzaSyAdU1P7wY0IDaWaYoQMbAi6nZmhjn3oFyY",
+        authDomain: "control-financiero-f5b48.firebaseapp.com",
+        projectId: "control-financiero-f5b48",
+        storageBucket: "control-financiero-f5b48.firebasestorage.app",
+        messagingSenderId: "1084614961043",
+        appId: "1:1084614961043:web:4a5e8f79c2e3b4d5f6a7b8c9"
+      };
+
+      // Inicializar Firebase
+      const app = initializeApp(firebaseConfig);
+      window.db = getFirestore(app);
+      window.auth = getAuth(app);
+      window.onSnapshot = onSnapshot;
+    </script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -937,6 +961,7 @@
 
             console.log('✅ Listado cargado - Filtro EXACTO por grado+sección+tanda');
             console.log('📡 Sincronización en vivo activada');
+            console.log('☁️ Firebase inicializado y listo para conexión en la nube');
         }
 
         if (document.readyState === 'loading') {
