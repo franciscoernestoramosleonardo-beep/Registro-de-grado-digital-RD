@@ -2558,44 +2558,96 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
+<!-- SCRIPT DE GUARDADO EN FIREBASE CORREGIDO -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const btnGuardar = document.getElementById('btnGuardar');
   
+  // Aseguramos que db y auth estén disponibles globalmente por si otros scripts los necesitan
+  window.db = window.db || firebase.firestore();
+  window.auth = window.auth || firebase.auth();
+
   if (btnGuardar) {
     btnGuardar.addEventListener('click', async function() {
-      if (!auth.currentUser) {
-        alert('⚠️ Debes iniciar sesión primero');
+      // 1. VALIDACIÓN BÁSICA DE CAMPOS OBLIGATORIOS
+      const nombre = document.getElementById('nombre')?.value.trim();
+      const apellido = document.getElementById('apellido')?.value.trim();
+      
+      if (!nombre || !apellido) {
+        alert('⚠️ El Nombre y el Apellido son campos obligatorios.');
         return;
       }
 
+      // 2. OBTENER DATOS DEL ESTUDIANTE (Corregido y completo según tu HTML)
       const datosEstudiante = {
-        docenteUid: auth.currentUser.uid,
-        grado: document.getElementById('gradoMostrado')?.textContent || '',
-        seccion: document.getElementById('seccionMostrado')?.textContent || '',
-        tanda: document.getElementById('tandaMostrado')?.textContent || '',
+        // Datos del contexto (asegúrate de que estos spans tengan texto)
+        grado: document.getElementById('gradoMostrado')?.textContent || 'No asignado',
+        seccion: document.getElementById('seccionMostrado')?.textContent || 'No asignada',
+        tanda: document.getElementById('tandaMostrado')?.textContent || 'No asignada',
+        
+        // Datos del estudiante
         orden: document.getElementById('orden')?.value || '',
         idEstudiante: document.getElementById('idEstudiante')?.value || '',
-        nombre: document.getElementById('nombre')?.value || '',
-        apellido: document.getElementById('apellido')?.value || '',
+        nombre: nombre,
+        apellido: apellido,
         nacionalidad: document.getElementById('nacionalidad')?.value || '',
         sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
         libro: document.getElementById('libro')?.value || '',
         folio: document.getElementById('folio')?.value || '',
         direccion: document.getElementById('direccionEstudiante')?.value || '',
+        provincia: document.getElementById('provincia')?.value || '',
+        municipio: document.getElementById('municipio')?.value || '',
+        barrio: document.getElementById('barrio')?.value || '',
         telefono: document.getElementById('telefono')?.value || '',
-        tutorNombre: document.getElementById('tutorNombre')?.value || '',  // ✅ CORREGIDO
+        
+        // Datos del Tutor (IDs corregidos para coincidir con tu HTML)
+        tutorTipo: document.getElementById('tutorTipo')?.value || '',
         tutorCedula: document.getElementById('tutorCedula')?.value || '',
+        tutorDireccion: document.getElementById('tutorDireccion')?.value || '',
         tutorTelefono: document.getElementById('tutorTelefono')?.value || '',
-        fechaRegistro: new Date()
+        tutorEscolaridad: document.getElementById('tutorEscolaridad')?.value || '',
+        tutorOcupacion: document.getElementById('tutorOcupacion')?.value || '',
+        
+        // Emergencia
+        emergenciaNombre: document.getElementById('emergenciaNombre')?.value || '',
+        emergenciaTelefono: document.getElementById('emergenciaTelefono')?.value || '',
+        
+        // Metadatos
+        fechaRegistro: firebase.firestore.FieldValue.serverTimestamp(), // Usa la hora del servidor de Firebase
+        creadoPor: window.auth?.currentUser?.uid || 'anonimo'
       };
 
+      console.log("📦 Datos a enviar:", datosEstudiante);
+
+      // 3. INTENTO DE GUARDADO EN FIREBASE
       try {
-        await db.collection('estudiantes').add(datosEstudiante);
+        // Mostramos estado de carga en el botón
+        const textoOriginal = btnGuardar.textContent;
+        btnGuardar.textContent = '⏳ Guardando...';
+        btnGuardar.disabled = true;
+
+        await window.db.collection('estudiantes').add(datosEstudiante);
+        
         alert('✅ ¡Guardado en la nube correctamente!');
+        
+        // Opcional: Limpiar formulario después de guardar
+        // document.getElementById('registroForm').reset();
+        
       } catch (error) {
-        console.error('Error:', error);
-        alert('❌ No se pudo guardar: ' + error.message);
+        console.error('🔥 Error de Firebase:', error);
+        
+        // Mensajes de error específicos para ayudarte a depurar
+        if (error.code === 'permission-denied') {
+          alert('❌ Error de permisos: Tus reglas de seguridad de Firebase requieren que el usuario esté autenticado. Debes iniciar sesión primero o cambiar las reglas de Firestore a modo prueba.');
+        } else if (error.code === 'unavailable') {
+          alert('❌ Error de red: No se pudo conectar con Firebase. Revisa tu conexión a internet.');
+        } else {
+          alert('❌ No se pudo guardar: ' + error.message);
+        }
+      } finally {
+        // Restaurar botón
+        btnGuardar.textContent = '✔ Guardar registro';
+        btnGuardar.disabled = false;
       }
     });
   }
