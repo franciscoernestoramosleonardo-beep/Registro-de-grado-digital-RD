@@ -1,5 +1,8 @@
 <!doctype html>
 <html lang="es">
+
+
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1010,6 +1013,30 @@
       }
     }
   </style>
+
+<<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyADuUP7WV0IDaNaYoQybAi6nZmhjn3oFyY",
+  authDomain: "control-financiero-f5b48.firebaseapp.com",
+  projectId: "control-financiero-f5b48",
+  storageBucket: "control-financiero-f5b48.appspot.com",
+  messagingSenderId: "1886739264551",
+  appId: "1:1086739264551:web:c45b9676523547436494a02"
+};
+
+if (!window.firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+const auth = firebase.auth();
+</script>
+
+
 </head>
 <body>
 
@@ -2530,6 +2557,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
 })();
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const btnGuardar = document.getElementById('btnGuardar');
+  
+  if (btnGuardar) {
+    btnGuardar.addEventListener('click', async function() {
+      if (!auth.currentUser) {
+        alert('⚠️ Debes iniciar sesión primero');
+        return;
+      }
+
+      const datosEstudiante = {
+        docenteUid: auth.currentUser.uid,
+        grado: document.getElementById('gradoMostrado')?.textContent || '',
+        seccion: document.getElementById('seccionMostrado')?.textContent || '',
+        tanda: document.getElementById('tandaMostrado')?.textContent || '',
+        orden: document.getElementById('orden')?.value || '',
+        idEstudiante: document.getElementById('idEstudiante')?.value || '',
+        nombre: document.getElementById('nombre')?.value || '',
+        apellido: document.getElementById('apellido')?.value || '',
+        nacionalidad: document.getElementById('nacionalidad')?.value || '',
+        sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
+        libro: document.getElementById('libro')?.value || '',
+        folio: document.getElementById('folio')?.value || '',
+        direccion: document.getElementById('direccionEstudiante')?.value || '',
+        telefono: document.getElementById('telefono')?.value || '',
+        tutorNombre: document.getElementById('tutorNombre')?.value || '',
+        tutorCedula: document.getElementById('tutorCedula')?.value || '',
+        tutorTelefono: document.getElementById('tutorTelefono')?.value || '',
+        fechaRegistro: new Date()
+      };
+
+      try {
+        await db.collection('estudiantes').add(datosEstudiante);
+        alert('✅ ¡Guardado en la nube correctamente!');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ No se pudo guardar: ' + error.message);
+      }
+    });
+  }
+});
+</script>
+
 
 </body>
 </html>
