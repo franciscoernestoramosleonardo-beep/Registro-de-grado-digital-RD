@@ -11,6 +11,7 @@
 // ✅ NUEVO: Nivel de ESCOLARIDAD del tutor
 // ✅ NUEVO: OCUPACIÓN u oficio del tutor
 // ✅ FIX ANTIDUPLICADO: limpia y reconstruye claves de fila (evalNota_*/evalRec_*) al eliminar/reordenar
+// ✅ NUEVO: Sincronización con Firebase al guardar y actualizar
 
 const FormularioSigerd = (function() {
     'use strict';
@@ -1274,6 +1275,12 @@ const FormularioSigerd = (function() {
         // ✅ FIX ANTIDUPLICADO: reconstruir claves de fila desde UID tras reordenar
         reconstruirClavesDeFilaDesdeUID();
         guardarRegistrosEnStorage();
+        
+        // ✅ NUEVO: Guardar también en Firebase
+        if (window.guardarEstudianteEnFirebase) {
+            window.guardarEstudianteEnFirebase(registro);
+        }
+        
         emitirEventoActualizacion();
         const registroGuardado = registros.find(r => r.uid === uid);
         const ordenFinal = registroGuardado ? registroGuardado.orden : '?';
@@ -1323,6 +1330,12 @@ const FormularioSigerd = (function() {
         // ✅ FIX ANTIDUPLICADO: reconstruir claves de fila desde UID tras reordenar
         reconstruirClavesDeFilaDesdeUID();
         guardarRegistrosEnStorage();
+        
+        // ✅ NUEVO: Guardar también en Firebase (por consistencia con guardarRegistro)
+        if (window.guardarEstudianteEnFirebase) {
+            window.guardarEstudianteEnFirebase(registroActualizado);
+        }
+        
         emitirEventoActualizacion();
         mostrarMensaje(`✅ Registro #${registroActualizado.orden} actualizado y reordenado exitosamente.`, 'success');
         cancelarEdicion();
