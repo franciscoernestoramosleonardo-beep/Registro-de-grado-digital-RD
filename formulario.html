@@ -1,10 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 
-
-
 <head>
-  <meta charset="utf-8" />
+
+
+<!-- FIREBASE - CONEXIÓN COMPLETA -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC0UNLtuESkEonapNUCTtkZNkNKDVRbj2Q",
+    authDomain: "registro-de-grado-digital-rd.firebaseapp.com",
+    projectId: "registro-de-grado-digital-rd",
+    storageBucket: "registro-de-grado-digital-rd.firebasestorage.app",
+    messagingSenderId: "500660193068",
+    appId: "1:500660193068:web:0187db6bd04a829c8c8e89"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  window.db = db;
+  window.auth = auth;
+  window.collection = collection;
+  window.addDoc = addDoc;
+</script>
+
+
+
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Formulario Digital RD - Sigerd</title>
   <link rel="stylesheet" href="formulario.css" />
@@ -1013,30 +1040,6 @@
       }
     }
   </style>
-
-<<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyADuUP7WV0IDaNaYoQybAi6nZmhjn3oFyY",
-  authDomain: "control-financiero-f5b48.firebaseapp.com",
-  projectId: "control-financiero-f5b48",
-  storageBucket: "control-financiero-f5b48.appspot.com",
-  messagingSenderId: "1886739264551",
-  appId: "1:1086739264551:web:c45b9676523547436494a02"
-};
-
-if (!window.firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
-const auth = firebase.auth();
-</script>
-
-
 </head>
 <body>
 
@@ -1048,12 +1051,12 @@ const auth = firebase.auth();
     <div class="form-header-left">
       <div class="logo-icon">RD</div>
       <h1>
-        formulario digital
+        FORMULARIO DIGITAL
         <small>Sigerd · Registro de Estudiantes</small>
       </h1>
     </div>
     <div class="form-header-right">
-      <span class="badge" id="badgeEstado">📋 nuevo registro</span>
+      <span class="badge" id="badgeEstado">📋 NUEVO REGISTRO</span>
       <div class="badge-grupo" id="badgeGrupo">
         <span class="badge-grado-item" id="badgeGradoPortada">
           🎓 <span id="gradoMostrado">Cargando...</span>
@@ -1212,7 +1215,7 @@ const auth = firebase.auth();
               <span>Masculino</span>
             </label>
           </div>
-          <span class="inline-hint">selecciona el sexo del estudiante (opcional)</span>
+          <span class="inline-hint">Selecciona el sexo del estudiante (opcional)</span>
         </div>
 
         <!-- FECHA DE NACIMIENTO - OPCIONAL -->
@@ -1239,7 +1242,7 @@ const auth = firebase.auth();
               <input type="text" id="edad" name="edad" readonly placeholder="0 años" />
             </div>
           </div>
-          <span class="inline-hint" id="edadHint">selecciona día, mes y año (opcional)</span>
+          <span class="inline-hint" id="edadHint">Selecciona día, mes y año (opcional)</span>
         </div>
 
         <!-- LIBRO - OPCIONAL -->
@@ -1253,7 +1256,7 @@ const auth = firebase.auth();
         <div class="field-group">
           <label for="folio">📄 Folio</label>
           <input type="text" id="folio" name="folio" placeholder="N° de folio" />
-          <span class="inline-hint">numero de folio de registro (opcional)</span>
+          <span class="inline-hint">Número de folio de registro (opcional)</span>
         </div>
 
         <!-- ==========================================
@@ -1678,7 +1681,7 @@ const auth = firebase.auth();
   </div>
 </div>
 
-<script src="datos-generales/paraje-barrio.js"></script>
+<script src="paraje-barrio.js"></script>
 <script src="formulario.js"></script>
 
 <!-- SCRIPT DE BLOQUEO Y CUMPLEAÑOS -->
@@ -2558,101 +2561,140 @@ document.addEventListener('DOMContentLoaded', function() {
 })();
 </script>
 
-<!-- SCRIPT DE GUARDADO EN FIREBASE CORREGIDO -->
+<!-- GUARDAR ESTUDIANTE EN FIREBASE -->
 <script>
+async function guardarEstudianteEnFirebase() {
+  if (!auth.currentUser) {
+    alert('⚠️ Debes iniciar sesión primero');
+    return false;
+  }
+
+  try {
+    // Recolectar datos directamente del formulario
+    const grado = document.getElementById('gradoMostrado')?.textContent || '';
+    const seccion = document.getElementById('seccionMostrado')?.textContent || '';
+    const tanda = document.getElementById('tandaMostrado')?.textContent || '';
+
+    // Recolectar fechas
+    const diaNac = document.getElementById('diaNacimiento')?.value || '';
+    const mesNac = document.getElementById('mesNacimiento')?.value || '';
+    const anioNac = document.getElementById('anoNacimiento')?.value || '';
+    const fechaNacimiento = anioNac && mesNac && diaNac 
+      ? `${anioNac}-${mesNac}-${diaNac}` 
+      : '';
+
+    const diaNuevo = document.getElementById('nuevoDia')?.value || '';
+    const mesNuevo = document.getElementById('nuevoMes')?.value || '';
+    const anioNuevo = document.getElementById('nuevoAnio')?.value || '';
+    const fechaNuevoInscrito = anioNuevo && mesNuevo && diaNuevo
+      ? `${anioNuevo}-${mesNuevo}-${diaNuevo}`
+      : '';
+
+    const diaRet = document.getElementById('retiradoDia')?.value || '';
+    const mesRet = document.getElementById('retiradoMes')?.value || '';
+    const anioRet = document.getElementById('retiradoAnio')?.value || '';
+    const fechaRetirado = anioRet && mesRet && diaRet
+      ? `${anioRet}-${mesRet}-${diaRet}`
+      : '';
+
+    // Condición (checkboxes)
+    const condicionSeleccionada = [];
+    document.querySelectorAll('input[name="condicion"]:checked').forEach(cb => {
+      condicionSeleccionada.push(cb.value);
+    });
+
+    // Preprimario
+    const preprimario = document.querySelector('input[name="preprimario"]:checked')?.value || '';
+
+    // NEAE
+    const neae = document.getElementById('neae')?.value || '';
+
+    // Enfermedades
+    const enfermedadesSeleccionadas = [];
+    document.querySelectorAll('#checklistEnfermedades input:checked').forEach(cb => {
+      if (cb.value !== 'OTRA') enfermedadesSeleccionadas.push(cb.value);
+    });
+    const otraEnfermedad = document.getElementById('enfermedadesOtra')?.value || '';
+    if (otraEnfermedad) enfermedadesSeleccionadas.push(otraEnfermedad);
+
+    // Medicamentos
+    const medicamentosSeleccionados = [];
+    document.querySelectorAll('#checklistMedicamentos input:checked').forEach(cb => {
+      if (cb.value !== 'OTRA') medicamentosSeleccionados.push(cb.value);
+    });
+    const otroMedicamento = document.getElementById('medicamentosOtra')?.value || '';
+    if (otroMedicamento) medicamentosSeleccionados.push(otroMedicamento);
+
+    const datosEstudiante = {
+      docenteUid: auth.currentUser.uid,
+      grado: grado,
+      seccion: seccion,
+      tanda: tanda,
+      orden: document.getElementById('orden')?.value || '',
+      idEstudiante: document.getElementById('idEstudiante')?.value || '',
+      nombre: document.getElementById('nombre')?.value || '',
+      apellido: document.getElementById('apellido')?.value || '',
+      nacionalidad: document.getElementById('nacionalidad')?.value || '',
+      parentescoEstudiante: document.getElementById('parentescoEstudiante')?.value || '',
+      sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
+      fechaNacimiento: fechaNacimiento,
+      edad: document.getElementById('edad')?.value || '',
+      libro: document.getElementById('libro')?.value || '',
+      folio: document.getElementById('folio')?.value || '',
+      direccionEstudiante: document.getElementById('direccionEstudiante')?.value || '',
+      provincia: document.getElementById('provincia')?.value || '',
+      municipio: document.getElementById('municipio')?.value || '',
+      barrio: document.getElementById('barrio')?.value || '',
+      telefono: document.getElementById('telefono')?.value || '',
+      fechaNuevoInscrito: fechaNuevoInscrito,
+      fechaRetirado: fechaRetirado,
+      condicion: condicionSeleccionada,
+      preprimario: preprimario,
+      neae: neae,
+      enfermedades: enfermedadesSeleccionadas,
+      medicamentos: medicamentosSeleccionadas,
+      tutorNombre: document.getElementById('tutorTipo')?.value || '',
+      tutorCedula: document.getElementById('tutorCedula')?.value || '',
+      tutorDireccion: document.getElementById('tutorDireccion')?.value || '',
+      tutorTelefono: document.getElementById('tutorTelefono')?.value || '',
+      tutorEscolaridad: document.getElementById('tutorEscolaridad')?.value || '',
+      tutorOcupacion: document.getElementById('tutorOcupacion')?.value || '',
+      emergenciaNombre: document.getElementById('emergenciaNombre')?.value || '',
+      emergenciaTelefono: document.getElementById('emergenciaTelefono')?.value || '',
+      fechaRegistro: new Date()
+    };
+
+    console.log("📤 Guardando estudiante:", datosEstudiante);
+    const docRef = await addDoc(collection(db, "estudiantes"), datosEstudiante);
+    console.log("✅ Guardado con ID:", docRef.id);
+    
+    alert('✅ Estudiante guardado correctamente en la nube');
+    return true;
+  } catch (error) {
+    console.error("❌ Error al guardar:", error);
+    alert('❌ Error al guardar: ' + error.message);
+    return false;
+  }
+}
+
+// Conectar el botón Guardar con Firebase
 document.addEventListener('DOMContentLoaded', function() {
   const btnGuardar = document.getElementById('btnGuardar');
-  
-  // Aseguramos que db y auth estén disponibles globalmente por si otros scripts los necesitan
-  window.db = window.db || firebase.firestore();
-  window.auth = window.auth || firebase.auth();
-
   if (btnGuardar) {
-    btnGuardar.addEventListener('click', async function() {
-      // 1. VALIDACIÓN BÁSICA DE CAMPOS OBLIGATORIOS
-      const nombre = document.getElementById('nombre')?.value.trim();
-      const apellido = document.getElementById('apellido')?.value.trim();
-      
-      if (!nombre || !apellido) {
-        alert('⚠️ El Nombre y el Apellido son campos obligatorios.');
-        return;
-      }
-
-      // 2. OBTENER DATOS DEL ESTUDIANTE (Corregido y completo según tu HTML)
-      const datosEstudiante = {
-        // Datos del contexto (asegúrate de que estos spans tengan texto)
-        grado: document.getElementById('gradoMostrado')?.textContent || 'No asignado',
-        seccion: document.getElementById('seccionMostrado')?.textContent || 'No asignada',
-        tanda: document.getElementById('tandaMostrado')?.textContent || 'No asignada',
-        
-        // Datos del estudiante
-        orden: document.getElementById('orden')?.value || '',
-        idEstudiante: document.getElementById('idEstudiante')?.value || '',
-        nombre: nombre,
-        apellido: apellido,
-        nacionalidad: document.getElementById('nacionalidad')?.value || '',
-        sexo: document.querySelector('input[name="sexo"]:checked')?.value || '',
-        libro: document.getElementById('libro')?.value || '',
-        folio: document.getElementById('folio')?.value || '',
-        direccion: document.getElementById('direccionEstudiante')?.value || '',
-        provincia: document.getElementById('provincia')?.value || '',
-        municipio: document.getElementById('municipio')?.value || '',
-        barrio: document.getElementById('barrio')?.value || '',
-        telefono: document.getElementById('telefono')?.value || '',
-        
-        // Datos del Tutor (IDs corregidos para coincidir con tu HTML)
-        tutorTipo: document.getElementById('tutorTipo')?.value || '',
-        tutorCedula: document.getElementById('tutorCedula')?.value || '',
-        tutorDireccion: document.getElementById('tutorDireccion')?.value || '',
-        tutorTelefono: document.getElementById('tutorTelefono')?.value || '',
-        tutorEscolaridad: document.getElementById('tutorEscolaridad')?.value || '',
-        tutorOcupacion: document.getElementById('tutorOcupacion')?.value || '',
-        
-        // Emergencia
-        emergenciaNombre: document.getElementById('emergenciaNombre')?.value || '',
-        emergenciaTelefono: document.getElementById('emergenciaTelefono')?.value || '',
-        
-        // Metadatos
-        fechaRegistro: firebase.firestore.FieldValue.serverTimestamp(), // Usa la hora del servidor de Firebase
-        creadoPor: window.auth?.currentUser?.uid || 'anonimo'
-      };
-
-      console.log("📦 Datos a enviar:", datosEstudiante);
-
-      // 3. INTENTO DE GUARDADO EN FIREBASE
-      try {
-        // Mostramos estado de carga en el botón
-        const textoOriginal = btnGuardar.textContent;
-        btnGuardar.textContent = '⏳ Guardando...';
-        btnGuardar.disabled = true;
-
-        await window.db.collection('estudiantes').add(datosEstudiante);
-        
-        alert('✅ ¡Guardado en la nube correctamente!');
-        
-        // Opcional: Limpiar formulario después de guardar
-        // document.getElementById('registroForm').reset();
-        
-      } catch (error) {
-        console.error('🔥 Error de Firebase:', error);
-        
-        // Mensajes de error específicos para ayudarte a depurar
-        if (error.code === 'permission-denied') {
-          alert('❌ Error de permisos: Tus reglas de seguridad de Firebase requieren que el usuario esté autenticado. Debes iniciar sesión primero o cambiar las reglas de Firestore a modo prueba.');
-        } else if (error.code === 'unavailable') {
-          alert('❌ Error de red: No se pudo conectar con Firebase. Revisa tu conexión a internet.');
-        } else {
-          alert('❌ No se pudo guardar: ' + error.message);
-        }
-      } finally {
-        // Restaurar botón
-        btnGuardar.textContent = '✔ Guardar registro';
-        btnGuardar.disabled = false;
+    btnGuardar.addEventListener('click', async function(e) {
+      e.preventDefault();
+      const exito = await guardarEstudianteEnFirebase();
+      if (exito) {
+        console.log('✅ Estudiante guardado exitosamente');
+        // Limpiar formulario después de guardar
+        document.getElementById('registroForm').reset();
+        // Resetear campos especiales si es necesario
       }
     });
   }
 });
 </script>
+
 
 
 
